@@ -1,0 +1,21 @@
+{
+  "name": "log",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/log/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/shared/log",
+        "main": "libs/shared/log/src/index.ts",
+        "tsConfig": "libs/shared/log/tsconfig.lib.json",
+        "assets": ["libs/shared/log/*.md"],
+        "generatePackageJson": true,
+        "format": ["esm"]
+      }
+    }
+  },
+  "tags": []
+}
