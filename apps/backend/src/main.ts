@@ -6,23 +6,27 @@
 import express from 'express';
 import * as path from 'path';
 import { fileURLToPath } from 'node:url';
-import { warn } from '@technohouser/log';
-
-warn('hello there');
+import { info } from '@technohouser/log';
+import config from 'config';
+import * as core from 'express-serve-static-core';
+import { toInt } from 'radash';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const portNum = toInt(config.get('express.port'));
+const assetsFolder: core.PathParams = config.get('express.assetsFolder');
+const apiBase: core.PathParams = config.get('express.apiBase');
 
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use(assetsFolder, express.static(path.join(__dirname, 'assets')));
 
-app.get('/api', (req, res) => {
+app.get(apiBase, (req, res) => {
   res.send({ message: 'Welcome to backend!' });
 });
 
-const port = process.env.PORT || 3333;
+const port = portNum || 3333;
 const server = app.listen(port, () => {
-  console.log(`Listening at http://localhost:${port}/api`);
+  info(`Listening at http://localhost:${port}/api`);
 });
 server.on('error', console.error);
