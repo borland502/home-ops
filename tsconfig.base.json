@@ -2,6 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "rootDir": ".",
+    "rootDirs": ["scripts", "apps", "libs"],
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
@@ -16,7 +17,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@technohouser/log": ["libs/shared/log/src/index.ts"]
+      "@technohouser/log": ["libs/shared/log/src/index.mts"],
+      "@technohouser/zx-utils": ["libs/shared/zx-utils/src/index.mts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

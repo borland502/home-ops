@@ -23,12 +23,6 @@
         "serveTargetName": "serve",
         "previewTargetName": "preview"
       }
-    },
-    {
-      "plugin": "@nx/eslint/plugin",
-      "options": {
-        "targetName": "lint"
-      }
     }
   ],
   "targetDefaults": {
@@ -36,6 +30,17 @@
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "inputs": ["default"],
+      "outputs": [],
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "node --experimental-vm-modules --no-warnings --enable-source-maps --loader ts-node/esm ../../node_modules/jest/bin/jest.js"
+      },
+      "cache": true
     }
   }
 }
