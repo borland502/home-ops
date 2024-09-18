@@ -9,7 +9,7 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/shared/log",
-        "main": "libs/shared/log/src/index.ts",
+        "main": "libs/shared/log/src/index.mts",
         "tsConfig": "libs/shared/log/tsconfig.lib.json",
         "assets": ["libs/shared/log/*.md"],
         "generatePackageJson": true,

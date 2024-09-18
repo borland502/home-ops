@@ -1,7 +1,7 @@
 {
-  "name": "backend",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/backend/src",
+  "name": "scripts",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "scripts",
   "projectType": "application",
   "tags": [],
   "targets": {
@@ -15,10 +15,10 @@
       },
       "configurations": {
         "development": {
-          "buildTarget": "backend:build:development"
+          "buildTarget": "scripts:build:development"
         },
         "production": {
-          "buildTarget": "backend:build:production"
+          "buildTarget": "scripts:build:production"
         }
       }
     },
@@ -27,13 +27,13 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "main": "apps/backend/src/main.ts",
-        "outputPath": "dist/apps/backend",
+        "main": "scripts/main.ts",
+        "outputPath": "dist/scripts",
         "outputFileName": "main.js",
-        "tsConfig": "apps/backend/tsconfig.app.json",
+        "tsConfig": "scripts/tsconfig.app.json",
         "assets": [],
         "platform": "node"
-      },     
+      },
       "configurations": {
         "development": {
           "minify": false
@@ -42,7 +42,6 @@
           "minify": true
         }
       }
-    },
-    "test": {}
+    }
   }
 }

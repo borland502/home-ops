@@ -16,7 +16,6 @@
   red = "#fc618d"
   yellow = "#fcd566"
 
-[express]
-  apiBase = "/api"
-  assetsFolder = "/assets"
-  port = 3000
+[nx]
+  bundler = "esbuild"
+
