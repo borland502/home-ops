@@ -1,4 +1,4 @@
-import { Chalk, ChalkInstance } from 'chalk';
+import { Chalk } from 'chalk';
 import config from 'config';
 
 const chalk = new Chalk();
