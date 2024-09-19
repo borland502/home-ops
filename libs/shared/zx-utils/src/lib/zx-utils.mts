@@ -1,20 +1,16 @@
-import * as logger from '../../../log/src/index.mjs';
-import { isString } from 'radash';
-import { which, LogEntry } from 'zx';
+import * as logger from "../../../log/src/index.mjs";
+import { isString } from "radash";
+import * as zx from "zx";
 
 // type ZxCommonOptions = Pick<Options, 'shell' | 'verbose' | 'nothrow' | 'log'>;
 
 const whichOptions = {
-  path: '/bin:/usr/bin:/usr/local/bin',
+  path: "/bin:/usr/bin:/usr/local/bin",
   nothrow: true,
 };
 
 export async function detectShell(): Promise<string | boolean> {
-  const shells = [
-    which('zsh', whichOptions),
-    which('bash', whichOptions),
-    which('sh', whichOptions),
-  ];
+  const shells = [zx.which("zsh", whichOptions), zx.which("bash", whichOptions), zx.which("sh", whichOptions)];
 
   // set the shell in order of preference [zsh -> bash -> sh]
   for (const shell of shells) {
@@ -39,27 +35,27 @@ export async function detectShell(): Promise<string | boolean> {
  * custom
  * retry
  */
-export function logProcessor(entry: LogEntry) {
+export function logProcessor(entry: zx.LogEntry) {
   switch (entry.kind) {
-    case 'stdout':
+    case "stdout":
       logger.info(entry.data.toString());
       break;
-    case 'stderr':
+    case "stderr":
       logger.error(entry.data.toString());
       break;
-    case 'cmd':
+    case "cmd":
       logger.info(`Running command: ${entry.cmd}`);
       break;
-    case 'fetch':
+    case "fetch":
       logger.info(`Fetching ${entry.url} through ${entry.init?.method}`);
       break;
-    case 'cd':
+    case "cd":
       logger.info(`Changing directory to ${entry.dir}`);
       break;
-    case 'custom':
+    case "custom":
       logger.warn(`executing custom zx function: ${entry.data.toString()}`);
       break;
-    case 'retry':
+    case "retry":
       logger.info(`retrying due to ${entry.error}`);
   }
 }

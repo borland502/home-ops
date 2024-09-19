@@ -80,3 +80,11 @@ And join the Nx community:
 
 https://github.com/bhouston/template-typescript-monorepo/blob/main/nx.json
 https://dev.to/a0viedo/nodejs-typescript-and-esm-it-doesnt-have-to-be-painful-438e
+https://eisenbergeffect.medium.com/an-esbuild-setup-for-typescript-3b24852479fe
+https://dev.to/zauni/create-a-zx-nodejs-script-as-binary-with-pkg-5abf
+
+## TODO:
+
+- Don't use esbuild for production bundles
+
+  https://esbuild.github.io/content-types/#file

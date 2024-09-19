@@ -1,0 +1,20 @@
+{
+  "name": "pkg-install",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/pkg-install/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "outputs": ["{options.outputPath}"],
+      "command": "esbuild libs/shared/pkg-install/src/index.mts --bundle --outfile=dist/pkg-install.mjs --platform=node --format=esm"
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/shared/pkg-install/jest.config.ts"
+      }
+    }
+}

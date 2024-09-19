@@ -27,12 +27,16 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "main": "scripts/main.ts",
+        "main": "scripts/main.mts",
         "outputPath": "dist/scripts",
-        "outputFileName": "main.js",
+        "outputFileName": "main.mjs",
         "tsConfig": "scripts/tsconfig.app.json",
         "assets": [],
-        "platform": "node"
+        "platform": "node",
+        "esbuildOptions": {
+          "outdir": "dist/apps/backend",
+          "outExtension": ".js=.mjs"
+        }        
       },
       "configurations": {
         "development": {

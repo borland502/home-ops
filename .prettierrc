@@ -1,3 +1,6 @@
 {
-  "singleQuote": true
+  "singleQuote": false,
+  "editorconfig": true,
+  "endOfLine": "lf",
+  "printWidth": 120
 }

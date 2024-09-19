@@ -1,23 +1,24 @@
-import sinon from 'sinon';
-import express, { Request, Response } from 'express';
-import config from 'config';
-import { expect } from '@jest/globals';
+import sinon from "sinon";
+import express from "express";
+import config from "config";
+import { expect } from "@jest/globals";
+import { Server } from "net";
 
-describe('src/main', () => {
+describe("src/main", () => {
   let app: express.Express;
-  let server: any;
+  let server: Server;
 
   beforeEach(() => {
     // Mock dependencies or setup environment
     // For example:
-    sinon.stub(config, 'get').callsFake((key: string) => {
+    sinon.stub(config, "get").callsFake((key: string) => {
       switch (key) {
-        case 'express.port':
-          return '3333';
-        case 'express.assetsFolder':
-          return '/assets';
-        case 'express.apiBase':
-          return '/api';
+        case "express.port":
+          return "3333";
+        case "express.assetsFolder":
+          return "/assets";
+        case "express.apiBase":
+          return "/api";
         default:
           return undefined;
       }
@@ -37,16 +38,15 @@ describe('src/main', () => {
     }
   });
 
-  it('should start the server and listen on the specified port', (done) => {
+  it("should start the server and listen on the specified port", (done) => {
     // Start the server
     server = app.listen(3333, () => {
       // Assertions
       expect(server).toBeTruthy();
-      expect(server.address()).toHaveProperty('port', 3333);
+      expect(server.address()).toHaveProperty("port", 3333);
 
       // Close the server and signal that the test is done
       server.close(done);
     });
   });
-
 });

@@ -1,1 +1,1 @@
-export * from './lib/log.mjs';
+export * from "./lib/log.mts";

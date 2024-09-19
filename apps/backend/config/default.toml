@@ -1,4 +1,0 @@
-[express]
-  apiBase = "/api"
-  assetsFolder = "/assets"
-  port = 3000

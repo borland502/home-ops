@@ -1,0 +1,13 @@
+{
+  "name": "utils",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/utils/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "outputs": ["{options.outputPath}"],
+      "command": "esbuild libs/shared/utils/src/index.mts --bundle --outfile=dist/utils.mjs --platform=node --format=esm"
+    }
+  }
+}

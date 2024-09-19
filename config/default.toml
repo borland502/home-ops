@@ -19,3 +19,10 @@
 [nx]
   bundler = "esbuild"
 
+[express]
+  apiBase = "/api"
+  assetsFolder = "assets"
+  engine = "pug"
+  host = "localhost"
+  port = 3000
+  views = "views"

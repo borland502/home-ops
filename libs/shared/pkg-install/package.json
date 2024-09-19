@@ -1,5 +1,5 @@
 {
-  "name": "@technohouser/log",
+  "name": "@technohouser/pkg-install",
   "version": "0.0.1",
   "type": "module",
   "main": "./index.js",
@@ -9,9 +9,5 @@
     "eslint": "^9.10.0",
     "globals": "^15.9.0",
     "typescript-eslint": "^8.6.0"
-  },
-  "dependencies": {
-    "config": "^3.3.12",
-    "zx": "^8.1.8"
   }
 }

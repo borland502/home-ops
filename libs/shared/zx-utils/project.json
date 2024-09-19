@@ -3,19 +3,11 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/zx-utils/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/esbuild:esbuild",
       "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/libs/shared/zx-utils",
-        "main": "libs/shared/zx-utils/src/index.mts",
-        "tsConfig": "libs/shared/zx-utils/tsconfig.lib.json",
-        "assets": ["libs/shared/zx-utils/*.md"],
-        "generatePackageJson": true,
-        "format": ["esm"]
-      }
+      "command": "esbuild libs/shared/zx-utils/src/index.mts --bundle --external:deno --external:zx --outfile=dist/zx-utils.mjs --platform=node --format=esm"      
     }
-  },
-  "tags": []
+  }
 }
