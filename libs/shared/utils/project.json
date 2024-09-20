@@ -5,9 +5,19 @@
   "projectType": "library",
   "tags": [],
   "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/shared/utils/**/*.mts"]
+      },
+      "cache": true
+    },    
     "build": {
       "outputs": ["{options.outputPath}"],
-      "command": "esbuild libs/shared/utils/src/index.mts --bundle --outfile=dist/utils.mjs --platform=node --format=esm"
+      "command": "npx tsx scripts/build/build-utils.mjs --entry=libs/shared/utils/src/index.mts",
+      "dependsOn": ["^lint"],
+      "cache": true
     }
   }
 }

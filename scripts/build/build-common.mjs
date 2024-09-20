@@ -101,7 +101,28 @@ export const logConfig = {
   ...cjsConfig,
   entryPoints: ["libs/shared/log/src/index.mts"],
   outfile: "dist/libs/shared/log/index.cjs",
-  tsconfig: 'libs/shared/log/tsconfig.app.json',
+  tsconfig: 'libs/shared/log/tsconfig.lib.json',
+};
+
+export const zxUtilsConfig = {
+  ...cjsConfig,
+  entryPoints: ["libs/shared/zx-utils/src/index.mts"],
+  outfile: "dist/libs/shared/zx-utils/index.cjs",
+  tsconfig: 'libs/shared/zx-utils/tsconfig.lib.json',
+};
+
+export const utilsConfig = {
+  ...cjsConfig,
+  entryPoints: ["libs/shared/utils/src/index.mts"],
+  outfile: "dist/libs/shared/utils/index.cjs",
+  tsconfig: 'libs/shared/utils/tsconfig.lib.json',
+};
+
+export const pkgInstallConfig = {
+  ...cjsConfig,
+  entryPoints: ["libs/shared/pkg-install/src/index.mts"],
+  outfile: "dist/libs/shared/pkg-install/index.cjs",
+  tsconfig: 'libs/shared/pkg-install/tsconfig.lib.json',
 };
 
 function entryPointsToRegexp(entryPoints) {

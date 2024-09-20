@@ -4,7 +4,15 @@
     "outDir": "../../dist/out-tsc",
     "module": "ESNext",
     "target": "ES2022",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedDeclarations": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "strict": true,
     "types": ["node"]
   },
-  "include": ["*.mts", "*.ts", "build-js.mjs"]
+  "include": ["*.mts", "*.ts", "*.mjs"]
 }

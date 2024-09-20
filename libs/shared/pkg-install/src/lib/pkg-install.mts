@@ -5,8 +5,8 @@ import { getAllData } from "systeminformation";
 import type { Systeminformation } from "systeminformation";
 import { xdgCache } from "xdg-basedir";
 import { $, fs, path, question, tmpfile, which } from "zx";
-import { error, warn } from "../../../log/src/index.mjs";
-import { isNil } from "../../../utils/src/index.mjs";
+import { error, warn } from "../../../log/src/index.mts";
+import { isNil } from "../../../utils/src/index.mts";
 
 const DISTRO = {
   arch: "arch",

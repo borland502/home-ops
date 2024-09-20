@@ -5,7 +5,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "lint": "eslint '*.mts' lint"
+    "build:all": "npx nx run-many --target=build --all"
   },
   "devDependencies": {
     "@chialab/esbuild-plugin-meta-url": "^0.18.2",

@@ -8,7 +8,8 @@
     "build": {
       "outputs": ["{options.outputPath}"],
       "command": "npx tsx scripts/build/build-backend.mjs --entry=apps/backend/src/main.mts",
-      "dependsOn": ["^lint"]     
+      "dependsOn": ["^lint"],
+      "cache": true
     },
     "test": {},
     "serve": {
@@ -33,7 +34,8 @@
       "options": {
         "lintFilePatterns": ["apps/backend/**/*.css"],
         "formatter": "github"
-      }
+      },
+      "cache": true
     }
   }
 }

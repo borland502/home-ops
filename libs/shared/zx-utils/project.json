@@ -5,9 +5,19 @@
   "projectType": "library",
   "tags": [],
   "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/shared/zx-utils/**/*.mts"]
+      },
+      "cache": true
+    },    
     "build": {
       "outputs": ["{options.outputPath}"],
-      "command": "esbuild libs/shared/zx-utils/src/index.mts --bundle --external:deno --external:zx --outfile=dist/zx-utils.mjs --platform=node --format=esm"      
+      "command": "npx tsx scripts/build/build-zx-utils.mjs --entry=libs/shared/zx-utils/src/index.mts",
+      "dependsOn": ["^lint"],
+      "cache": true
     }
   }
 }

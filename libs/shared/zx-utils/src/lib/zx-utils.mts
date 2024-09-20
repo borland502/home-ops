@@ -1,4 +1,4 @@
-import * as logger from "../../../log/src/index.mjs";
+import * as logger from "../../../log/src/index.mts";
 import { isString } from "radash";
 import * as zx from "zx";
 
@@ -47,13 +47,13 @@ export function logProcessor(entry: zx.LogEntry) {
       logger.info(`Running command: ${entry.cmd}`);
       break;
     case "fetch":
-      logger.info(`Fetching ${entry.url} through ${entry.init?.method}`);
+      logger.info(`Fetching ${String(entry.url)} through ${entry.init?.method}`);
       break;
     case "cd":
       logger.info(`Changing directory to ${entry.dir}`);
       break;
     case "custom":
-      logger.warn(`executing custom zx function: ${entry.data.toString()}`);
+      logger.warn(`executing custom zx function: ${isString(entry.data) ? entry.data : String(entry.data)}`);
       break;
     case "retry":
       logger.info(`retrying due to ${entry.error}`);

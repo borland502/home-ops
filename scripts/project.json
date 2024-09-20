@@ -5,47 +5,13 @@
   "projectType": "application",
   "tags": [],
   "targets": {
-    "serve": {
-      "executor": "@nx/js:node",
-      "defaultConfiguration": "development",
-      "dependsOn": ["build"],
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "buildTarget": "backend:build",
-        "runBuildTargetDependencies": false
+        "lintFilePatterns": ["scripts/**/*.mts", "scripts/**/*.mjs"]
       },
-      "configurations": {
-        "development": {
-          "buildTarget": "scripts:build:development"
-        },
-        "production": {
-          "buildTarget": "scripts:build:production"
-        }
-      }
-    },
-    "build": {
-      "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
-      "defaultConfiguration": "production",
-      "options": {
-        "main": "scripts/main.mts",
-        "outputPath": "dist/scripts",
-        "outputFileName": "main.mjs",
-        "tsConfig": "scripts/tsconfig.app.json",
-        "assets": [],
-        "platform": "node",
-        "esbuildOptions": {
-          "outdir": "dist/apps/backend",
-          "outExtension": ".js=.mjs"
-        }        
-      },
-      "configurations": {
-        "development": {
-          "minify": false
-        },
-        "production": {
-          "minify": true
-        }
-      }
+      "cache": true
     }
   }
 }

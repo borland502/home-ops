@@ -9,12 +9,14 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["libs/shared/log/**/*.mts"]
-      }      
+      },
+      "cache": true 
     },
     "build": {
       "outputs": ["{options.outputPath}"],
       "command": "npx tsx scripts/build/build-log.mjs --entry=libs/shared/log/src/index.mts",
-      "dependsOn": ["^lint"]     
+      "dependsOn": ["^lint"],
+      "cache": true
     }
   },
   "tags": []

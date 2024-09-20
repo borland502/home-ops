@@ -5,16 +5,19 @@
   "projectType": "library",
   "tags": [],
   "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/shared/pkg-install/**/*.mts"]
+      },
+      "cache": true
+    },    
     "build": {
       "outputs": ["{options.outputPath}"],
-      "command": "esbuild libs/shared/pkg-install/src/index.mts --bundle --outfile=dist/pkg-install.mjs --platform=node --format=esm"
-      }
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "options": {
-        "jestConfig": "libs/shared/pkg-install/jest.config.ts"
-      }
+      "command": "npx tsx scripts/build/build-utils.mjs --entry=libs/shared/pkg-install/src/index.mts",
+      "dependsOn": ["^lint"],
+      "cache": true
     }
+  }
 }

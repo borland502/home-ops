@@ -1,8 +1,11 @@
 {
   "name": "@technohouser/zx-utils",
   "version": "0.0.1",
-  "dependencies": {},
+  "dependencies": {
+    "radash": "^12.1.0",
+    "zx": "^8.1.8"
+  },
   "type": "module",
-  "main": "./index.js",
+  "main": "./index.cjs",
   "private": true
 }
