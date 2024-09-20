@@ -1,12 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../../dist/out-tsc",
-    "module": "ES2022",
-    "declaration": true,
-    "esModuleInterop": true,
+    "module": "CommonJS",
+    "allowImportingTsExtensions": true,
     "types": ["node"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts","src/**/*.mts"],
   "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"]
 }

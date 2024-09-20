@@ -1,8 +1,22 @@
 {
   "name": "@technohouser/zx-utils",
   "version": "0.0.1",
-  "dependencies": {},
+  "dependencies": {
+    "radash": "^12.1.0",
+    "zx": "^8.1.8"
+  },
   "type": "module",
-  "main": "./index.mts",
-  "private": true
+  "main": "./index.cjs",
+  "private": true,
+  "eslintConfig": {
+    "overrides": [
+      {
+        "files": ["*.mts"],
+        "parserOptions": {
+          "project": ["libs/shared/zx-utils/tsconfig.lib.json"],
+          "createDefaultProgram": true
+        }
+      }
+    ]
+  }
 }

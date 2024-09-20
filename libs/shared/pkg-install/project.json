@@ -1,23 +1,23 @@
 {
-  "name": "log",
+  "name": "pkg-install",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/shared/log/src",
+  "sourceRoot": "libs/shared/pkg-install/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "lint": {
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/shared/log/**/*.mts"]
+        "lintFilePatterns": ["libs/shared/pkg-install/**/*.mts"]
       },
-      "dependsOn": ["^build"],      
-      "cache": true 
-    },
+      "dependsOn": ["^build"],
+      "cache": true
+    },    
     "build": {
       "outputs": ["{options.outputPath}"],
-      "command": "npx tsx scripts/build/build-log.mjs --entry=libs/shared/log/src/index.mts",
+      "command": "npx tsx scripts/build/build-utils.mjs --entry=libs/shared/pkg-install/src/index.mts",
       "cache": true
     }
-  },
-  "tags": []
+  }
 }

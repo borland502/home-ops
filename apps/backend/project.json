@@ -5,44 +5,36 @@
   "projectType": "application",
   "tags": [],
   "targets": {
-    "serve": {
-      "executor": "@nx/js:node",
-      "defaultConfiguration": "development",
-      "dependsOn": ["build"],
-      "options": {
-        "buildTarget": "backend:build",
-        "runBuildTargetDependencies": false
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "backend:build:development"
-        },
-        "production": {
-          "buildTarget": "backend:build:production"
-        }
-      }
-    },
     "build": {
-      "executor": "@nx/esbuild:esbuild",
       "outputs": ["{options.outputPath}"],
-      "defaultConfiguration": "production",
-      "options": {
-        "main": "apps/backend/src/main.ts",
-        "outputPath": "dist/apps/backend",
-        "outputFileName": "main.js",
-        "tsConfig": "apps/backend/tsconfig.app.json",
-        "assets": [],
-        "platform": "node"
-      },     
-      "configurations": {
-        "development": {
-          "minify": false
-        },
-        "production": {
-          "minify": true
-        }
-      }
+      "command": "npx tsx scripts/build/build-backend.mjs --entry=apps/backend/src/main.mts",
+      "cache": true
     },
-    "test": {}
+    "test": {},
+    "serve": {
+      "outputs": ["{options.outputPath}"],
+      "command": "npx tsx dist/apps/backend/main.cjs",
+      "dependsOn": ["build"]
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/backend/**/*.mts"],
+        "format": "stylish",
+        "fix": true
+      },
+      "cache": true,
+      "dependsOn": ["^nx-stylelint:lint","^build"]
+    },
+    "stylelint": {
+      "executor": "nx-stylelint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/backend/**/*.css"],
+        "formatter": "github"
+      },
+      "cache": true
+    }
   }
 }

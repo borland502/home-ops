@@ -1,4 +1,0 @@
-import jestConfig from '../../../jest.config.todo';
-// jest.config.ts
-// https://kulshekhar.github.io/ts-jest/docs/guides/esm-support/
-// https://jestjs.io/docs/next/configuration#projects-arraystring--projectconfig

@@ -3,19 +3,21 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/zx-utils/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
-    "build": {
-      "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "outputPath": "dist/libs/shared/zx-utils",
-        "main": "libs/shared/zx-utils/src/index.mts",
-        "tsConfig": "libs/shared/zx-utils/tsconfig.lib.json",
-        "assets": ["libs/shared/zx-utils/*.md"],
-        "generatePackageJson": true,
-        "format": ["esm"]
-      }
+        "lintFilePatterns": ["libs/shared/zx-utils/**/*.mts"]
+      },
+      "dependsOn": ["^build"],      
+      "cache": true
+    },    
+    "build": {
+      "outputs": ["{options.outputPath}"],
+      "command": "npx tsx scripts/build/build-zx-utils.mjs --entry=libs/shared/zx-utils/src/index.mts",
+      "cache": true
     }
-  },
-  "tags": []
+  }
 }

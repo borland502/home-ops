@@ -4,59 +4,17 @@
 
 ## Run tasks
 
-To run tasks with Nx use:
+### Build all projects
 
 ```sh
-npx nx <target> <project-name>
+npm run build:all
 ```
 
-For example:
+### Lint all projects
 
 ```sh
-npx nx build myproject
+npm run lint:all
 ```
-
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
-
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Versioning and releasing
-
-To version and release the library use
-
-```
-npx nx release
-```
-
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](hhttps://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-To install a new plugin you can use the `nx add` command. Here's an example of adding the React plugin:
-
-```sh
-npx nx add @nx/react
-```
-
-Use the plugin's generator to create new projects. For example, to create a new React app or library:
-
-```sh
-# Genenerate an app
-npx nx g @nx/react:app demo
-
-# Generate a library
-npx nx g @nx/react:lib some-lib
-```
-
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
-
-## Install Nx Console
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 
 ## Links
 
@@ -80,3 +38,11 @@ And join the Nx community:
 
 https://github.com/bhouston/template-typescript-monorepo/blob/main/nx.json
 https://dev.to/a0viedo/nodejs-typescript-and-esm-it-doesnt-have-to-be-painful-438e
+https://eisenbergeffect.medium.com/an-esbuild-setup-for-typescript-3b24852479fe
+https://dev.to/zauni/create-a-zx-nodejs-script-as-binary-with-pkg-5abf
+
+## TODO:
+
+- Don't use esbuild for production bundles
+
+  https://esbuild.github.io/content-types/#file
