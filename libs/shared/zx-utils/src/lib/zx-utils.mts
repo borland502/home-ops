@@ -1,4 +1,4 @@
-import * as logger from "../../../log/src/index.mts";
+import * as logger from "@technohouser/log";
 import { isString } from "radash";
 import * as zx from "zx";
 
@@ -10,11 +10,15 @@ const whichOptions = {
 };
 
 export async function detectShell(): Promise<string | boolean> {
-  const shells = [zx.which("zsh", whichOptions), zx.which("bash", whichOptions), zx.which("sh", whichOptions)];
+  const shells = await Promise.all([
+    zx.which("zsh", whichOptions),
+    zx.which("bash", whichOptions),
+    zx.which("sh", whichOptions),
+  ]);
 
   // set the shell in order of preference [zsh -> bash -> sh]
   for (const shell of shells) {
-    const isShell = await shell;
+    const isShell = shell;
     if (isString(isShell)) {
       return isShell;
     }
@@ -47,13 +51,17 @@ export function logProcessor(entry: zx.LogEntry) {
       logger.info(`Running command: ${entry.cmd}`);
       break;
     case "fetch":
-      logger.info(`Fetching ${String(entry.url)} through ${entry.init?.method}`);
+      logger.info(
+        `Fetching ${String(entry.url)} through ${entry.init?.method}`
+      );
       break;
     case "cd":
       logger.info(`Changing directory to ${entry.dir}`);
       break;
     case "custom":
-      logger.warn(`executing custom zx function: ${isString(entry.data) ? entry.data : String(entry.data)}`);
+      logger.warn(
+        `executing custom zx function: ${isString(entry.data) ? entry.data : String(entry.data)}`
+      );
       break;
     case "retry":
       logger.info(`retrying due to ${entry.error}`);

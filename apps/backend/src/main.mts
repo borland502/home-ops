@@ -11,29 +11,30 @@ import { toInt } from "radash";
 import { fileURLToPath } from "url";
 import path from "path";
 
-let __filename: string;
-let __dirname: string;
+let fileName: string;
+let dirName: string;
 
-if (typeof __filename === "undefined" || typeof __dirname === "undefined") {
-  __filename = fileURLToPath(import.meta.url);
-  __dirname = path.dirname(__filename);
+if (typeof fileName === "undefined" || typeof dirName === "undefined") {
+  fileName = fileURLToPath(import.meta.url);
+  dirName = path.dirname(fileName);
 }
 
-export { __filename, __dirname };
+export { fileName, dirName };
 
-const app = express();
+export const app = express();
 const portNum = toInt(config.get("express.port"));
 const assetsFolder: core.PathParams = config.get("express.assetsFolder");
 const apiBase: core.PathParams = config.get("express.apiBase");
 
-app.use(assetsFolder, express.static(path.join(__dirname, "assets")));
+// @ts-expect-error The types do not align and yet this is the supported syntax
+app.use(assetsFolder, express.static(path.join(dirName, "assets")));
 
 app.get(apiBase, (req, res) => {
   res.send({ message: "Welcome to backend!" });
 });
 
 const port = portNum || 3333;
-const server = app.listen(port, () => {
+export const server = app.listen(port, () => {
   info(`Listening at http://localhost:${port}/api`);
 });
 server.on("error", console.error);

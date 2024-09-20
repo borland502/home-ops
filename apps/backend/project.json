@@ -8,13 +8,13 @@
     "build": {
       "outputs": ["{options.outputPath}"],
       "command": "npx tsx scripts/build/build-backend.mjs --entry=apps/backend/src/main.mts",
-      "dependsOn": ["^lint"],
       "cache": true
     },
     "test": {},
     "serve": {
       "outputs": ["{options.outputPath}"],
-      "command": "node dist/apps/backend/main.js"
+      "command": "npx tsx dist/apps/backend/main.cjs",
+      "dependsOn": ["build"]
     },
     "lint": {
       "executor": "@nx/eslint:lint",
@@ -22,11 +22,10 @@
       "options": {
         "lintFilePatterns": ["apps/backend/**/*.mts"],
         "format": "stylish",
-        "eslintConfig": "apps/backend/.eslintrc.json",
         "fix": true
       },
       "cache": true,
-      "dependsOn": ["^nx-stylelint:lint"]
+      "dependsOn": ["^nx-stylelint:lint","^build"]
     },
     "stylelint": {
       "executor": "nx-stylelint:lint",

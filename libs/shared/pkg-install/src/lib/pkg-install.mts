@@ -5,8 +5,8 @@ import { getAllData } from "systeminformation";
 import type { Systeminformation } from "systeminformation";
 import { xdgCache } from "xdg-basedir";
 import { $, fs, path, question, tmpfile, which } from "zx";
-import { error, warn } from "../../../log/src/index.mts";
-import { isNil } from "../../../utils/src/index.mts";
+import { error, warn } from "@technohouser/log";
+import { isNil } from "@technohouser/utils";
 
 const DISTRO = {
   arch: "arch",
@@ -36,7 +36,10 @@ const PKG_MGR = {
   yay: "yay",
 } as const;
 
-type Pkgmgr = keyof typeof PKG_MGR;
+// type Pkgmgr = keyof typeof PKG_MGR;
+
+type SystemInformation = Systeminformation.StaticData &
+  Systeminformation.DynamicData;
 
 // initialize the system information right away
 const cacheDir = isNil(xdgCache) ? "${os.homedir()}/.cache/sysinfo" : xdgCache;
@@ -44,8 +47,8 @@ const sysInfoCacheFile = path.join(cacheDir, "/sysinfo.json");
 
 fs.ensureDirSync(cacheDir);
 
-async function getSystemData<T extends Systeminformation.StaticData & Systeminformation.DynamicData>(): Promise<T> {
-  let data = fs.readJSONSync(sysInfoCacheFile);
+async function getSystemData(): Promise<SystemInformation> {
+  let data = fs.readJSONSync(sysInfoCacheFile) as SystemInformation;
 
   if (isNil(data)) {
     data = await getAllData("*", "*");
@@ -68,7 +71,7 @@ export async function askConfirmation(quest: string): Promise<boolean> {
   return confirmation.toLowerCase() === "y";
 }
 
-export async function hasCommand(command: string): Promise<boolean | unknown> {
+export async function hasCommand(command: string): Promise<boolean> {
   return !!(await which(command, { nothrow: true }));
 }
 
@@ -116,15 +119,15 @@ export async function installByApt(pkg: string) {
   return true;
 }
 
-export async function installByNala(pkg: string) {
-  $.verbose = true;
-  // $`sudo nala install -y ${pkg}`.then(
-  //   (output) => {},
-  //   (err) => {}
-  // );
+// export async function installByNala(pkg: string) {
+//   $.verbose = true;
+//   // $`sudo nala install -y ${pkg}`.then(
+//   //   (output) => {},
+//   //   (err) => {}
+//   // );
 
-  return true;
-}
+//   return true;
+// }
 
 export async function getPackageManager(os: Os, distro: Distro) {
   const pkgMgrs = [];
@@ -170,18 +173,22 @@ export async function downloadScript(url: URL) {
 
 // for potentially long-running scripts it is better to execute this way with zx as prompts to the user
 // and output are displayed closer to realtime
-export function executeScript(file: PathLike) {
+export async function executeScript(file: PathLike) {
   fs.chmodSync(file, "0500");
-  $`NONINTERACTIVE=1; ${file}`.verbose(true).run();
+  await $`NONINTERACTIVE=1; ${file}`.verbose(true).run();
 }
 
-export function ensureBrew() {
-  return downloadScript(new URL("https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh")).then(
-    (file) => {
-      executeScript(file);
+export async function ensureBrew() {
+  return downloadScript(
+    new URL(
+      "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
+    )
+  ).then(
+    async (file) => {
+      return await executeScript(file);
     },
-    (err) => {
-      error(err);
+    (err: Error) => {
+      error(err.message);
     }
   );
 }

@@ -6,7 +6,22 @@
     "@jest/globals": "^29.7.0",
     "config": "^3.3.12",
     "express": "^4.21.0",
+    "express-serve-static-core": "^0.1.1",
     "radash": "^12.1.0",
     "sinon": "^19.0.2"
+  },
+  "eslintConfig": {
+    "overrides": [
+        {
+          "files": ["*.mts"],
+          "parserOptions": {
+            "project": ["apps/backend/tsconfig.app.json"],
+            "createDefaultProgram": true
+          }
+        }
+      ]
+    },
+  "devDependencies": {
+    "ts-jest": "^29.2.5"
   }
 }

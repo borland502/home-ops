@@ -13,5 +13,16 @@
   "dependencies": {
     "config": "^3.3.12",
     "zx": "^8.1.8"
+  },
+  "eslintConfig": {
+    "overrides": [
+      {
+        "files": ["*.mts"],
+        "parserOptions": {
+          "project": ["libs/shared/log/tsconfig.lib.json"],
+          "createDefaultProgram": true
+        }
+      }
+    ]
   }
 }

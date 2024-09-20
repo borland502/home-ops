@@ -14,5 +14,16 @@
     "systeminformation": "^5.23.5",
     "xdg-basedir": "^5.1.0",
     "zx": "^8.1.8"
-  }
+  },
+    "eslintConfig": {
+    "overrides": [
+        {
+          "files": ["*.mts"],
+          "parserOptions": {
+            "project": ["libs/shared/pkg-install/tsconfig.lib.json"],
+            "createDefaultProgram": true
+          }
+        }
+      ]
+    }
 }

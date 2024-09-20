@@ -11,12 +11,12 @@
       "options": {
         "lintFilePatterns": ["libs/shared/zx-utils/**/*.mts"]
       },
+      "dependsOn": ["^build"],      
       "cache": true
     },    
     "build": {
       "outputs": ["{options.outputPath}"],
       "command": "npx tsx scripts/build/build-zx-utils.mjs --entry=libs/shared/zx-utils/src/index.mts",
-      "dependsOn": ["^lint"],
       "cache": true
     }
   }

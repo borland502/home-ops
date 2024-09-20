@@ -1,9 +1,9 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc",
     "module": "ESNext",
     "target": "ES2022",
+    "declaration": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
@@ -12,7 +12,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "strict": true,
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "@technohouser/log": ["../libs/shared/log/src/index.mts"],
+      "@technohouser/zx-utils": ["../libs/shared/zx-utils/src/index.mts"]
+    }
   },
-  "include": ["*.mts", "*.ts", "*.mjs"]
+  "include": ["*.mts", "*.ts"]
 }

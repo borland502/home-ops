@@ -2,17 +2,15 @@
   "compileOnSave": false,
   "compilerOptions": {
     "rootDir": ".",
-    "sourceMap": true,
-    "declaration": false,
+    "sourceMap": false,
+    "declaration": true,
     "moduleResolution": "node",
-    "emitDecoratorMetadata": false,
-    "experimentalDecorators": true,
-    "resolveJsonModule": true,
-    "importHelpers": true,
     "isolatedModules": true,
     "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "target": "es2022",
-    "module": "CommonJS",
+    "module": "ESNext",
     "lib": ["es2022", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
@@ -25,5 +23,6 @@
       "@technohouser/zx-utils": ["libs/shared/zx-utils/src/index.mts"]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": ["node_modules", "tmp"],
+  "files": ["**/*.mts", "**/*.ts"]
 }
