@@ -5,5 +5,31 @@
   "projectType": "library",
   "tags": [],
   "targets": {
-  }
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "libs/watchyourlan-api/**/*.mts"
+        ]
+      },
+      "dependsOn": [
+        "^build"
+      ],
+      "cache": true
+    }
+  },
+  "eslintConfig": {
+    "overrides": [
+        {
+          "files": ["*.mts","*.mjs"],
+          "parserOptions": {
+            "project": ["libs/watchyourlan-api/tsconfig.app.json"],
+            "createDefaultProgram": true
+          }
+        }
+      ]
+    }
 }

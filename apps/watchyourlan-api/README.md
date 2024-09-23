@@ -12,6 +12,10 @@ the sqlite database created by WatchYourLan.
 nx run watchyourlan-api:build && nx run watchyourlan-api:serve
 ```
 
-## Running unit tests
+## Running e2e tests
 
-Run `nx test watchyourlan-lib` to execute the unit tests via [Jest](https://jestjs.io).
+After the server is up.  Execute the following command to run the e2e tests.
+
+```shell
+nx run watchyourlan-api-e2e:e2e
+```

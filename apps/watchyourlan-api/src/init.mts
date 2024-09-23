@@ -1,16 +1,29 @@
 #!/usr/bin/env -S npx tsx --tsconfig ./scripts/tsconfig.app.json
 
-import {$, globby, systemInfo, homeopsConfig, path, fs} from "@technohouser/zx-utils"
-import {info, warn, error} from "@technohouser/log"
-import {xdgData} from "xdg-basedir";
+import {
+  $,
+  globby,
+  systemInfo,
+  homeopsConfig,
+  path,
+  fs,
+} from "@technohouser/zx-utils";
+import { info, warn, error } from "@technohouser/log";
+import { xdgData, xdgState } from "xdg-basedir";
 import { Sequelize, Model, DataTypes } from "sequelize";
 import config from "config";
-import {PathLike} from "fs";
-
+import { PathLike } from "fs";
 
 // **** Variables **** //
-export const entryPoints = (await globby(["scripts/**/*.mts", "scripts/**/*.mjs", "!scripts/node_modules/**/*"]));
-export const watchYourLanDb = path.join(xdgData, homeopsConfig.get("watchyourlan.db.dbFileName"));
+export const entryPoints = await globby([
+  "scripts/**/*.mts",
+  "scripts/**/*.mjs",
+  "!scripts/node_modules/**/*",
+]);
+export const watchYourLanDb = path.join(
+  xdgState,
+  homeopsConfig.get("watchyourlan.db.dbFileName")
+);
 
 // Initialize Sequelize
 export const sequelize = new Sequelize({
@@ -24,23 +37,16 @@ export async function checkAndSyncTable() {
     fs.ensureFileSync(watchYourLanDb);
 
     // Check if the table exists
-    const tableExists = await sequelize.getQueryInterface().showAllTables().then(tables => tables.includes("now"));
+    const tableExists = await sequelize
+      .getQueryInterface()
+      .showAllTables()
+      .then((tables) => tables.includes("now"));
 
-    if (!tableExists && config.get("env") === "dev") {
-      // Sync the model if in development mode
-      await sequelize.sync();
-      info("Table 'now' has been created.");
-    } else {
-      info("Table 'now' already exists or not in development mode.");
+    if (!tableExists) {
+      error("Table does not exist.  Exiting.");
+      process.exit(1);
     }
   } catch (err) {
     error(`Error: ${err.message}`);
   }
 }
-
-
-
-
-
-
-

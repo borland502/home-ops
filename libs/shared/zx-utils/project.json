@@ -7,17 +7,41 @@
   "targets": {
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["libs/shared/zx-utils/**/*.mts"]
+        "lintFilePatterns": [
+          "libs/shared/zx-utils/**/*.mts"
+        ]
       },
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "cache": true
     },
     "build": {
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "command": "npx tsx scripts/build/build-zx-utils.mjs --entry=libs/shared/zx-utils/src/index.mts",
       "cache": true
     }
+  },
+  "eslintConfig": {
+    "overrides": [
+      {
+        "files": [
+          "*.mts",
+          "*.mjs"
+        ],
+        "parserOptions": {
+          "project": [
+            "libs/shared/zx-utils/tsconfig.app.json"
+          ],
+          "createDefaultProgram": true
+        }
+      }
+    ]
   }
 }

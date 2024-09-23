@@ -1,13 +1,10 @@
-import {logProcessor, detectShell} from "./lib/zx-utils.mts";
-import  { getSystemData } from "@technohouser/pkg-install";
+import { logProcessor, detectShell } from "./lib/zx-utils.mts";
+import { getSystemData } from "@technohouser/pkg-install";
 import type { SystemInformation } from "@technohouser/pkg-install";
-import {
-  $ as _$,
-  Options,
-} from "zx";
+import { $ as _$, Options } from "zx";
 import { DeepProxy } from "@qiwi/deep-proxy";
 import config from "config";
-import {set} from "radash"
+import { set } from "radash";
 
 export * from "zx";
 
@@ -25,11 +22,15 @@ export const $ = new DeepProxy(
 );
 
 // set the zx variable to values in zxConfig, or framework defaults
-set($, "verbose", zxConfig.verbose || $.verbose)
-set($, "nothrow", zxConfig.nothrow || $.nothrow)
-set($, "shell", zxConfig.shell ? zxConfig.shell : await detectShell() || $.shell)
-set($, "log", logProcessor)
+set($, "verbose", zxConfig.verbose || $.verbose);
+set($, "nothrow", zxConfig.nothrow || $.nothrow);
+set(
+  $,
+  "shell",
+  zxConfig.shell ? zxConfig.shell : (await detectShell()) || $.shell
+);
+set($, "log", logProcessor);
 
 const systemInfoData: SystemInformation = await getSystemData();
 
-export const systemInfo = systemInfoData
+export const systemInfo = systemInfoData;

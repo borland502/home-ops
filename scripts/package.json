@@ -2,23 +2,10 @@
   "name": "@home-ops/scripts",
   "version": "0.0.1",
   "type": "module",
-  "dependencies": {
-    "esbuild": "^0.23.1",
-    "esbuild-plugin-copy-watch": "^2.3.1",
-    "esbuild-plugin-extract-helpers": "^0.0.6",
-    "esbuild-plugin-resolve": "^2.0.0",
-    "radash": "^12.1.0",
-    "zx": "^8.1.8"
-  },
-  "devDependencies": {
-    "@types/node": "^22.5.5",
-    "esbuild-plugin-transform-hook": "^0.1.1",
-    "esbuild-plugin-utils": "^0.1.0"
-  },
   "eslintConfig": {
     "overrides": [
         {
-          "files": ["*.mts"],
+          "files": ["*.mts","*.mjs"],
           "parserOptions": {
             "project": ["scripts/tsconfig.app.json"],
             "createDefaultProgram": true

@@ -41,9 +41,10 @@ const PKG_MGR = {
 export type SystemInformation = Systeminformation.StaticData &
   Systeminformation.DynamicData;
 
-
 export async function getSystemData(): Promise<SystemInformation> {
-  const cacheDir = isNil(xdgCache) ? "${os.homedir()}/.cache/sysinfo" : path.join(xdgCache, "/sysinfo");
+  const cacheDir = isNil(xdgCache)
+    ? "${os.homedir()}/.cache/sysinfo"
+    : path.join(xdgCache, "/sysinfo");
   const sysInfoCacheFile = path.join(cacheDir, "sysinfo.json");
 
   fs.ensureDirSync(cacheDir, {
