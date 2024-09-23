@@ -1,8 +1,8 @@
 // https://github.com/lucax88x/configs/blob/main/scripts/utilities.mts
 
 import type { PathLike } from "fs";
-import { getAllData } from "systeminformation";
 import type { Systeminformation } from "systeminformation";
+import { getAllData } from "systeminformation";
 import { xdgCache } from "xdg-basedir";
 import { $, fs, path, question, tmpfile, which } from "zx";
 import { error, warn } from "@technohouser/log";
@@ -38,32 +38,29 @@ const PKG_MGR = {
 
 // type Pkgmgr = keyof typeof PKG_MGR;
 
-type SystemInformation = Systeminformation.StaticData &
+export type SystemInformation = Systeminformation.StaticData &
   Systeminformation.DynamicData;
 
-// initialize the system information right away
-const cacheDir = isNil(xdgCache) ? "${os.homedir()}/.cache/sysinfo" : xdgCache;
-const sysInfoCacheFile = path.join(cacheDir, "/sysinfo.json");
 
-fs.ensureDirSync(cacheDir);
+export async function getSystemData(): Promise<SystemInformation> {
+  const cacheDir = isNil(xdgCache) ? "${os.homedir()}/.cache/sysinfo" : path.join(xdgCache, "/sysinfo");
+  const sysInfoCacheFile = path.join(cacheDir, "sysinfo.json");
 
-async function getSystemData(): Promise<SystemInformation> {
-  let data = fs.readJSONSync(sysInfoCacheFile) as SystemInformation;
+  fs.ensureDirSync(cacheDir, {
+    mode: 0o700,
+  });
 
-  if (isNil(data)) {
-    data = await getAllData("*", "*");
-    fs.outputJsonSync(cacheDir, JSON.stringify(data, null, 2));
+  try {
+    return fs.readJSONSync(sysInfoCacheFile) as SystemInformation;
+  } catch (err) {
+    warn(`Error reading system information cache: ${err}`);
+    const data = await getAllData("*", "*");
+    fs.outputJsonSync(sysInfoCacheFile, JSON.stringify(data, null, 2));
+    return data;
   }
-
-  return data;
 }
 
 const systemData = await getSystemData();
-
-export const systemConstants = {
-  os: systemData.os.platform.toLowerCase(),
-  distro: systemData.os.distro.split(" ")[0].toLowerCase(),
-} as const;
 
 export async function askConfirmation(quest: string): Promise<boolean> {
   const confirmation = await question(`${quest} (y)`);

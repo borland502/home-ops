@@ -15,13 +15,20 @@
     ],
     "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
   },
-  "nxCloudId": "66e787b3f43a04445f5ec50d",
+  "neverConnectToCloud": true,
   "plugins": [
     {
       "plugin": "@nx/eslint/plugin",
       "options": {
         "targetName": "lint"
       }
+    },
+    {
+      "plugin": "@nx/jest/plugin",
+      "options": {
+        "targetName": "test"
+      },
+      "exclude": ["apps/watchyourlan-api-e2e/**/*"]
     }
   ],
   "targetDefaults": {
@@ -52,7 +59,10 @@
       "dependsOn": ["^build"]
     },
     "stylelint": {
-      "inputs": ["default", "{workspaceRoot}/.stylelintrc(.(json|yml|yaml|js))?"],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.stylelintrc(.(json|yml|yaml|js))?"
+      ],
       "cache": true
     }
   }

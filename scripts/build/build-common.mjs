@@ -6,27 +6,29 @@ import { cwd } from "process";
 import extractHelpersPlugin from "esbuild-plugin-extract-helpers";
 import { injectFile } from "esbuild-plugin-utils";
 import { argv, glob } from "zx";
+import DynamicImport from "@rtvision/esbuild-dynamic-import"
 
 const absWorkingDir = cwd().toString();
 
 const entry = argv.entry || "*.mts";
 const entries = argv.entry.split(/:\s?/);
 
-console.log("entries:", entries);
 const entryPoints = entry.includes("*")
   ? await glob(entries, {
-      absolute: false,
-      onlyFiles: true,
-      absWorkingDir,
-      root: absWorkingDir,
-    })
+    absolute: false,
+    onlyFiles: true,
+    absWorkingDir,
+    root: absWorkingDir,
+  })
   : entries.map((p) =>
-      path.relative(absWorkingDir, path.resolve(absWorkingDir, p))
-    );
-
-console.log("entries:", entryPoints);
+    path.relative(absWorkingDir, path.resolve(absWorkingDir, p))
+  );
 
 const plugins = [
+  DynamicImport({
+    transformExtensions: [".js", ".cjs", ".mjs"],
+    changeRelativeToAbsolute: true,
+  }),
   esbuildResolvePlugin({
     zx: path.resolve(absWorkingDir, "node_modules/zx/build"),
   }),
@@ -83,50 +85,15 @@ const plugins = [
 
 export const cjsConfig = {
   absWorkingDir: absWorkingDir,
-  external: ["deno", "zx"],
+  external: ["deno", "zx", "pg-hstore","crypto","node:*","fsevents"],
   bundle: true,
   minify: false,
   sourcemap: true,
   sourcesContent: true,
   platform: "node",
-  target: "ES2020",
+  target: "ES2022",
   format: "iife",
   plugins: plugins,
-};
-
-export const backendConfig = {
-  ...cjsConfig,
-  entryPoints: ["apps/backend/src/main.mts"],
-  outfile: "dist/apps/backend/main.cjs",
-  tsconfig: "apps/backend/tsconfig.app.json",
-};
-
-export const logConfig = {
-  ...cjsConfig,
-  entryPoints: ["libs/shared/log/src/index.mts"],
-  outfile: "dist/libs/shared/log/index.cjs",
-  tsconfig: "libs/shared/log/tsconfig.lib.json",
-};
-
-export const zxUtilsConfig = {
-  ...cjsConfig,
-  entryPoints: ["libs/shared/zx-utils/src/index.mts"],
-  outfile: "dist/libs/shared/zx-utils/index.cjs",
-  tsconfig: "libs/shared/zx-utils/tsconfig.lib.json",
-};
-
-export const utilsConfig = {
-  ...cjsConfig,
-  entryPoints: ["libs/shared/utils/src/index.mts"],
-  outfile: "dist/libs/shared/utils/index.cjs",
-  tsconfig: "libs/shared/utils/tsconfig.lib.json",
-};
-
-export const pkgInstallConfig = {
-  ...cjsConfig,
-  entryPoints: ["libs/shared/pkg-install/src/index.mts"],
-  outfile: "dist/libs/shared/pkg-install/index.cjs",
-  tsconfig: "libs/shared/pkg-install/tsconfig.lib.json",
 };
 
 function entryPointsToRegexp(entryPoints) {

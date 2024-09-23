@@ -1,0 +1,43 @@
+{
+  "name": "watchyourlan-api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/watchyourlan-api/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "outputs": ["{options.outputPath}"],
+      "command": "npx tsx scripts/build/build-watchyourlan-app.mjs --entry=apps/watchyourlan-api/src/main.mts",
+      "cache": true
+    },
+    "serve": {
+      "outputs": ["{options.outputPath}"],
+      "command": "npx tsx dist/apps/watchyourlan-api/main.mjs",
+      "dependsOn": ["build"]
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/watchyourlan-api/**/*.mts"],
+        "format": "stylish",
+        "fix": true
+      },
+      "cache": true,
+      "dependsOn": ["^nx-stylelint:lint","^build"]
+    },
+    "stylelint": {
+      "executor": "nx-stylelint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/watchyourlan-api/**/*.css"],
+        "formatter": "github"
+      },
+      "cache": true
+    },
+    "docker-build": {
+      "dependsOn": ["build"],
+      "command": "docker build -f apps/watchyourlan-api/Dockerfile . -t watchyourlan-api"
+    }
+  }
+}

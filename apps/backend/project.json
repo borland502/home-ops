@@ -13,7 +13,7 @@
     "test": {},
     "serve": {
       "outputs": ["{options.outputPath}"],
-      "command": "npx tsx dist/apps/backend/main.cjs",
+      "command": "npx tsx --tsconfig=./apps/backend/tsconfig.app.json dist/apps/backend/main.cjs",
       "dependsOn": ["build"]
     },
     "lint": {

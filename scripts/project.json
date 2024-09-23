@@ -5,15 +5,19 @@
   "projectType": "application",
   "tags": [],
   "targets": {},
-    "eslintConfig": {
+  "eslintConfig": {
     "overrides": [
-        {
-          "files": ["*.mts"],
-          "parserOptions": {
-            "project": ["scripts/tsconfig.app.json"],
-            "createDefaultProgram": true
-          }
+      {
+        "files": [
+          "*.mts"
+        ],
+        "parserOptions": {
+          "project": [
+            "scripts/tsconfig.app.json"
+          ],
+          "createDefaultProgram": true
         }
-      ]
-    }
+      }
+    ]
+  }
 }

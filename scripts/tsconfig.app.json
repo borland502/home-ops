@@ -12,11 +12,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "strict": true,
-    "types": ["node"],
-    "paths": {
-      "@technohouser/log": ["../libs/shared/log/src/index.mts"],
-      "@technohouser/zx-utils": ["../libs/shared/zx-utils/src/index.mts"]
-    }
+    "types": ["node"]
   },
   "include": ["*.mts", "*.ts"]
 }

@@ -1,11 +1,14 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "moduleDetection": "force",
+    "module": "Preserve",
+    "allowJs": true,
     "target": "ES2022",
-    "outDir": "../../../dist/out-tsc",
     "declaration": true,
     "types": ["node"],
     "esModuleInterop": true,
+    "isolatedModules": true,
     "allowImportingTsExtensions": true
   },
   "include": ["src/**/*.ts", "src/index.mts"],
