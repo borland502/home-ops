@@ -2,22 +2,31 @@
  * Setup express server.
  */
 
-import cookieParser from "cookie-parser";
-import morgan from "morgan";
 // import helmet from 'helmet';
 import express, { Request, Response } from "express";
+import { IncomingHttpHeaders } from "node:http2"
 import { homeopsConfig } from "@technohouser/zx-utils";
 import cors from "cors";
 import { HttpStatusCodes } from "@technohouser/utils";
 import { checkAndSyncTable } from "./init.mts";
 import { BaseRouter, Paths, RouteError } from "@technohouser/watchyourlan";
 
-// **** Variables **** //
-const expressConfig = homeopsConfig.get("express");
-const expressHeaders = expressConfig["headers"];
+// **** Types **** //
+export type RemoveIndexSignature<T> = {
+  [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K];
+}
 
+export type HttpDefaultHeaders = RemoveIndexSignature<IncomingHttpHeaders>;
+
+export interface HttpReqHeaders extends HttpDefaultHeaders {
+
+}
+
+const origin: string = homeopsConfig.get("express.headers.origin");
+
+// **** Variables **** //
 const corsOptions = {
-  origin: expressHeaders.origin,
+  origin: origin,
   optionsSuccessStatus: 200,
   methods: "GET",
   allowedHeaders: ["Content-Range"],
@@ -34,8 +43,6 @@ await checkAndSyncTable();
 // Basic middleware
 app.use("/", express.json());
 app.use("/", express.urlencoded({ extended: true }));
-app.use("/", morgan("dev"));
-app.use("/", cookieParser("xxxxxxxxxxxxxx"));
 
 app.get('/', (req: Request, res: Response) => {
   res.send({"message": 'Hello World!'});

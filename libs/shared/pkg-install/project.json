@@ -13,10 +13,18 @@
       },
       "dependsOn": ["^build"],
       "cache": true
-    },    
+    },
     "build": {
-      "outputs": ["{options.outputPath}"],
-      "command": "npx tsx scripts/build/build-utils.mjs --entry=libs/shared/pkg-install/src/index.mts",
+      "executor": "@nx/esbuild:esbuild",
+      "options": {
+        "outputPath": "dist/libs/shared/pkg-install",
+        "main": "libs/shared/pkg-install/src/index.mjs",
+        "tsConfig": "libs/shared/pkg-install/tsconfig.lib.json",
+        "assets": ["libs/shared/pkg-install/*.md"],
+        "bundle": true,
+        "deleteOutputPath": true,
+        "thirdParty": false
+      },
       "cache": true
     }
   }

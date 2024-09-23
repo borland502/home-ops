@@ -3,10 +3,9 @@
 import type { PathLike } from "fs";
 import type { Systeminformation } from "systeminformation";
 import { getAllData } from "systeminformation";
-import { xdgCache } from "xdg-basedir";
 import { $, fs, path, question, tmpfile, which } from "zx";
 import { error, warn } from "@technohouser/log";
-import { isNil } from "@technohouser/utils";
+import { isNil, xdgCache } from "@technohouser/utils";
 
 const DISTRO = {
   arch: "arch",

@@ -4,7 +4,6 @@
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
     "declaration": true,
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "sourceMap": true,
     "isolatedModules": true,

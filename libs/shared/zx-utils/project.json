@@ -21,27 +21,24 @@
       "cache": true
     },
     "build": {
-      "outputs": [
-        "{options.outputPath}"
-      ],
-      "command": "npx tsx scripts/build/build-zx-utils.mjs --entry=libs/shared/zx-utils/src/index.mts",
-      "cache": true
-    }
-  },
-  "eslintConfig": {
-    "overrides": [
-      {
-        "files": [
-          "*.mts",
-          "*.mjs"
-        ],
-        "parserOptions": {
-          "project": [
-            "libs/shared/zx-utils/tsconfig.app.json"
-          ],
-          "createDefaultProgram": true
-        }
+      "executor": "@nx/esbuild:esbuild",
+      "options": {
+        "outputPath": "dist/libs/shared/zx-utils",
+        "main": "libs/shared/zx-utils/src/index.mjs",
+        "tsConfig": "libs/shared/zx-utils/tsconfig.lib.json",
+        "assets": ["libs/shared/zx-utils/*.md"],
+        "bundle": true,
+        "deleteOutputPath": true,
+        "thirdParty": false
+      },
+      "cache": true,
+      "esbuildOptions": {
+        "target": "es2020",
+        "format": "cjs",
+        "platform": "node",
+        "external": ["deno", "zx", "pg-hstore", "morgan", "express", "express-async-errors", "express-jwt", "jsonwebtoken",
+    "bcryptjs", "cors", "helmet", "cookie-parser", "cookie-signature","node:*","fsevents", "config"]
       }
-    ]
+    }
   }
 }

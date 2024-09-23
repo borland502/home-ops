@@ -2,28 +2,6 @@
   "name": "@technohouser/pkg-install",
   "version": "0.0.1",
   "type": "module",
-  "main": "./index.cjs",
-  "private": true,
-  "devDependencies": {
-    "@eslint/js": "^9.10.0",
-    "eslint": "^9.10.0",
-    "globals": "^15.9.0",
-    "typescript-eslint": "^8.6.0"
-  },
-  "dependencies": {
-    "systeminformation": "^5.23.5",
-    "xdg-basedir": "^5.1.0",
-    "zx": "^8.1.8"
-  },
-    "eslintConfig": {
-    "overrides": [
-        {
-          "files": ["*.mts"],
-          "parserOptions": {
-            "project": ["libs/shared/pkg-install/tsconfig.lib.json"],
-            "createDefaultProgram": true
-          }
-        }
-      ]
-    }
+  "main": "./index.mjs",
+  "private": true
 }

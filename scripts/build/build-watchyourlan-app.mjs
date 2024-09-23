@@ -2,6 +2,7 @@
 
 import esbuild from "esbuild";
 import { cjsConfig } from "./build-common.mjs";
+import { console, process } from "node:global";
 
 export const backendConfig = {
   ...cjsConfig,

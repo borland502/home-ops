@@ -19,17 +19,19 @@
         "^build"
       ],
       "cache": true
+    },
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "options": {
+        "outputPath": "dist/libs/watchyourlan-api",
+        "main": "libs/watchyourlan-api/src/index.mjs",
+        "tsConfig": "libs/watchyourlan-api/tsconfig.lib.json",
+        "assets": ["libs/watchyourlan-api/*.md"],
+        "bundle": true,
+        "deleteOutputPath": true,
+        "thirdParty": false
+      },
+      "cache": true
     }
-  },
-  "eslintConfig": {
-    "overrides": [
-        {
-          "files": ["*.mts","*.mjs"],
-          "parserOptions": {
-            "project": ["libs/watchyourlan-api/tsconfig.app.json"],
-            "createDefaultProgram": true
-          }
-        }
-      ]
-    }
+  }
 }

@@ -34,6 +34,18 @@ npm run build:all
 npm run lint:all
 ```
 
+## Frameworks Used
+
+- [NX](https://nx.dev/)
+- [ESBuild](https://esbuild.github.io/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [ESLint](https://eslint.org/)
+- [Prettier](https://prettier.io/)
+- [Jest](https://jestjs.io/)
+- [Playwright](https://playwright.dev/)
+- [Zx](https://google.github.io/zx/)
+- [TSX](https://tsx.is/)
+
 ## Links
 
 Sources:
@@ -48,7 +60,6 @@ Sources:
 - Don't use esbuild for production bundles
 - Add jest
 - Add playwright
-- Split eslint back out to individual files from package.json
 - Sort out Documentation
 
   https://esbuild.github.io/content-types/#file

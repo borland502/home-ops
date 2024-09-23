@@ -11,12 +11,20 @@
       "options": {
         "lintFilePatterns": ["libs/shared/utils/**/*.mts"]
       },
-      "dependsOn": ["^build"],      
+      "dependsOn": ["^build"],
       "cache": true
-    },    
+    },
     "build": {
-      "outputs": ["{options.outputPath}"],
-      "command": "npx tsx scripts/build/build-utils.mjs --entry=libs/shared/utils/src/index.mts",
+      "executor": "@nx/esbuild:esbuild",
+      "options": {
+        "outputPath": "dist/libs/shared/utils",
+        "main": "libs/shared/utils/src/index.mjs",
+        "tsConfig": "libs/shared/utils/tsconfig.lib.json",
+        "assets": ["libs/shared/utils/*.md"],
+        "bundle": true,
+        "deleteOutputPath": true,
+        "thirdParty": false
+      },
       "cache": true
     }
   }

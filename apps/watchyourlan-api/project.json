@@ -4,15 +4,34 @@
   "sourceRoot": "apps/watchyourlan-api/src",
   "projectType": "application",
   "tags": [],
-  "targets": {
+  "targets":
+  {
     "build": {
-      "outputs": ["{options.outputPath}"],
-      "command": "npx tsx scripts/build/build-watchyourlan-app.mjs --entry=apps/watchyourlan-api/src/main.mts",
-      "cache": true
+      "executor": "@nx/esbuild:esbuild",
+      "options": {
+        "outputPath": "dist/apps/watchyourlan-api",
+        "main": "apps/watchyourlan-api/src/main.mjs",
+        "tsConfig": "apps/watchyourlan-api/tsconfig.app.json",
+        "assets": ["apps/watchyourlan-api/*.md"],
+        "bundle": true,
+        "deleteOutputPath": true,
+        "generatePackageJson": true,
+        "thirdParty": false
+      },
+      "cache": true,
+      "esbuildOptions": {
+        "target": "es2020",
+        "format": "cjs",
+        "platform": "node",
+        "banner": {
+          "js": "import { createRequire } from 'module';const require = createRequire(import.meta.url);"
+        },
+        "packages": "external"
+      }
     },
     "serve": {
       "outputs": ["{options.outputPath}"],
-      "command": "npx tsx dist/apps/watchyourlan-api/main.mjs",
+      "command": "npx tsx dist/apps/watchyourlan-api/main.js",
       "dependsOn": ["build"]
     },
     "lint": {

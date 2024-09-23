@@ -9,7 +9,6 @@
     "isolatedModules": true,
     "esModuleInterop": true,
     "allowImportingTsExtensions": true,
-    "noEmit": true,
     "target": "es2022",
     "module": "Preserve",
     "resolveJsonModule": true,
@@ -17,6 +16,7 @@
     "lib": ["es2022", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
+    "noImplicitAny": true,
     "baseUrl": ".",
     "paths": {
       "@technohouser/watchyourlan": ["libs/watchyourlan-api/src/index.mts"],

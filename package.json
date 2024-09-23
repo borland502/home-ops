@@ -27,7 +27,8 @@
     "build:all": "npx nx run-many --target=build --parallel --all ",
     "lint:all": "npx nx run-many --target=lint --parallel --all ",
     "nx:update": "npx nx migrate latest",
-    "nx:graph": "npx nx graph"
+    "nx:graph": "npx nx graph",
+    "dev:watchyourlan": "NODE_ENV=dev npx nx run watchyourlan-api:serve"
   },
   "devDependencies": {
     "@eslint/compat": "^1.1.1",
@@ -116,12 +117,14 @@
     "prettier": "^2.6.2",
     "process": "^0.11.10",
     "react-refresh": "^0.10.0",
+    "rimraf": "^6.0.1",
     "sinon": "^19.0.2",
     "size-limit": "^11.1.5",
     "stylelint": "^15.0.0",
     "stylelint-config-standard": "^34.0.0",
     "ts-jest": "^29.2.5",
     "ts-node": "10.9.1",
+    "tsc-alias": "^1.8.10",
     "tsconfig-paths": "^4.2.0",
     "tsd": "^0.31.2",
     "tsx": "^4.19.1",
@@ -144,6 +147,7 @@
     "express": "^4.21.0",
     "express-validator": "^7.2.0",
     "http-status-codes": "^2.3.0",
+    "pg-hstore": "^2.3.4",
     "radash": "^12.1.0",
     "sequelize": "^6.37.3",
     "sequelize-typescript": "^2.1.6",
@@ -157,49 +161,6 @@
   "eslintIgnore": [
     "node_modules"
   ],
-  "eslintConfig": {
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:@typescript-eslint/recommended-requiring-type-checking",
-      "plugin:promise/recommended",
-      "plugin:prettier/recommended"
-    ],
-    "parser": "@typescript-eslint/parser",
-    "plugins": [
-      "@typescript-eslint",
-      "promise"
-    ],
-    "rules": {
-      "no-console": "off",
-      "no-undef": "off",
-      "no-unused-vars": "off",
-      "no-use-before-define": "off",
-      "no-var": "error",
-      "prefer-const": "error",
-      "prefer-template": "error",
-      "@typescript-eslint/await-thenable": "error"
-    },
-    "overrides": [
-      {
-        "files": [
-          "src/**/*.spec.ts"
-        ],
-        "plugins": [
-          "jest"
-        ],
-        "env": {
-          "jest/globals": true
-        }
-      }
-    ]
-  },
-  "prettier": {
-    "semi": true,
-    "singleQuote": false,
-    "endOfLine": "lf",
-    "trailingComma": "es5"
-  },
   "stylelint": {
     "ignoreFiles": [
       "**/*"
