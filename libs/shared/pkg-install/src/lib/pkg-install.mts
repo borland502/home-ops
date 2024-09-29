@@ -72,16 +72,6 @@ export async function hasCommand(command: string): Promise<boolean> {
   return !!(await which(command, { nothrow: true }));
 }
 
-// export async function existsApplicationInOsx(app: string) {
-//   return async (): Promise<Condition> => {
-//     try {
-//       return toCondition(await fs.exists(`/Applications/${app}.app`));
-//     } catch (error) {
-//       return 'not exists';
-//     }
-//   };
-// }
-
 // export async function existsByPwsh(command: string) {
 //   return async (): Promise<Condition> => {
 //     try {
@@ -188,6 +178,20 @@ export async function ensureBrew() {
       error(err.message);
     }
   );
+}
+
+export async function installByFlatpak(pkg: string) {
+  $.verbose = true;
+  await $`flatpak install ${pkg}`;
+
+  return true;
+}
+
+export async function installByGh(pkg: string) {
+  $.verbose = true;
+  await $`gh release download ${pkg}`;
+
+  return true;
 }
 
 export async function installByBrew(pkg: string, asCask = false) {
