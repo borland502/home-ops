@@ -19,11 +19,11 @@
     "noImplicitAny": true,
     "baseUrl": ".",
     "paths": {
-      "@technohouser/watchyourlan": ["libs/watchyourlan-api/src/index.mts"],
       "@technohouser/eslint": ["libs/tools/eslint/src/index.mts"],
       "@technohouser/log": ["libs/shared/log/src/index.mts"],
       "@technohouser/pkg-install": ["libs/shared/pkg-install/src/index.mts"],
       "@technohouser/utils": ["libs/shared/utils/src/index.mts"],
+      "@technohouser/watchyourlan": ["libs/watchyourlan-api/src/index.mts"],
       "@technohouser/zx-utils": ["libs/shared/zx-utils/src/index.mts"]
     }
   },
