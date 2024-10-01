@@ -28,8 +28,4 @@ npm install
 
 > In executable scripts `#!/usr/bin/env -S npx tsx` is preferred because transpiling is directly to memory and executed there
 
-```js
-#!/usr/bin/env zx
 
-
-```
