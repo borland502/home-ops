@@ -1,7 +1,7 @@
 import { Host } from "@technohouser/watchyourlan";
 import {DataTypes, QueryTypes} from "sequelize";
 import {Sequelize} from "sequelize-typescript";
-import {homeopsConfig, path} from "@technohouser/zx-utils";
+import {homeopsConfig, path, within} from "@technohouser/zx-utils";
 import {xdgState} from "@technohouser/utils";
 
 const watchYourLanDb = path.join(
@@ -24,7 +24,7 @@ Host.init(
     id: {
       type: new DataTypes.INTEGER(),
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: false,
       field: "ID",
     },
     name: {
@@ -69,7 +69,7 @@ Host.init(
     modelName: "Host",
     createdAt: false,
     updatedAt: false,
-    deletedAt: false,
+    deletedAt: false
   }
 );
 
@@ -95,5 +95,10 @@ async function findAndCountAll(limit: number, range: number[]) {
 export async function findAllHosts(): Promise<Host[]> {
   return await sequelize.query("SELECT * FROM `now`", {
     type: QueryTypes.SELECT,
+    model: Host,
+    logging: (msg) => console.log(msg),
   });
 }
+
+
+console.log(JSON.stringify(await findAllHosts(), null, 2))

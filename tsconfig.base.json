@@ -15,6 +15,7 @@
     "verbatimModuleSyntax": true,
     "rootDir": ".",
     "moduleDetection": "force",
+    "useDefineForClassFields": true,
     "sourceMap": true,
     "declaration": true,
     "isolatedModules": true,
