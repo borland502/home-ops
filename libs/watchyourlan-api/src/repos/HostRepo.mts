@@ -95,10 +95,9 @@ async function findAndCountAll(limit: number, range: number[]) {
 export async function findAllHosts(): Promise<Host[]> {
   return await sequelize.query("SELECT * FROM `now`", {
     type: QueryTypes.SELECT,
-    model: Host,
     logging: (msg) => console.log(msg),
   });
 }
-
-
-console.log(JSON.stringify(await findAllHosts(), null, 2))
+//
+//
+// console.log(JSON.stringify(await findAllHosts(), null, 2))

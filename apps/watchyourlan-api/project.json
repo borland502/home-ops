@@ -30,7 +30,7 @@
           "packages": "external"
         }
       },
-      "cache": false
+      "cache": true
     },
     "serve": {
       "outputs": ["{options.outputPath}"],
