@@ -59,9 +59,8 @@ Sources:
 ## TODO:
 
 - Don't use esbuild for production bundles
-- Figure out mts --> cjs conversion if possible:  https://github.com/microsoft/TypeScript/issues/51990
 - Add jest
 - Add playwright
 - Sort out Documentation
-
+- Fold functioning parts of dasbootstrap project into the python sections
   https://esbuild.github.io/content-types/#file
