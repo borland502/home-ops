@@ -2,7 +2,7 @@
  * Express router paths go here.
  */
 
-export const CTX = {
+export default {
   Base: "/api",
   Hosts: {
     Base: "/hosts",

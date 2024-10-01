@@ -1,7 +1,8 @@
 import { logProcessor, detectShell } from "./lib/zx-utils.mts";
 import { getSystemData } from "@technohouser/pkg-install";
 import type { SystemInformation } from "@technohouser/pkg-install";
-import { $ as _$, Options } from "zx";
+import { $ as _$ } from "zx";
+import type { Options } from "zx";
 import { DeepProxy } from "@qiwi/deep-proxy";
 import config from "config";
 import { set } from "radash";

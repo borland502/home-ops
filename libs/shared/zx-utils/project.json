@@ -31,14 +31,7 @@
         "deleteOutputPath": true,
         "thirdParty": false
       },
-      "cache": true,
-      "esbuildOptions": {
-        "target": "es2020",
-        "format": "cjs",
-        "platform": "node",
-        "external": ["deno", "zx", "pg-hstore", "morgan", "express", "express-async-errors", "express-jwt", "jsonwebtoken",
-    "bcryptjs", "cors", "helmet", "cookie-parser", "cookie-signature","node:*","fsevents", "config"]
-      }
+      "cache": true
     }
   }
 }

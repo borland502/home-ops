@@ -1,11 +1,6 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "NodeNext",
-    "module": "NodeNext",
-    "declaration": true,
-    "esModuleInterop": true,
-    "allowImportingTsExtensions": true,
     "types": ["node","express","cors","morgan","body-parser"]
   },
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],

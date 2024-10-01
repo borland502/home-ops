@@ -9,8 +9,12 @@
     "build": {
       "executor": "@nx/esbuild:esbuild",
       "options": {
-        "outputPath": "dist/apps/watchyourlan-api",
-        "main": "apps/watchyourlan-api/src/main.mjs",
+        "main": "apps/watchyourlan-api/src/main.mts",
+        "format": [
+          "esm"
+        ],
+        "outputPath": "dist",
+        "outputFileName": "apps/watchyourlan-api/main.mjs",
         "tsConfig": "apps/watchyourlan-api/tsconfig.app.json",
         "assets": ["apps/watchyourlan-api/*.md"],
         "bundle": true,
@@ -18,11 +22,10 @@
         "generatePackageJson": true,
         "thirdParty": false
       },
-      "cache": true,
+      "cache": false,
       "esbuildOptions": {
-        "target": "es2020",
-        "format": "cjs",
-        "platform": "node",
+        "outExtension": ".js=.mjs",
+        "sourceMap": "inline",
         "banner": {
           "js": "import { createRequire } from 'module';const require = createRequire(import.meta.url);"
         },

@@ -3,3 +3,10 @@
 version: "3"
 
 tasks:
+
+  nx:gen-pyapp:
+    desc: Generate a new python application for the home-ops repo
+    cmd:
+
+  nx:gen-pylib:
+    desc: Generate a new python library for the home-ops repo

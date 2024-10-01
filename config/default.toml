@@ -30,6 +30,11 @@
 [express.headers]
   origin = "*"
 
+[watchyourlan.api]
+  apiBase = "/api"
+  host = "localhost"
+  port = 3001
+
 [watchyourlan.db]
   dbFileName = "/watchyourlan/db.sqlite"
   dialect = "sqlite"

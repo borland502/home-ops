@@ -1,5 +1,20 @@
-import { Host, sequelize } from "@technohouser/watchyourlan";
-import { DataTypes, QueryTypes } from "sequelize";
+import { Host } from "@technohouser/watchyourlan";
+import {DataTypes, QueryTypes} from "sequelize";
+import {Sequelize} from "sequelize-typescript";
+import {homeopsConfig, path} from "@technohouser/zx-utils";
+import {xdgState} from "@technohouser/utils";
+
+const watchYourLanDb = path.join(
+  xdgState,
+  homeopsConfig.get("watchyourlan.db.dbFileName")
+);
+
+const sequelize = new Sequelize({
+	dialect: "sqlite",
+  storage: `${watchYourLanDb}`,
+	models: [Host],
+});
+
 
 /**
  * Adapt the watchyourlan table layout to the format expected by the React Admin front end.
@@ -77,7 +92,7 @@ async function findAndCountAll(limit: number, range: number[]) {
  *
  * @returns A Promise that resolves to an array of objects, where each object represents a row from the "now" table.
  */
-export async function getAll(): Promise<Host[]> {
+export async function findAllHosts(): Promise<Host[]> {
   return await sequelize.query("SELECT * FROM `now`", {
     type: QueryTypes.SELECT,
   });

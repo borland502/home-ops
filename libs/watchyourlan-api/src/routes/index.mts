@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { HostRoutes, Paths } from "@technohouser/watchyourlan";
+import { findAllHosts, Paths } from "@technohouser/watchyourlan";
 
 // **** Variables **** //
 
@@ -11,7 +11,7 @@ export const apiRouter = Router();
 const hostRouter = Router();
 
 // Get all hosts
-hostRouter.get(Paths.CTX.Hosts.Get, HostRoutes.getAll);
+hostRouter.get(Paths.default.Hosts.Get, findAllHosts);
 
 // Add HostRouter
-apiRouter.use(Paths.CTX.Hosts.Base, hostRouter);
+apiRouter.use(Paths.default.Hosts.Base, hostRouter);
