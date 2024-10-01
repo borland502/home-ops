@@ -1,34 +1,23 @@
 #!/usr/bin/env -S npx tsx --tsconfig ./scripts/tsconfig.app.json
 
 import {
-  $,
-  globby,
-  systemInfo,
-  homeopsConfig,
+  fs, homeopsConfig,
   path,
-  fs,
 } from "@technohouser/zx-utils";
-import { info, warn, error } from "@technohouser/log";
-import { xdgData, xdgState } from "xdg-basedir";
-import { Sequelize, Model, DataTypes } from "sequelize";
-import config from "config";
-import { PathLike } from "fs";
+import { error } from "@technohouser/log";
+import {xdgState} from "@technohouser/utils";
+import {Sequelize} from "sequelize-typescript";
+import {Host} from "@technohouser/watchyourlan";
 
-// **** Variables **** //
-export const entryPoints = await globby([
-  "scripts/**/*.mts",
-  "scripts/**/*.mjs",
-  "!scripts/node_modules/**/*",
-]);
-export const watchYourLanDb = path.join(
+const watchYourLanDb = path.join(
   xdgState,
   homeopsConfig.get("watchyourlan.db.dbFileName")
 );
 
-// Initialize Sequelize
-export const sequelize = new Sequelize({
-  dialect: "sqlite",
-  storage: watchYourLanDb,
+const sequelize = new Sequelize({
+	dialect: "sqlite",
+  storage: `${watchYourLanDb}`,
+	models: [Host],
 });
 
 export async function checkAndSyncTable() {
@@ -43,7 +32,7 @@ export async function checkAndSyncTable() {
       .then((tables) => tables.includes("now"));
 
     if (!tableExists) {
-      error("Table does not exist.  Exiting.");
+      error(`Table 'now' does not exist at path ${watchYourLanDb}.  Exiting.`);
       process.exit(1);
     }
   } catch (err) {

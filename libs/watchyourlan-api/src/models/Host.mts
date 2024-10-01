@@ -3,30 +3,27 @@ import { Table, Column, Model, DataType } from "sequelize-typescript";
 @Table
 export class Host extends Model {
   @Column(DataType.INTEGER)
-  ID!: number;
+  declare ID: number;
 
   @Column(DataType.STRING)
-  NAME!: string;
+  declare NAME: string;
 
   @Column(DataType.STRING)
-  IP?: string;
+  declare IP?: string;
 
   @Column(DataType.STRING)
-  MAC?: string;
+  declare MAC?: string;
 
   @Column(DataType.STRING)
-  HW?: string;
+  declare HW?: string;
 
   @Column(DataType.STRING)
-  DATE?: string;
+  declare DATE?: string;
 
   @Column(DataType.INTEGER)
-  KNOWN?: number;
+  declare KNOWN?: number;
 
   @Column(DataType.INTEGER)
-  NOW?: number;
+  declare NOW?: number;
 }
 
-export default {
-  Host,
-} as const;

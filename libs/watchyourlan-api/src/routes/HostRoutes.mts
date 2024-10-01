@@ -1,5 +1,5 @@
 import { HostService, Host } from "@technohouser/watchyourlan";
-import { Router, Request, Response } from "express";
+import type { Request, Response } from "express";
 import { HttpStatusCodes } from "@technohouser/utils";
 import { get } from "radash";
 import * as jsonapi from "jsonapi-serializer";
@@ -23,8 +23,8 @@ export function toJsonApi(res: Response, hosts: Host[]) {
 /**
  * Get all users.
  */
-export function getAll(_: Request, res: Response) {
-  HostService.getAllHosts()
+export async function getAll(_: Request, res: Response) {
+  return await HostService.findAllHosts()
     .then((hosts: Host[] | Error) => {
       if (hosts !== undefined && get(hosts, "length", 0) <= 0) {
         console.log("No hosts found");

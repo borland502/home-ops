@@ -1,16 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "moduleDetection": "force",
-    "module": "Preserve",
-    "allowJs": true,
-    "target": "ES2022",
-    "declaration": true,
-    "types": ["node"],
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "allowImportingTsExtensions": true
-  },
   "include": ["src/**/*.ts", "src/index.mts"],
   "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"],
 }

@@ -54,10 +54,12 @@ Sources:
 - https://dev.to/a0viedo/nodejs-typescript-and-esm-it-doesnt-have-to-be-painful-438e
 - https://eisenbergeffect.medium.com/an-esbuild-setup-for-typescript-3b24852479fe
 - https://dev.to/zauni/create-a-zx-nodejs-script-as-binary-with-pkg-5abf
+- https://esbuild.github.io/content-types/#typescript-caveats
 
 ## TODO:
 
 - Don't use esbuild for production bundles
+- Figure out mts --> cjs conversion if possible:  https://github.com/microsoft/TypeScript/issues/51990
 - Add jest
 - Add playwright
 - Sort out Documentation

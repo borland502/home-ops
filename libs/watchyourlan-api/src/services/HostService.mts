@@ -1,4 +1,4 @@
-import { getAll, Host } from "@technohouser/watchyourlan";
+import { findAllHosts, Host } from "@technohouser/watchyourlan";
 import { error } from "@technohouser/log";
 
 function handleSuccess(res: Host[]) {
@@ -15,7 +15,7 @@ function handleFailure(reason: Error) {
  * Get all users.
  */
 export async function getAllHosts(): Promise<Host[] | Error> {
-  return await getAll().then(
+  return await findAllHosts().then(
     (res: Host[]) => handleSuccess(res),
     (reason: Error) => handleFailure(reason)
   );
