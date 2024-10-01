@@ -20,17 +20,17 @@
         "bundle": true,
         "deleteOutputPath": true,
         "generatePackageJson": true,
-        "thirdParty": false
+        "thirdParty": false,
+        "esbuildOptions": {
+          "outExtension": ".js=.mjs",
+          "sourcemap": "both",
+          "banner": {
+            "js": "import { createRequire } from 'module';const require = createRequire(import.meta.url);"
+          },
+          "packages": "external"
+        }
       },
-      "cache": false,
-      "esbuildOptions": {
-        "outExtension": ".js=.mjs",
-        "sourceMap": "inline",
-        "banner": {
-          "js": "import { createRequire } from 'module';const require = createRequire(import.meta.url);"
-        },
-        "packages": "external"
-      }
+      "cache": false
     },
     "serve": {
       "outputs": ["{options.outputPath}"],
