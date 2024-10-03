@@ -1,1 +1,1 @@
-export * from "./lib/pkg-install.mts";
+export * from "./lib/pkg-install.mjs";

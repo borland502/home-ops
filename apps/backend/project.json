@@ -45,6 +45,7 @@
           "{options.outputFile}"
         ],
         "options": {
+          "eslintConfig": "eslint.config.js",
           "lintFilePatterns": [
             "apps/backend/**/*.mts"
           ],

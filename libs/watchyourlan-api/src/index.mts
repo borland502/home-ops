@@ -4,5 +4,5 @@ export * from "./models/Host.mjs";
 export * from "./repos/HostRepo.mjs";
 export * as BaseRouter from "./routes/index.mjs";
 export * as HostService from "@technohouser/watchyourlan";
-export {getAll} from "./routes/HostRoutes.mts";
+export {getAll} from "./routes/HostRoutes.mjs";
 export * as HttpStatusCodes from "@technohouser/utils";

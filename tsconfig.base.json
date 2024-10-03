@@ -1,5 +1,5 @@
-// Most of these values are ignored by esbuild during compilation:  https://esbuild.github.io/content-types/#typescript-caveats
 {
+  "extends": "./node_modules/gts/tsconfig-google.json",
   "compileOnSave": false,
   "compilerOptions": {
     "experimentalDecorators": true,
@@ -20,7 +20,6 @@
     "declaration": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "allowImportingTsExtensions": true,
     "target": "ESNext",
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
@@ -29,8 +28,8 @@
     "lib": ["esnext", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "noImplicitAny": true
+    "noImplicitAny": true,
   },
-  "exclude": ["node_modules", "dist","tmp","scripts"],
-  "files": ["**/*.mts", "**/*.ts"]
+  "include": ["**/*.mts", "**/*.ts", "**/*.mjs", "eslint.config.js"],
+  "exclude": ["node_modules", "dist", "tmp", "scripts", "**/.eslintrc", "**/.eslintrc.*"]
 }

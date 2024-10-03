@@ -1,4 +1,4 @@
-import { logProcessor, detectShell } from "./lib/zx-utils.mts";
+import { logProcessor, detectShell } from "./lib/zx-utils.mjs";
 import { getSystemData } from "@technohouser/pkg-install";
 import type { SystemInformation } from "@technohouser/pkg-install";
 import { $ as _$ } from "zx";

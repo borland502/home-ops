@@ -2,13 +2,13 @@
  * Setup express server.
  */
 
-// import helmet from 'helmet';
+
 import type { Request, Response } from "express";
 import express from "express"
 import { homeopsConfig } from "@technohouser/zx-utils";
 import cors from "cors";
 import { HttpStatusCodes } from "@technohouser/utils";
-import { checkAndSyncTable } from "./init.mts";
+import { checkAndSyncTable } from "./init.mjs";
 import { BaseRouter, Paths, RouteError } from "@technohouser/watchyourlan";
 
 // **** Types **** //
@@ -44,9 +44,7 @@ app.use(Paths.default.Base, BaseRouter.apiRouter);
 // Add error handler
 app.use((err: RouteError, _: Request, res: Response, next: () => void) => {
   let status = HttpStatusCodes.BAD_REQUEST;
-  if (err instanceof RouteError) {
-    status = err.status;
-  }
+  status = err.status;
   next();
   return res.status(status).json({ error: err.message });
 });

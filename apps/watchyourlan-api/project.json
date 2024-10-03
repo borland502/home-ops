@@ -4,15 +4,12 @@
   "sourceRoot": "apps/watchyourlan-api/src",
   "projectType": "application",
   "tags": [],
-  "targets":
-  {
+  "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
       "options": {
         "main": "apps/watchyourlan-api/src/main.mts",
-        "format": [
-          "esm"
-        ],
+        "format": ["esm"],
         "outputPath": "dist",
         "outputFileName": "apps/watchyourlan-api/main.mjs",
         "tsConfig": "apps/watchyourlan-api/tsconfig.app.json",
@@ -37,16 +34,21 @@
       "command": "npx tsx dist/apps/watchyourlan-api/main.js",
       "dependsOn": ["build"]
     },
+    "gtsLint": {
+      "command": "gts lint apps/watchyourlan-api/**/*.mts",
+      "cache": true
+    },
     "lint": {
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["apps/watchyourlan-api/**/*.mts"],
+        "eslintConfig": "eslint.config.js",
         "format": "stylish",
         "fix": true
       },
       "cache": true,
-      "dependsOn": ["^nx-stylelint:lint","^build"]
+      "dependsOn": ["^nx-stylelint:lint", "^build", "^gtsLint"]
     },
     "stylelint": {
       "executor": "nx-stylelint:lint",

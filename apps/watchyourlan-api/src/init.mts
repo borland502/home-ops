@@ -8,6 +8,7 @@ import { error } from "@technohouser/log";
 import {xdgState} from "@technohouser/utils";
 import {Sequelize} from "sequelize-typescript";
 import {Host} from "@technohouser/watchyourlan";
+import process from "process"
 
 const watchYourLanDb = path.join(
   xdgState,
@@ -21,21 +22,15 @@ const sequelize = new Sequelize({
 });
 
 export async function checkAndSyncTable() {
-  try {
-    // if the db doesn't already exist, then create it
-    fs.ensureFileSync(watchYourLanDb);
-
-    // Check if the table exists
-    const tableExists = await sequelize
-      .getQueryInterface()
-      .showAllTables()
-      .then((tables) => tables.includes("now"));
-
-    if (!tableExists) {
-      error(`Table 'now' does not exist at path ${watchYourLanDb}.  Exiting.`);
-      process.exit(1);
-    }
-  } catch (err) {
-    error(`Error: ${err.message}`);
+  // if the db doesn't already exist, then create it
+  fs.ensureFileSync(watchYourLanDb);
+  // Check if the table exists
+  const tableExists = await sequelize
+    .getQueryInterface()
+    .showAllTables()
+    .then((tables) => tables.includes("now"));
+  if (!tableExists) {
+    error(`Table 'now' does not exist at path ${watchYourLanDb}.  Exiting.`);
+    process.exit(1);
   }
 }
