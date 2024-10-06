@@ -29,6 +29,16 @@
       },
       "cache": true
     },
+    "e2e": {
+      "executor": "@nx/playwright:playwright",
+      "options": {
+        "testFiles": [
+          "apps/watchyourlan-api/e2e/"
+        ],
+        "config": "playwright.config.mts"
+      },
+      "cache": true
+    },
     "serve": {
       "outputs": ["{options.outputPath}"],
       "command": "npx tsx dist/apps/watchyourlan-api/main.js",

@@ -43,8 +43,7 @@ app.use(Paths.default.Base, BaseRouter.apiRouter);
 
 // Add error handler
 app.use((err: RouteError, _: Request, res: Response, next: () => void) => {
-  let status = HttpStatusCodes.BAD_REQUEST;
-  status = err.status;
+  const status: HttpStatusCodes = err.status;
   next();
   return res.status(status).json({ error: err.message });
 });

@@ -60,7 +60,7 @@ Sources:
 
 - Don't use esbuild for production bundles
 - Add jest
-- Add playwright
-- Sort out Documentation
+- Sort out documentation publishing
+- Add swagger docs
 - Fold functioning parts of dasbootstrap project into the python sections
   https://esbuild.github.io/content-types/#file

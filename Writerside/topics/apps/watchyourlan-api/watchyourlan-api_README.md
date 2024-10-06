@@ -9,7 +9,8 @@ the sqlite database created by WatchYourLan.
 ## Quickstart
 
 ```shell
-nx run watchyourlan-api:build && nx run watchyourlan-api:serve
+nx run watchyourlan-api:build
+nx run watchyourlan-api:serve
 ```
 
 ## Running e2e tests
@@ -17,5 +18,5 @@ nx run watchyourlan-api:build && nx run watchyourlan-api:serve
 After the server is up.  Execute the following command to run the e2e tests.
 
 ```shell
-nx run watchyourlan-api-e2e:e2e
+nx run watchyourlan-api:e2e
 ```
