@@ -1,17 +1,29 @@
-import { Router } from "express";
-import { getAll, Paths} from "@technohouser/watchyourlan";
+import {Router} from "express";
+import {getAll, Paths} from "@technohouser/watchyourlan";
 
 // **** Variables **** //
 
 export const apiRouter = Router();
 
-// ** Add UserRouter ** //
-
-// Init router
 const hostRouter = Router();
 
-// Get all hosts
-hostRouter.get(Paths.default.Hosts.Get, getAll);
+/**
+ * @swagger
+ * /hosts:
+ *  get:
+ *  description: Get all hosts.
+ *  responses:
+ *  200:
+ *  description: OK
+ *  204:
+ *  description: No Content
+ *  500:
+ *  description: Internal Server Error
+ *
+ */
+hostRouter.get(Paths.default.Hosts.Get, (req, res, next) => {
+  getAll(req, res).catch(next);
+});
 
 // Add HostRouter
 apiRouter.use(Paths.default.Hosts.Base, hostRouter);
