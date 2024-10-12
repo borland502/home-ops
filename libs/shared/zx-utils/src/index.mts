@@ -1,37 +1,29 @@
 import { logProcessor, detectShell } from "./lib/zx-utils.mjs";
 import { getSystemData } from "@technohouser/pkg-install";
 import type { SystemInformation } from "@technohouser/pkg-install";
-import { $ as _$ } from "zx";
-import type { Options } from "zx";
-import { DeepProxy } from "@qiwi/deep-proxy";
+import { $ } from "zx";
 import config from "config";
 import { set } from "radash";
 
-export * from "zx";
+export * from 'zx';
 
 /**
  * Override the default zx options with custom options and functions
  */
-const zxConfig: Partial<Options> = config.get("zx");
+// const zxConfig: Partial<Options> = config.get("zx");
+
 export const homeopsConfig = config;
 
-export const $ = new DeepProxy(
-  _$,
-  ({ name, DEFAULT, target: t, trapName, args }) => {
-    return DEFAULT;
-  }
-);
-
-// set the zx variable to values in zxConfig, or framework defaults
-set($, "verbose", zxConfig.verbose || $.verbose);
-set($, "nothrow", zxConfig.nothrow || $.nothrow);
+// Create proxy manually rather than dynamically, and shallowly rather than deep
+set($, "verbose", homeopsConfig.get("zx.verbose") || $.verbose);
+set($, "nothrow", homeopsConfig.get("zx.nothrow") || $.nothrow);
+set($, "log", logProcessor);
 set(
   $,
   "shell",
-  zxConfig.shell ? zxConfig.shell : (await detectShell()) || $.shell
+  homeopsConfig.get("zx.shell") || await detectShell()
 );
-set($, "log", logProcessor);
 
-const systemInfoData: SystemInformation = await getSystemData();
+export const systemInfo: SystemInformation = await getSystemData();
 
-export const systemInfo = systemInfoData;
+declare module "@technohouser/zx-utils" {}

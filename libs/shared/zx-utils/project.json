@@ -28,6 +28,11 @@
         "tsConfig": "libs/shared/zx-utils/tsconfig.lib.json",
         "assets": ["libs/shared/zx-utils/*.md"],
         "bundle": true,
+        "format": ["esm"],
+        "minify": true,
+        "esbuildOptions": {
+          "outExtension": ".js=.mjs"
+        },
         "deleteOutputPath": true,
         "thirdParty": false
       },

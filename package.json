@@ -13,9 +13,6 @@
     "nx:update": "npx nx migrate latest",
     "nx:graph": "npx nx graph",
     "dev:watchyourlan": "NODE_ENV=dev npx nx run watchyourlan-api:serve",
-    "lint": "gts lint",
-    "clean": "gts clean",
-    "fix": "gts fix",
     "pretest": "npm run compile",
     "posttest": "npm run lint"
   },

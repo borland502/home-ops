@@ -1,12 +1,16 @@
-
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
-tasks:
+includes:
+    scripts:
+        taskfile: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts/scripts.yaml"
+        dir: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts"
 
-  nx:gen-pyapp:
-    desc: Generate a new python application for the home-ops repo
-    cmd:
+#tasks:
 
-  nx:gen-pylib:
-    desc: Generate a new python library for the home-ops repo
+#  nx:gen-pyapp:
+#    desc: Generate a new python application for the home-ops repo
+#    cmd:
+#
+#  nx:gen-pylib:
+#    desc: Generate a new python library for the home-ops repo

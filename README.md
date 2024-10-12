@@ -42,8 +42,9 @@ npm run lint:all
 - [ESLint](https://eslint.org/)
 - [Prettier](https://prettier.io/)
 - [Jest](https://jestjs.io/)
+- [Poetry](https://python-poetry.org/docs/)
 - [Playwright](https://playwright.dev/)
-- [Zx](https://google.github.io/zx/)
+- [ZX](https://google.github.io/zx/)
 - [TSX](https://tsx.is/)
 
 ## Links
