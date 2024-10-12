@@ -2,20 +2,21 @@
 
 ## Overview
 
-These utility scripts use the [ZX](https://github.com/google/zx) scripting extensions from Google.  They operate 
-within the path structure of the [NX]() monorepo.  The scripts either need to be executed with nx (e.g. build scripts) 
+These utility scripts use [ZX](https://github.com/google/zx), python, and shell.  Shell scripts are simply copied to ${HOME}/.local/bin, as are python scripts.  
+ZX Scripts (i.e. nodejs) have dependencies that eliminate their portability, but aren't going to be published to npm.  So they use a 
+cheap shim to invoke the ZX script within the monorepo directly.
+
+## ZX shim
 
 ```shell
-nx reset && nx run watchyourlan-api:build && nx run watchyourlan-api:serve
+#!/usr/bin/env zsh
+exec ${XDG_DATA_HOME}/automation/home-ops/scripts/bin/zx/vscode.mts
 ```
 
-or with [TSX](https://tsx.is) and the following flag:
+The scripts themselves ditch the simple zx hashbang to references libraries in the monorepo.  If you are old school shell, I apologize for
+the inflicted trauma
 
 ```shell
-npx tsx --tsconfig ./script/tsconfig.app.json ./scripts/init/init.mts
+#!/usr/bin/env -S npx tsx --tsconfig ./tsconfig.base.json
+echo "Hello, World!"
 ```
-or
-```shell
-./scripts/init/init.mts
-```
-

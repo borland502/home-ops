@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+vars:
+  HOMEOPS_DIR: "${XDG_DATA_HOME}/automation/home-ops"
+  TARGET_DIR: "${XDG_BIN_HOME}"
+
+tasks:
+
+  deploy:
+    desc: Deploy the scripts to the ~/.local/bin directory
+    cmds:
+      - |
+        # Define the source directories and the target directory
+        source_dirs=("{{.HOMEOPS_DIR}}/scripts/bin/zx")
+        target_dir="{{.TARGET_DIR}}"
+
+        # Create the target directory if it doesn't exist
+        mkdir -p "$target_dir"
+
+        # create a shim to the script directory
+        for dir in "${source_dirs[@]}"; do
+          files=$(find "$dir" -type f)
+          for file in $files; do
+            base_name=$(basename "$file" | sed 's/\.[^.]*$//')
+
+            # missing something about heredocs in yaml
+            echo "#!/usr/bin/env zsh" > ${XDG_BIN_HOME}/${base_name}
+            echo "exec $file" >> ${XDG_BIN_HOME}/${base_name}
+
+            chmod +x ${XDG_BIN_HOME}/${base_name}
+          done
+        done

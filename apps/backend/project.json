@@ -39,37 +39,22 @@
       "command": "npx tsx dist/apps/backend/main.js",
       "dependsOn": ["build"]
     },
-      "lint": {
-        "executor": "@nx/eslint:lint",
-        "outputs": [
-          "{options.outputFile}"
-        ],
-        "options": {
-          "eslintConfig": "eslint.config.js",
-          "lintFilePatterns": [
-            "apps/backend/**/*.mts"
-          ],
-          "format": "stylish",
-          "fix": true
-        },
-        "cache": true,
-        "dependsOn": [
-          "^nx-stylelint:lint",
-          "^build"
-        ]
+    "lint": {
+      "command": "gts lint apps/backend/**/*.mts",
+      "cache": true
+    },
+    "stylelint": {
+      "executor": "nx-stylelint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/backend/**/*.css"],
+        "formatter": "github"
       },
-      "stylelint": {
-        "executor": "nx-stylelint:lint",
-        "outputs": [
-          "{options.outputFile}"
-        ],
-        "options": {
-          "lintFilePatterns": [
-            "apps/backend/**/*.css"
-          ],
-          "formatter": "github"
-        },
-        "cache": true
-      }
+      "cache": true
+    },
+    "docker-build": {
+      "dependsOn": ["build"],
+      "command": "docker build -f apps/backend/Dockerfile . -t backend"
     }
   }
+}

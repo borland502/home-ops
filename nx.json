@@ -1,7 +1,10 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
     "production": [
       "default",
       "!{projectRoot}/eslint.config.js",
@@ -10,16 +13,24 @@
       "!{projectRoot}/jest.config.[jt]s",
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/test-setup.[jt]s",
-      "!{projectRoot}/.stylelintrc(.(json|yml|yaml|js))?"
+      "!{projectRoot}/.stylelintrc(.(json|yml|yaml|js))?",
+      "!{projectRoot}/.eslintrc.json"
     ],
-    "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
+    "sharedGlobals": [
+      "{workspaceRoot}/.github/workflows/ci.yml"
+    ]
   },
   "neverConnectToCloud": true,
   "plugins": [
     {
       "plugin": "@nx/eslint/plugin",
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "targetName": "lint"
+        "targetName": "lint",
+        "lintFilePatterns": [
+          "libs/**/*.mts", "apps/**/*.mts", "scripts/**/*.mts"
+        ],
+        "eslintConfig": "eslint.config.js"
       }
     },
     {
@@ -27,7 +38,12 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/watchyourlan-api-e2e/**/*"]
+      "include": [
+        "jest.config.mts"
+      ],
+      "exclude": [
+        "apps/watchyourlan-api-e2e/**/*"
+      ]
     },
     {
       "plugin": "@nx/playwright/plugin",
@@ -39,13 +55,22 @@
   "targetDefaults": {
     "@nx/esbuild:esbuild": {
       "cache": true,
-      "dependsOn": ["^build"],
-      "inputs": ["production", "^production"]
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ]
     },
     "test": {
       "executor": "nx:run-commands",
-      "dependsOn": ["build"],
-      "inputs": ["default"],
+      "dependsOn": [
+        "build"
+      ],
+      "inputs": [
+        "default"
+      ],
       "outputs": [],
       "options": {
         "cwd": "{projectRoot}",
@@ -55,13 +80,19 @@
     },
     "lint": {
       "cache": true,
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["libs/**/*.mts"],
+        "lintFilePatterns": [
+          "libs/**/*.mts"
+        ],
         "fix": true,
         "eslintConfig": "package.json"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "stylelint": {
       "inputs": [
