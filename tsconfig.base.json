@@ -30,6 +30,6 @@
     "skipDefaultLibCheck": true,
     "noImplicitAny": true,
   },
-  "include": ["**/*.mts", "eslint.config.js", "playwright.config.mts", "jest.config.mts"],
+  "include": ["**/*.mts", "eslint.config.js", "*.mts", "jest.config.mts"],
   "exclude": ["node_modules", "dist", "tmp", "**/.eslintrc", "**/.eslintrc.*"]
 }

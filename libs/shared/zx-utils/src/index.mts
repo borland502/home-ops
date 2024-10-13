@@ -4,6 +4,7 @@ import type { SystemInformation } from "@technohouser/pkg-install";
 import { $ } from "zx";
 import config from "config";
 import { set } from "radash";
+import minimist from "minimist";
 
 export * from 'zx';
 
@@ -14,7 +15,12 @@ export * from 'zx';
 
 export const homeopsConfig = config;
 
+const argv_opts: object = homeopsConfig.get("zx.minimist.opts");
+
+const argv = minimist(process.argv.slice(2), argv_opts)
+
 // Create proxy manually rather than dynamically, and shallowly rather than deep
+set($, "argv", argv);
 set($, "verbose", homeopsConfig.get("zx.verbose") || $.verbose);
 set($, "nothrow", homeopsConfig.get("zx.nothrow") || $.nothrow);
 set($, "log", logProcessor);

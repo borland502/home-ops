@@ -1,7 +1,7 @@
-import { Host } from "@technohouser/watchyourlan";
+import {Host} from "@technohouser/watchyourlan";
 import {DataTypes, QueryTypes} from "sequelize";
 import {Sequelize} from "sequelize-typescript";
-import {homeopsConfig, path, within} from "@technohouser/zx-utils";
+import {homeopsConfig, path} from "@technohouser/zx-utils";
 import {xdgState} from "@technohouser/utils";
 
 const watchYourLanDb = path.join(
@@ -10,9 +10,9 @@ const watchYourLanDb = path.join(
 );
 
 const sequelize = new Sequelize({
-	dialect: "sqlite",
+  dialect: "sqlite",
   storage: `${watchYourLanDb}`,
-	models: [Host],
+  models: [Host],
 });
 
 
@@ -74,20 +74,6 @@ Host.init(
 );
 
 /**
- * Retrieves a paginated list of hosts and network metdadata from the database.
- *
- * @param limit - The maximum number of hosts to retrieve.
- * @param range - The number of hosts to skip (for pagination).
- * @returns A Promise that resolves to an object containing the retrieved hosts and the total count.
- */
-async function findAndCountAll(limit: number, range: number[]) {
-  return await Host.findAndCountAll({
-    limit: limit,
-    offset: range[0],
-  });
-}
-
-/**
  * Retrieves all records from the "now" table in the database.
  *
  * @returns A Promise that resolves to an array of objects, where each object represents a row from the "now" table.
@@ -98,6 +84,3 @@ export async function findAllHosts(): Promise<Host[]> {
     logging: (msg) => console.log(msg),
   });
 }
-//
-//
-// console.log(JSON.stringify(await findAllHosts(), null, 2))
