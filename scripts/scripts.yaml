@@ -7,7 +7,62 @@ vars:
 
 tasks:
 
+#  help:
+#    desc: Scripts available in this project
+#    cmd:
+
+  internal:init:
+    internal: true
+    silent: true
+    desc: Validate script prerequisites
+    preconditions:
+      - test $(command -v npx) || echo "npx is not installed. Please install it."
+      - test $(command -v tsx) || echo "tsx is not installed. Please install it."
+      - test $(command -v zsh) || echo "zsh is not installed. Please install it."
+      - test $(command -v zx) || echo "zx is not installed. Please install it."
+      - test $(command -v python) || echo "python is not installed. Please install it."
+      - test -d "${XDG_DATA_HOME}/automation/home-ops" || echo "The home-ops repository is not cloned. Please clone it."
+    cmds:
+      - |
+        # Confirm that XDG_BIN_HOME is set and not empty
+        if [ -z "${XDG_BIN_HOME+x}" ]; then
+          echo "XDG_BIN_HOME is not set. Please set it to the directory where the scripts will be deployed."
+          exit 2
+        fi
+      - |
+        # Create the target directory if it doesn't exist
+        mkdir -p "${XDG_BIN_HOME}"
+      - |
+        # Confirm that NODE_CONFIG_DIR is set and not empty
+        if [ -z "${NODE_CONFIG_DIR+x}" ]; then
+          echo "NODE_CONFIG_DIR is not set. Please set it to the directory where the configuration files are stored."
+          exit 2
+        fi
+
+  internal:copy:config:
+    internal: true
+    silent: true
+    desc: Copy the configuration files to the NODE_CONFIG_DIR
+    cmds:
+      - |
+        # Define the source directories and the target directory
+        source_dir="{{.HOMEOPS_DIR}}/config"
+        target_dir="${XDG_CONFIG_HOME}/home-ops"
+
+        # Create the target directory if it doesn't exist
+        mkdir -p "$target_dir"
+
+        # Copy the configuration files to the target directory
+        cp -r "$source_dir"/*.toml "$target_dir"
+    sources:
+      - "{{.HOMEOPS_DIR}}/scripts/config/*"
+    generates:
+      - "{{.XDG_CONFIG_HOME}}/home-ops"
+
   deploy:
+    deps:
+      - internal:copy:config
+      - internal:init
     desc: Deploy the scripts to the ~/.local/bin directory
     cmds:
       - |
@@ -26,7 +81,7 @@ tasks:
 
             # missing something about heredocs in yaml
             echo "#!/usr/bin/env zsh" > ${XDG_BIN_HOME}/${base_name}
-            echo "exec $file" >> ${XDG_BIN_HOME}/${base_name}
+            echo "NODE_ENV=prod npx tsx --tsconfig "${XDG_DATA_HOME}/automation/home-ops/tsconfig.base.json" $file" >> ${XDG_BIN_HOME}/${base_name}
 
             chmod +x ${XDG_BIN_HOME}/${base_name}
           done

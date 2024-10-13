@@ -6,6 +6,7 @@ import { getAllData } from "systeminformation";
 import { $, fs, path, question, tmpfile, which } from "zx";
 import { error, warn } from "@technohouser/log";
 import { isNil, xdgCache } from "@technohouser/utils";
+import { get } from 'radash'
 
 const DISTRO = {
   arch: "arch",
@@ -52,15 +53,13 @@ export async function getSystemData(): Promise<SystemInformation> {
 
   try {
     return fs.readJSONSync(sysInfoCacheFile) as SystemInformation;
-  } catch (err) {
-    warn(`Error reading system information cache: ${err}`);
+  } catch (err: unknown) {
+    error(`Error reading system information cache: ${get(err, 'message', 'Unknown error')}`);
     const data = await getAllData("*", "*");
     fs.outputJsonSync(sysInfoCacheFile, JSON.stringify(data, null, 2));
     return data;
   }
 }
-
-const systemData = await getSystemData();
 
 export async function askConfirmation(quest: string): Promise<boolean> {
   const confirmation = await question(`${quest} (y)`);

@@ -1,11 +1,11 @@
 {
   "name": "@home-ops/source",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "license": "MIT",
   "type": "module",
   "private": true,
   "imports": {
-    "node": "^20.17.0"
+    "node": "^20.18.0"
   },
   "scripts": {
     "build:all": "npx nx run-many --target=build --parallel --all ",
