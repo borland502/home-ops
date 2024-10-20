@@ -4,8 +4,8 @@ import type { PathLike } from "fs";
 import type { Systeminformation } from "systeminformation";
 import { getAllData } from "systeminformation";
 import { $, fs, path, question, tmpfile, which } from "zx";
-import { error, warn } from "@technohouser/log";
-import { isNil, xdgCache } from "@technohouser/utils";
+import { error, warn } from "@technohouser/zx-utils";
+import { isNil, xdgCache } from "@technohouser/zx-utils";
 import { get } from 'radash'
 
 const DISTRO = {

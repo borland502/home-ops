@@ -53,19 +53,44 @@ tasks:
         mkdir -p "$target_dir"
 
         # Copy the configuration files to the target directory
-        cp -r "$source_dir"/*.toml "$target_dir"
+        ln -sf "$source_dir"/*.toml "$target_dir"
     sources:
       - "{{.HOMEOPS_DIR}}/scripts/config/*"
     generates:
       - "{{.XDG_CONFIG_HOME}}/home-ops"
 
-  deploy:
+  internal:deploy:taskfiles:
+    silent: true
+    internal: true
     deps:
       - internal:copy:config
       - internal:init
-    desc: Deploy the scripts to the ~/.local/bin directory
+    desc: Deploy the taskfiles to the ~/.config/taskfiles directory
     cmds:
       - |
+        # Define the source directories and the target directory
+        source_dir="{{.HOMEOPS_DIR}}/scripts/taskfiles"
+        target_dir="${XDG_CONFIG_HOME}/taskfiles"
+
+        # Create the target directory if it doesn't exist
+        mkdir -p "$target_dir"
+
+        # Copy the taskfiles to the target directory
+        ln -sf "$source_dir"/*.yaml "$target_dir"
+    sources:
+      - "{{.HOMEOPS_DIR}}/scripts/taskfiles/*"
+    generates:
+      - "{{.XDG_CONFIG_HOME}}/taskfiles"
+
+  internal:deploy:zx:
+    silent: true
+    internal: true
+    deps:
+      - internal:copy:config
+      - internal:init
+    desc: Deploy the ZX scripts to the ~/.local/bin directory
+    cmds:
+      - |-
         # Define the source directories and the target directory
         source_dirs=("{{.HOMEOPS_DIR}}/scripts/bin/zx")
         target_dir="{{.TARGET_DIR}}"
@@ -86,3 +111,12 @@ tasks:
             chmod +x ${XDG_BIN_HOME}/${base_name}
           done
         done
+  deploy:
+    silent: true
+    deps:
+      - task: internal:copy:config
+      - task: internal:init
+    desc: Deploy the scripts to the ~/.local/bin directory
+    cmds:
+      - task: internal:deploy:zx
+      - task: internal:deploy:taskfiles

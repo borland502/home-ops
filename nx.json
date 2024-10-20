@@ -23,6 +23,7 @@
   },
   "neverConnectToCloud": true,
   "plugins": [
+    "@nxlv/python",
     {
       "plugin": "@nx/eslint/plugin",
       "outputs": ["{options.outputFile}"],

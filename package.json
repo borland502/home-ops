@@ -33,7 +33,7 @@
     "@nx/playwright": "^19.8.0",
     "@nx/web": "19.8.0",
     "@nx/workspace": "19.8.0",
-    "@nxlv/python": "^19.1.2",
+    "@nxlv/python": "^19.2.1",
     "@playwright/test": "^1.36.0",
     "@size-limit/file": "^11.1.5",
     "@swc-node/register": "~1.9.1",
