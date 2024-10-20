@@ -1,4 +1,4 @@
-import { info } from "@technohouser/log";
+import { info } from "@technohouser/zx-utils";
 import app from "./server.mjs";
 import { createServer } from "http";
 

@@ -22,17 +22,22 @@ tasks:
     cmds:
       - gts fix $(fd --glob '*.mts' --exclude 'dist/**/*' --exclude 'node_modules/**/*')
 
-#  nx:gen-pyapp:
-#    desc: Generate a new python application for the home-ops repo
-#    silent: true
-#    cmds:
-#      - |
-#        # Confirm that the project name is provided
-#        retVal=$(gum input --prompt="Please provide the python application name to generate: " --placeholder="app name")
-#
-#        npx nx generate @nxlv/poetry-project:app "${retVal}" --directory="pyapps/${retVal}" --tags=type:app,scope:"${retVal}" --linter=ruff \
-#        --unitTestRunner=pytest --projectNameAndRootFormat=as-provided
-#    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+  nx:show:
+    desc: Show the available nx commands
+    silent: true
+    cmds:
+      - npx nx show projects --affected
+
+  nx:gen-pyapp:
+    desc: Generate a new python application for the home-ops repo
+    cmds:
+      - |
+        # Confirm that the project name is provided
+        retVal=$(gum input --prompt="Please provide the python application name to generate: " --placeholder="app name")
+
+        npx nx generate @nxlv/poetry-project "${retVal}" --directory="pyapps/${retVal}" --linter=ruff \
+        --unitTestRunner=pytest --projectNameAndRootFormat=as-provided
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 #
 #  nx:gen-pylib:
 #    desc: Generate a new python library for the home-ops repo

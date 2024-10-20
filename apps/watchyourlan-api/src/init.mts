@@ -1,14 +1,13 @@
 #!/usr/bin/env -S npx tsx --tsconfig ./scripts/tsconfig.app.json
 
 import {
-  fs, homeopsConfig,
-  path,
+  fs, homeopsConfig
 } from "@technohouser/zx-utils";
-import { error } from "@technohouser/log";
-import {xdgState} from "@technohouser/utils";
+import { error, xdgState } from "@technohouser/zx-utils";
 import {Sequelize} from "sequelize-typescript";
 import {Host} from "@technohouser/watchyourlan";
 import process from "process"
+import path from "path";
 
 const watchYourLanDb = path.join(
   xdgState,
