@@ -4,7 +4,7 @@ import type { PathLike } from "fs";
 import type { Systeminformation } from "systeminformation";
 import { getAllData } from "systeminformation";
 import { $, fs, path, question, tmpfile, which } from "zx";
-import { error, warn } from "@technohouser/zx-utils";
+import {error, info, warn} from "@technohouser/zx-utils";
 import { isNil, xdgCache } from "@technohouser/zx-utils";
 import { get } from 'radash'
 
@@ -42,23 +42,25 @@ export type SystemInformation = Systeminformation.StaticData &
   Systeminformation.DynamicData;
 
 export async function getSystemData(): Promise<SystemInformation> {
-  const cacheDir = isNil(xdgCache)
-    ? "${os.homedir()}/.cache/sysinfo"
-    : path.join(xdgCache, "/sysinfo");
-  const sysInfoCacheFile = path.join(cacheDir, "sysinfo.json");
+    return await getAllData("*", "*");
+    // fs.outputJsonSync(sysInfoCacheFile, JSON.stringify(data, null, 2));
+    // return data;
 
-  fs.ensureDirSync(cacheDir, {
-    mode: 0o700,
-  });
-
-  try {
-    return fs.readJSONSync(sysInfoCacheFile) as SystemInformation;
-  } catch (err: unknown) {
-    error(`Error reading system information cache: ${get(err, 'message', 'Unknown error')}`);
-    const data = await getAllData("*", "*");
-    fs.outputJsonSync(sysInfoCacheFile, JSON.stringify(data, null, 2));
-    return data;
-  }
+  // const cacheDir = isNil(xdgCache)
+  //   ? "${os.homedir()}/.cache/sysinfo"
+  //   : path.join(xdgCache, "/sysinfo");
+  // const sysInfoCacheFile = path.join(cacheDir, "sysinfo.json");
+  //
+  // fs.ensureDirSync(cacheDir, {
+  //   mode: 0o700,
+  // });
+  //
+  // try {
+  //   return fs.readJSONSync(sysInfoCacheFile) as SystemInformation;
+  // } catch (err: unknown) {
+  //   error(`Error reading system information cache: ${get(err, 'message', 'Unknown error')}`);
+  //
+  // }
 }
 
 export async function askConfirmation(quest: string): Promise<boolean> {

@@ -6,9 +6,6 @@
     "baseUrl": ".",
     "paths": {
       "@technohouser/eslint": ["libs/tools/eslint/src/index.mts"],
-      "@technohouser/log": ["libs/shared/log/src/index.mts"],
-      "@technohouser/pkg-install": ["libs/shared/pkg-install/src/index.mts"],
-      "@technohouser/utils": ["libs/shared/utils/src/index.mts"],
       "@technohouser/watchyourlan": ["libs/watchyourlan-api/src/index.mts"],
       "@technohouser/zx-utils": ["libs/shared/zx-utils/src/index.mts"]
     },
@@ -30,6 +27,6 @@
     "skipDefaultLibCheck": true,
     "noImplicitAny": true,
   },
-  "include": ["**/*.mts", "eslint.config.js", "*.mts", "jest.config.mts"],
+  "include": ["**/*.mts", "./jest.config.ts", "eslint.config.js", "playwright.config.mts", "jest.config.mts"],
   "exclude": ["node_modules", "dist", "tmp", "**/.eslintrc", "**/.eslintrc.*"]
 }

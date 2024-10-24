@@ -5,19 +5,29 @@
   "projectType": "library",
   "tags": [],
   "targets": {
+    "gtsLint": {
+      "command": "gts lint apps/watchyourlan-api/**/*.mts",
+      "cache": true
+    },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "libs/watchyourlan-api/**/*.mts"
-        ]
+        "lintFilePatterns": ["libs/watchyourlan-api/src/**/*.mts"],
+        "eslintConfig": "eslint.config.js",
+        "format": "stylish",
+        "fix": true
       },
-      "dependsOn": [
-        "^build"
-      ],
+      "cache": true,
+      "dependsOn": ["^nx-stylelint:lint", "^build", "^gtsLint"]
+    },
+    "stylelint": {
+      "executor": "nx-stylelint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/watchyourlan-api/**/*.css"],
+        "formatter": "github"
+      },
       "cache": true
     },
     "build": {

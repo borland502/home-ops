@@ -15,18 +15,22 @@ includes:
 tasks:
   lint:
     desc: Run all linters
-    cmd: gts lint $(fd --glob '*.mts' --exclude 'playwright.config.mts' --exclude 'dist/**/*' --exclude 'node_modules/**/*')
-
-  lint:fixall:
-    desc: Fix all linting errors
-    cmds:
-      - gts fix $(fd --glob '*.mts' --exclude 'dist/**/*' --exclude 'node_modules/**/*')
+    cmd: npx nx run-many --target=lint --parallel --all
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   nx:show:
     desc: Show the available nx commands
     silent: true
     cmds:
       - npx nx show projects --affected
+
+  nx:build:
+    desc: Build all the projects
+    deps:
+      - task: lint
+    cmds:
+      - npx nx run-many --target=build --parallel --all
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   nx:gen-pyapp:
     desc: Generate a new python application for the home-ops repo
