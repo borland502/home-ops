@@ -1,5 +1,5 @@
-import {$, which, argv, fs, error, info} from "@technohouser/zx-utils"
-import {isString, get} from "radash"
+import {$, argv, error, fs, info, which} from "@technohouser/zx-utils"
+import {get} from "radash"
 import {exit} from "node:process";
 
 /**
@@ -34,7 +34,7 @@ if (argv._.length === 0) {
   await $`${vscode} .`
 } else {
   for (const arg of argv._) {
-    if(await fs.pathExists(arg)) {
+    if (await fs.pathExists(arg)) {
       await $`${vscode} ${arg}`
     } else {
       error(`Directory ${arg} does not exist`)

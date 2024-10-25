@@ -28,7 +28,7 @@
       "plugin": "@nx/eslint/plugin",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "targetName": "lint",
+        "targetName": "pylint",
         "lintFilePatterns": [
           "libs/**/*.mts", "apps/**/*.mts", "scripts/**/*.mts"
         ],
@@ -90,11 +90,11 @@
           "libs/**/*.mts"
         ],
         "fix": true,
-        "eslintConfig": "package.json"
-      },
-      "dependsOn": [
-        "^build"
-      ]
+        "eslintConfig": "package.json",
+        "options": {
+          "targetName": "lint"
+        }
+      }
     },
     "stylelint": {
       "inputs": [

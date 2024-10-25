@@ -1,14 +1,4 @@
-import {
-  $,
-  error,
-  getSystemData,
-  hasCommand,
-  info,
-  installByBrew,
-  detectShell,
-  echo
-} from "@technohouser/zx-utils"
-import { exit } from "process"
+import {$, detectShell, error, getSystemData, hasCommand, info, installByBrew} from "@technohouser/zx-utils"
 
 const sysinfo = await getSystemData()
 
@@ -146,7 +136,7 @@ await hasCommand("tldr").then((hasTLDR) => {
 })
 
 await hasCommand("softwareupdate").then((hasSoftwareUpdate) => {
-  if(hasSoftwareUpdate !== null && sysinfo.os.distro === "macOS") {
+  if (hasSoftwareUpdate !== null && sysinfo.os.distro === "macOS") {
     $`softwareupdate --install --all --force`.catch((reason: unknown) => {
       error(`Error: ${reason}`)
     })
