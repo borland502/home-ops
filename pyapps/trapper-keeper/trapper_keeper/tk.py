@@ -6,10 +6,11 @@ import contextlib
 from enum import StrEnum, auto
 from pathlib import Path
 
-from trapper_keeper.stores.bolt_kvstore import BoltStore
-from trapper_keeper.stores.keepass_store import KeepassStore
 from pandas import DataFrame
 from pykeepass.entry import Entry
+
+from trapper_keeper.stores.bolt_kvstore import BoltStore
+from trapper_keeper.stores.keepass_store import KeepassStore
 
 
 # TODO: Factory pattern would probably suit here
@@ -27,6 +28,7 @@ class DbTypes(StrEnum):
 
 
 def open_tk_store(db_type: DbTypes, db_path: Path, **kwargs) -> contextlib.AbstractContextManager:
+  """Open a Trapper Keeper store based on the db_type."""
   match db_type:
     case DbTypes.BOLT:
       readonly: bool = kwargs["readonly"]
@@ -41,6 +43,7 @@ def open_tk_store(db_type: DbTypes, db_path: Path, **kwargs) -> contextlib.Abstr
 
 # TODO: Remove
 def validate_tk_store(db_type: DbTypes, db_path: Path, **kwargs) -> bool:
+  """Validate a Trapper Keeper store based on the db_type."""
   match db_type:
     case DbTypes.KP:
       key: Path = kwargs["key"]
@@ -51,6 +54,7 @@ def validate_tk_store(db_type: DbTypes, db_path: Path, **kwargs) -> bool:
 
 # TODO: Remove
 def save_dataframe(df: DataFrame, db_type: DbTypes, db_path: Path, **kwargs):
+  """Save a DataFrame to a Trapper Keeper store based on the db_type."""
   match db_type:
     case DbTypes.KP:
       key: Path = kwargs["key"]

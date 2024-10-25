@@ -27,6 +27,8 @@ pandas = "^2.2.3"
 pykeepass = "^4.1.0.post1"
 boltdb = "^0.0.2"
 faker = "^30.8.1"
+benedict = "^0.3.2"
+sqlite-utils = "^3.37"
 
 [tool.poetry.dependencies.resources]
 path = "../../pylibs/resources"
@@ -64,7 +66,6 @@ exclude = [
 
 [tool.ruff.lint]
 ignore = [
-  "C901",
   "PLR0912",
   "D104",
   "D203",
@@ -72,19 +73,16 @@ ignore = [
   "E501",
   "PGH003",
   "RET504",
-  "S101",
-  "S307",
   "D205",
   "ISC001",
   "E111",
-  "N999"
+  "N999",
+  "PT009"
 ]
 select = [
   "A",
   "ASYNC",
   "B",
-  "C4",
-  "C90",
   "D",
   "DTZ",
   "E",
@@ -92,7 +90,6 @@ select = [
   "FLY",
   "I",
   "ISC",
-  "LOG",
   "N",
   "NPY",
   "PERF",
@@ -122,7 +119,9 @@ section-order = [
   "third-party",
   "first-party",
   "tests",
-  "local-folder"
+  "local-folder",
+  "fixable",
+  "unfixable"
 ]
 
 [tool.ruff.lint.isort.sections]

@@ -13,9 +13,11 @@ class BoltStore(AbstractContextManager):
   """Basic context manager for accessing BoltDB."""
 
   def __entry__(self) -> Tx:
+    """Enters the BoltStore context manager."""
     return self.tx
 
   def __init__(self, bp_fp: Path, readonly: bool):
+    """Initializes the BoltStore context manager."""
     self.bolt_db = BoltDB(filename=bp_fp, readonly=readonly)
     self.tx = self.bolt_db.begin(writable=(not readonly))
     self.readonly = readonly
@@ -24,6 +26,7 @@ class BoltStore(AbstractContextManager):
     self.bp_fp = bp_fp
 
   def __getattr__(self, item):
+    """Gets the attribute of the BoltStore context manager."""
     def method(*args):
       # boltdb lib calls close on del and that behavior is neither wanted nor desirable
       if item in self.bolt_db_methods:
@@ -36,6 +39,7 @@ class BoltStore(AbstractContextManager):
     return method
 
   def __exit__(self, __exc_type, __exc_value, __traceback):
+    """Exits the BoltStore context manager."""
     if not self.readonly:
       self.tx.write()
       self.tx.commit()

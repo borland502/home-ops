@@ -1,8 +1,11 @@
+"""Offer a persistent dictionary with an API compatible with shelve and anydbm."""
 import csv
 import json
 import os
 import pickle
 import shutil
+
+import benedict
 
 
 class PersistentDict(benedict):
@@ -19,19 +22,21 @@ class PersistentDict(benedict):
   All three serialization formats are backed by fast C implementations.
   """
 
-  def __init__(self, filename, flag="c", mode=None, format="pickle", *args, **kwds):
+  def __init__(self, filename, flag="c", mode=None, file_format="pickle", *args, **kwds):
+    """Initialize a persistent dictionary."""
     self.flag = flag  # r=readonly, c=create, or n=new
     self.mode = mode  # None or an octal triple like 0644
-    self.format = format  # 'csv', 'json', or 'pickle'
+    self.format = file_format  # 'csv', 'json', or 'pickle'
     self.filename = filename
     if flag != "n" and os.access(filename, os.R_OK):
-      fileobj = open(filename, "rb" if format == "pickle" else "r")
+      # ruff: noqa: SIM115
+      fileobj = open(filename, "rb" if file_format == "pickle" else "r")
       with fileobj:
         self.load(fileobj)
     dict.__init__(self, *args, **kwds)
 
   def sync(self):
-    """Write dict to disk"""
+    """Write dict to disk."""
     if self.flag == "r":
       return
     filename = self.filename
@@ -49,15 +54,19 @@ class PersistentDict(benedict):
       os.chmod(self.filename, self.mode)
 
   def close(self):
+    """Synchronize and close file."""
     self.sync()
 
   def __enter__(self):
+    """Context manager enter."""
     return self
 
   def __exit__(self, *exc_info):
+    """Context manager exit."""
     self.close()
 
   def dump(self, fileobj):
+    """Pickle to file."""
     if self.format == "csv":
       csv.writer(fileobj).writerows(self.items())
     elif self.format == "json":
@@ -68,9 +77,11 @@ class PersistentDict(benedict):
       raise NotImplementedError("Unknown format: " + repr(self.format))
 
   def load(self, fileobj):
-    # try formats from most restrictive to least restrictive
+    """Load from file."""
+    # try formats from most restrictive to the least restrictive
     for loader in (pickle.load, json.load, csv.reader):
       fileobj.seek(0)
+      # noinspection PyBroadException
       try:
         return self.update(loader(fileobj))
       except Exception:
@@ -79,10 +90,11 @@ class PersistentDict(benedict):
 
 
 if __name__ == "__main__":
+  """Demonstrate the PersistentDict class."""
   import random
 
   # Make and use a persistent dictionary
-  with PersistentDict("/tmp/demo.json", "c", format="json") as d:
+  with PersistentDict("/tmp/demo.json", "c", file_format="json") as d:
     print(d, "start")
     d["abc"] = "123"
     d["rand"] = random.randrange(10000)

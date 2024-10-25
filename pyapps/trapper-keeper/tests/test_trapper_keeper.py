@@ -3,12 +3,15 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from trapper_keeper.tk import DbTypes, open_tk_store
 from faker import Faker
-from pykeepass.pykeepass import PyKeePass, create_database
+from pykeepass.pykeepass import create_database
+
+from trapper_keeper.tk import DbTypes, open_tk_store
 
 
 class TestTrapperKeeper(unittest.TestCase):
+  """Tests for the trapper_keeper module."""
+
   def setUp(self):
     """Sets up the test environment."""
     self.fake = Faker()
@@ -23,6 +26,7 @@ class TestTrapperKeeper(unittest.TestCase):
       self.bolt_path = Path(tmpdir, "bolt.db")
 
   def test_chezmoi_bolt_db_rw(self):
+    """Test that we can read and write to a bolt db."""
     # Create boltdb file
     self.bolt_path.touch()
     with open_tk_store(db_type=DbTypes.BOLT, db_path=self.bolt_path, readonly=False) as tx:
@@ -55,9 +59,9 @@ class TestTrapperKeeper(unittest.TestCase):
       self.assertIsNotNone(script_state)
 
   def test_keepass_basic_db_rw(self):
+    """Test that we can read and write to a keepass db."""
     create_database(self.kp_db, self.kp_token.read_text(encoding="utf-8"), keyfile=self.kp_key)
     with open_tk_store(db_type=DbTypes.KP, db_path=self.kp_db, token=self.kp_token, key=self.kp_key) as tk_db:
-      tk_db: PyKeePass = tk_db
       self.assertTrue(self.kp_token.exists())
       self.assertTrue(self.kp_key.exists())
       for _ in range(19):

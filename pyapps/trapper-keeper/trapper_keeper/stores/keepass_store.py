@@ -1,3 +1,4 @@
+"""Keepass store for trapper-keeper."""
 from __future__ import annotations
 
 import os
@@ -40,6 +41,7 @@ ATTR_URL = "__url__"
 
 
 def _validate_ref(ref: str) -> None:
+  """Validate the ref string."""
   if not ref:
     raise ValueError("Empty ref")
   if not ref.startswith(REF_PREFIX):
@@ -55,6 +57,7 @@ def _validate_ref(ref: str) -> None:
 
 
 def _parse_ref(ref: str) -> tuple[list[str], str]:
+  """Parse the ref string."""
   _validate_ref(ref)
   ref = ref.removeprefix(REF_PREFIX)
   _path, attribute = ref.rsplit(REF_SEP2, maxsplit=1)
@@ -63,7 +66,9 @@ def _parse_ref(ref: str) -> tuple[list[str], str]:
 
 
 class KeepassStore(PyKeePass):
+  """Keepass store for trapper-keeper."""
   def __init__(self, kp_fp: Path, kp_token: Path, kp_key: Path | None = None):
+    """Initialize the KeepassStore."""
     super().__init__(
       filename=kp_fp,
       password=kp_token.read_text(encoding="utf-8"),
@@ -71,9 +76,11 @@ class KeepassStore(PyKeePass):
     )
 
   def __enter__(self) -> AbstractContextManager:
+    """Context manager enter."""
     return self
 
   def load_ref(self, ref: str) -> str:
+    """Load a reference."""
     path, attribute = _parse_ref(ref)
     entry = self.find_entries(path=path)
     if entry is None:
@@ -95,6 +102,7 @@ class KeepassStore(PyKeePass):
     return out
 
   def load_env(self, entry_path: Sequence[str]) -> None:
+    """Load the environment."""
     env = self.env(entry_path=entry_path)
     for k, v in env.items():
       os.environ[k] = v
@@ -122,17 +130,19 @@ class KeepassStore(PyKeePass):
     env: dict[str, str],
     create_if_not_exists: bool = True,
   ) -> None:
+    """Write the environment."""
     entry = self.find_entries(path=entry_path)
     if entry is None:
       if create_if_not_exists:
         raise NotImplementedError
-      else:
-        raise KeyError(f"Entry {entry_path!r} not found")
+
+      raise KeyError(f"Entry {entry_path!r} not found")
     for k, v in env.items():
       entry.set_custom_property(k, v)
     self.save()
 
   def dump_env(self, entry_path: Sequence[str], output_format: str) -> StringIO:
+    """Dump the environment."""
     with StringIO() as sink:
       for k, v in self.env(entry_path):
         match output_format:
@@ -148,4 +158,5 @@ class KeepassStore(PyKeePass):
       return sink
 
   def __exit__(self, __exc_type, __exc_value, __traceback):
+    """Context manager exit."""
     super().__exit__(__exc_type, __exc_value, __traceback)

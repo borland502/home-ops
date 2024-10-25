@@ -29,6 +29,7 @@ tasks:
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   build:
+    run: once
     deps:
       - task: lint
     desc: Build all the projects
@@ -39,6 +40,7 @@ tasks:
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   test:
+    run: once
     desc: Test all the projects
     deps:
       - task: lint
@@ -67,6 +69,7 @@ tasks:
     deps:
       - task: lint
       - task: build
+      - task: test
     cmds:
       # - npx nx run-many --target=deploy --parallel --all
       - "echo hi"
