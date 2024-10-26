@@ -1,0 +1,3 @@
+[submodule "dotfiles"]
+	path = scripts/dotfiles
+	url = https://github.com/borland502/dotfiles

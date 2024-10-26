@@ -47,3 +47,5 @@ test-results
 .task
 .coverage
 **/*.coverage
+
+__pycache__
