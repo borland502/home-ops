@@ -1,3 +1,0 @@
-# ansible
-
-Project description here.

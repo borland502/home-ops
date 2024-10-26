@@ -6,7 +6,7 @@ export default tseslint.config(
     ignores: ["**/*.js",".eslintrc.*", ".eslintrc", "**/*.spec.mts"]
   },
   {
-    files: ["apps/watchyourlan-api/**/*.mts"]
+    files: ["**/*.mts"],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
@@ -15,7 +15,7 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         projectService: true,
-        tsconfigRootDir: import.meta.dirname
+        tsconfigRootDir: "."
       }
     },
   }

@@ -7,7 +7,7 @@ import type { Request, Response } from "express";
 import express from "express"
 import { homeopsConfig } from "@technohouser/zx-utils";
 import cors from "cors";
-import { HttpStatusCodes } from "@technohouser/utils";
+import { HttpStatusCodes } from "@technohouser/zx-utils";
 import { checkAndSyncTable } from "./init.mjs";
 import { BaseRouter, Paths, RouteError } from "@technohouser/watchyourlan";
 

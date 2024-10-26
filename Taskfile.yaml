@@ -2,24 +2,107 @@
 version: "3"
 
 includes:
-    scripts:
-        taskfile: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts/scripts.yaml"
-        dir: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts"
+  scripts:
+    taskfile: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts/scripts.yaml"
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts"
+  chez:
+    taskfile: "{{.XDG_CONFIG_HOME}}/taskfiles/chezmoi.yaml"
+    dir: "{{.CHEZMOI_HOME}}"
+  keepassxc:
+    taskfile: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts/taskfiles/keepassxc.yaml"
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts/taskfiles"
 
 tasks:
-  lint:
-    desc: Run all linters
-    cmd: gts lint $(fd --glob '*.mts' --exclude 'playwright.config.mts' --exclude 'dist/**/*' --exclude 'node_modules/**/*')
-
-  lint:fixall:
-    desc: Fix all linting errors
+  nx:show:
+    desc: Show the available nx commands
+    silent: true
     cmds:
-      - gts fix $(fd --glob '*.mts' --exclude 'dist/**/*' --exclude 'node_modules/**/*')
+      - npx nx show projects --affected
 
+  lint:
+    desc: Lint all the projects
+    run: once
+    summary: |
+      This task lints all the projects locally
+    cmds:
+      - npm run lint:all
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
-#  nx:gen-pyapp:
-#    desc: Generate a new python application for the home-ops repo
-#    cmd:
-#
-#  nx:gen-pylib:
-#    desc: Generate a new python library for the home-ops repo
+  build:
+    run: once
+    deps:
+      - task: lint
+    desc: Build all the projects
+    summary: |
+      This task builds all the projects locally
+    cmds:
+      - npm run build:all
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+
+  test:
+    run: once
+    desc: Test all the projects
+    deps:
+      - task: lint
+      - task: build
+    summary: |
+      This task tests all the projects locally
+    cmds:
+      - npm run test:all
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+
+  #    mcv:pack:
+  #      desc: Pack all the projects
+  #      summary: |
+  #        This task packs all the projects locally
+  #      deps:
+  #        - task: lint
+  #        - task: nx:build
+  #      cmds:
+  #        - npx nx run-many --target=pack --parallel --all
+  #      dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+
+  mcv:unpack:
+    desc: Deploy all the system and home directory projects
+    summary: |
+      This task verifies, configures, and deploys projects locally much like a [Mobile Construction Vehicle](https://cnc.fandom.com/wiki/Mobile_construction_vehicle)
+    deps:
+      - task: lint
+      - task: build
+      - task: test
+    cmds:
+      # - npx nx run-many --target=deploy --parallel --all
+      - "echo hi"
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+
+  pyapp:create:
+    desc: Create a new Python application
+    summary: |
+      This task creates a new Python application
+    cmds:
+      - >-
+        npx nx generate @nxlv/python:poetry-project {{.PROJ_NAME}} --projectType application --packageName {{.PROJ_NAME}}
+        --directory pyapps/{{.PROJ_NAME}} --moduleName {{.MODULE_NAME}}  --pyprojectPythonDependency '>=3.12'
+        --linter ruff --projectNameAndRootFormat as-provided
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+    vars:
+      PROJ_NAME:
+        sh: "echo $(gum input --placeholder 'Project Name')"
+      MODULE_NAME:
+        sh: "echo $(gum input --placeholder 'Module Name: Usually the same as the project name with an underscore')"
+
+  pylib:create:
+    desc: Create a new Python library
+    summary: |
+      This task creates a new Python library
+    cmds:
+      - >-
+        npx nx generate @nxlv/python:poetry-project {{.PROJ_NAME}} --projectType library --packageName {{.PROJ_NAME}}
+        --directory pylibs/{{.PROJ_NAME}} --moduleName {{.MODULE_NAME}}  --pyprojectPythonDependency '>=3.12'
+        --linter ruff --projectNameAndRootFormat as-provided
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+    vars:
+      PROJ_NAME:
+        sh: "echo $(gum input --placeholder 'Library Name')"
+      MODULE_NAME:
+        sh: "echo $(gum input --placeholder 'Module Name: Usually the same as the library name with an underscore')"

@@ -1,14 +1,14 @@
 {
-  "name": "resources",
+  "name": "trapper-keeper",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "projectType": "library",
-  "sourceRoot": "pylibs/resources/resources",
+  "projectType": "application",
+  "sourceRoot": "pyapps/trapper-keeper/trapper_keeper",
   "targets": {
     "lock": {
       "executor": "@nxlv/python:run-commands",
       "options": {
         "command": "poetry lock --no-update",
-        "cwd": "pylibs/resources"
+        "cwd": "pyapps/trapper-keeper"
       }
     },
     "add": {
@@ -29,7 +29,7 @@
         "{projectRoot}/dist"
       ],
       "options": {
-        "outputPath": "pylibs/resources/dist",
+        "outputPath": "pyapps/trapper-keeper/dist",
         "publish": false,
         "lockedVersions": true,
         "bundleLocalDependencies": true
@@ -50,7 +50,7 @@
       "outputs": [],
       "options": {
         "lintFilePatterns": [
-          "resources",
+          "trapper_keeper",
           "tests"
         ]
       }
@@ -58,12 +58,12 @@
     "test": {
       "executor": "@nxlv/python:run-commands",
       "outputs": [
-        "{workspaceRoot}/reports/pylibs/resources/unittests",
-        "{workspaceRoot}/coverage/pylibs/resources"
+        "{workspaceRoot}/reports/pyapps/trapper-keeper/unittests",
+        "{workspaceRoot}/coverage/pyapps/trapper-keeper"
       ],
       "options": {
         "command": "poetry run pytest tests/",
-        "cwd": "pylibs/resources"
+        "cwd": "pyapps/trapper-keeper"
       }
     }
   },

@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+vars:
+  HOMEOPS_DB: "{{.XDG_DATA_HOME}}/automation/home_ops.kdbx"
+  HA_TOKEN: "78bd91ec-a925-41ac-81de-2a91bc4916d9_ha_token"
+
+includes:
+    validate:
+        taskfile: "./validate.yaml"
+
+tasks:
+
+  internal:keepassxc:validate:
+    desc: Validate the keepassxc database
+    preconditions:
+      - sh: |
+          # Confirm that keepassxc-cli is installed
+          if [[ ! $(command -v keepassxc-cli) ]]; then
+            echo "keepassxc-cli is not installed. Please install it."
+            exit 2
+          fi
+        msg: "keepassxc-cli is not installed. Please install it."
+    deps:
+      - task: validate:internal:xdg
+    cmds:
+      - test -f {{.HOMEOPS_DB}}
+
+  open:
+    desc: Open the keepassxc database
+    interactive: true
+    deps:
+      - task: internal:keepassxc:validate
+    cmds:
+      - keepassxc-cli open {{.HOMEOPS_DB}}

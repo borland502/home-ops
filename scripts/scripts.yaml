@@ -1,6 +1,10 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
+includes:
+    validate:
+        taskfile: "./taskfiles/validate.yaml"
+
 vars:
   HOMEOPS_DIR: "${XDG_DATA_HOME}/automation/home-ops"
   TARGET_DIR: "${XDG_BIN_HOME}"
@@ -53,21 +57,80 @@ tasks:
         mkdir -p "$target_dir"
 
         # Copy the configuration files to the target directory
-        cp -r "$source_dir"/*.toml "$target_dir"
+        ln -sf "$source_dir"/*.toml "$target_dir"
     sources:
       - "{{.HOMEOPS_DIR}}/scripts/config/*"
     generates:
       - "{{.XDG_CONFIG_HOME}}/home-ops"
 
-  deploy:
-    deps:
-      - internal:copy:config
-      - internal:init
-    desc: Deploy the scripts to the ~/.local/bin directory
+  internal:deploy:taskfiles:
+    silent: true
+    internal: true
+    desc: Deploy the taskfiles to the ~/.config/taskfiles directory
     cmds:
       - |
         # Define the source directories and the target directory
-        source_dirs=("{{.HOMEOPS_DIR}}/scripts/bin/zx")
+        source_dir="{{.HOMEOPS_DIR}}/scripts/taskfiles"
+        target_dir="${XDG_CONFIG_HOME}/taskfiles"
+
+        # Create the target directory if it doesn't exist
+        mkdir -p "$target_dir"
+
+        # Copy the taskfiles to the target directory
+        ln -sf "$source_dir"/*.yaml "$target_dir"
+    sources:
+      - "{{.HOMEOPS_DIR}}/scripts/taskfiles/*"
+    generates:
+      - "{{.XDG_CONFIG_HOME}}/taskfiles"
+
+  internal:deploy:shell:
+    desc: Deploy the shell scripts to the ~/.local/{bin,lib} directory
+    silent: true
+    internal: true
+    cmds:
+      - |
+        # Define the source directories and the target directory
+        source_dirs=("{{.HOMEOPS_DIR}}/scripts/shell/bin")
+        target_dir="{{.TARGET_DIR}}"
+
+        # Create the target directory if it doesn't exist
+        mkdir -p "$target_dir"
+
+        # copy the shell scripts to the target directory
+        for dir in "${source_dirs[@]}"; do
+          files=$(find "$dir" -type f)
+          for file in $files; do
+            base_name=$(basename "$file" | sed 's/\.[^.]*$//')
+            ln -sf "${file}" ${XDG_BIN_HOME}/${base_name}
+
+            chmod +x ${XDG_BIN_HOME}/${base_name}
+          done
+        done
+      - |
+        # Define the source directories and the target directory
+        source_dirs=("{{.HOMEOPS_DIR}}/scripts/shell/lib")
+        target_dir="{{.TARGET_DIR}}"
+
+        # Create the target directory if it doesn't exist
+        mkdir -p "$target_dir"
+
+        # copy the shell scripts to the target directory
+        for dir in "${source_dirs[@]}"; do
+          files=$(find "$dir" -type f)
+          for file in $files; do
+            base_name=$(basename "$file")
+            ln -sf "${file}" ${XDG_LIB_HOME}/${base_name}
+          done
+        done
+
+  internal:deploy:zx:
+    silent: true
+    internal: true
+    desc: Deploy the ZX scripts to the ~/.local/bin directory
+    cmds:
+      - |-
+        # Define the source directories and the target directory
+        source_dirs=("{{.HOMEOPS_DIR}}/scripts/zx")
         target_dir="{{.TARGET_DIR}}"
 
         # Create the target directory if it doesn't exist
@@ -86,3 +149,14 @@ tasks:
             chmod +x ${XDG_BIN_HOME}/${base_name}
           done
         done
+  deploy:
+    silent: true
+    deps:
+      - task: validate:internal:xdg
+      - task: internal:copy:config
+      - task: internal:init
+    desc: Deploy the scripts to the ~/.local/bin directory
+    cmds:
+      - task: internal:deploy:zx
+      - task: internal:deploy:taskfiles
+      - task: internal:deploy:shell

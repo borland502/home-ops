@@ -1,6 +1,6 @@
 import { HostService, Host } from "@technohouser/watchyourlan";
 import type { Request, Response } from "express";
-import { HttpStatusCodes } from "@technohouser/utils";
+import { HttpStatusCodes } from "@technohouser/zx-utils";
 import { get } from "radash";
 import * as jsonapi from "jsonapi-serializer";
 

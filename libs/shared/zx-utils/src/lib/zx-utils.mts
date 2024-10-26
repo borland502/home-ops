@@ -1,13 +1,35 @@
-import * as logger from "@technohouser/log";
+import * as logger from "./log.mjs";
 import { isString } from "radash";
 import * as zx from "zx";
-
-// type ZxCommonOptions = Pick<Options, 'shell' | 'verbose' | 'nothrow' | 'log'>;
+import config from "config";
 
 const whichOptions = {
   path: "/bin:/usr/bin:/usr/local/bin",
   nothrow: true,
 };
+
+export const homeopsConfig = config;
+
+/**
+ * Override the default zx options with custom options and functions
+ */
+// Create proxy manually rather than dynamically, and shallowly rather than deep
+// const argv_opts: object = homeopsConfig.get("zx.minimist.opts");
+// export const argv = zx.minimist(process.argv.slice(2), argv_opts)
+// export const fs = zx.fs;
+//
+
+// // override defaults
+// zx.$.arguments = argv;
+// zx.$.verbose = homeopsConfig.get("zx.verbose") || zx.$.verbose;
+// zx.$.nothrow = homeopsConfig.get("zx.nothrow") || zx.$.nothrow;
+// zx.$.log = logProcessor;
+//
+// // export augmented zx functions and options
+//
+// export const $ = zx.$;
+
+export * from "zx";
 
 export async function detectShell(): Promise<string | boolean> {
   const shells = await Promise.all([
@@ -39,7 +61,7 @@ export async function detectShell(): Promise<string | boolean> {
  * custom
  * retry
  */
-export function logProcessor(entry: zx.LogEntry) {
+function logProcessor(entry: zx.LogEntry) {
   switch (entry.kind) {
     case "stdout":
       logger.info(entry.data.toString());

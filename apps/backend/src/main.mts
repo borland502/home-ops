@@ -5,7 +5,7 @@
 
 import type { Request, Response } from "express";
 import express from "express";
-import { info } from "@technohouser/log";
+import { info } from "@technohouser/zx-utils";
 import config from "config";
 import { toInt } from "radash";
 

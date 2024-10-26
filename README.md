@@ -59,6 +59,8 @@ Sources:
 
 ## TODO:
 
+- Add home assistant integration
+- Add secrets management via google drive & keepass
 - Don't use esbuild for production bundles
 - Add jest
 - Sort out documentation publishing
