@@ -9,11 +9,15 @@
       "executor": "@nx/esbuild:esbuild",
       "options": {
         "main": "apps/watchyourlan-api/src/main.mts",
-        "format": ["esm"],
+        "format": [
+          "esm"
+        ],
         "outputPath": "dist",
         "outputFileName": "apps/watchyourlan-api/main.mjs",
         "tsConfig": "apps/watchyourlan-api/tsconfig.app.json",
-        "assets": ["apps/watchyourlan-api/*.md"],
+        "assets": [
+          "apps/watchyourlan-api/*.md"
+        ],
         "bundle": true,
         "deleteOutputPath": true,
         "generatePackageJson": true,
@@ -37,12 +41,19 @@
         ],
         "config": "playwright.config.mts"
       },
+      "dependsOn": [
+        "build", "^serve"
+      ],
       "cache": true
     },
     "serve": {
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "command": "npx tsx dist/apps/watchyourlan-api/main.js",
-      "dependsOn": ["build"]
+      "dependsOn": [
+        "build"
+      ]
     },
     "gtsLint": {
       "command": "gts lint apps/watchyourlan-api/**/*.mts",
@@ -50,27 +61,41 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["apps/watchyourlan-api/**/*.mts"],
+        "lintFilePatterns": [
+          "apps/watchyourlan-api/**/*.mts"
+        ],
         "eslintConfig": "eslint.config.js",
         "format": "stylish",
         "fix": true
       },
       "cache": true,
-      "dependsOn": ["^nx-stylelint:lint", "^build", "^gtsLint"]
+      "dependsOn": [
+        "^nx-stylelint:lint",
+        "^build",
+        "^gtsLint"
+      ]
     },
     "stylelint": {
       "executor": "nx-stylelint:lint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["apps/watchyourlan-api/**/*.css"],
+        "lintFilePatterns": [
+          "apps/watchyourlan-api/**/*.css"
+        ],
         "formatter": "github"
       },
       "cache": true
     },
     "docker-build": {
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "command": "docker build -f apps/watchyourlan-api/Dockerfile . -t watchyourlan-api"
     }
   }

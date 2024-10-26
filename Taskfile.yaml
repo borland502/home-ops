@@ -15,9 +15,30 @@ includes:
 tasks:
   nx:show:
     desc: Show the available nx commands
+    run: once
     silent: true
     cmds:
       - npx nx show projects --affected
+
+#  serve:
+#    desc: Serve the application
+#    cmds:
+#      - npx nx run-many --target=serve --parallel --all
+#    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+#
+#  e2e:
+#    desc: Run the end-to-end tests
+#    run: once
+#    deps:
+#      - task: serve
+#    cmds:
+#      - npx nx run-many --target=e2e --parallel --all
+#    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+  deploy:local:
+    desc: Deploy the applications locally
+    cmds:
+      - task: scripts:deploy
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   lint:
     desc: Lint all the projects
@@ -70,9 +91,10 @@ tasks:
       - task: lint
       - task: build
       - task: test
+#      - task: e2e
     cmds:
       # - npx nx run-many --target=deploy --parallel --all
-      - "echo hi"
+      - task: deploy:local
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   pyapp:create:

@@ -3,13 +3,20 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "sourceRoot": "pyapps/trapper-keeper/trapper_keeper",
+  "release": {
+    "version": {
+      "generator": "@nxlv/python:release-version"
+    }
+  },
+  "tags": [],
   "targets": {
     "lock": {
       "executor": "@nxlv/python:run-commands",
       "options": {
         "command": "poetry lock --no-update",
         "cwd": "pyapps/trapper-keeper"
-      }
+      },
+      "cache": true
     },
     "add": {
       "executor": "@nxlv/python:add",
@@ -28,12 +35,14 @@
       "outputs": [
         "{projectRoot}/dist"
       ],
+      "dependsOn": ["^lint","^lock", "^install"],
       "options": {
         "outputPath": "pyapps/trapper-keeper/dist",
         "publish": false,
         "lockedVersions": true,
         "bundleLocalDependencies": true
-      }
+      },
+      "cache": true
     },
     "install": {
       "executor": "@nxlv/python:install",
@@ -43,7 +52,17 @@
         "cacheDir": ".cache/pypoetry",
         "verbose": false,
         "debug": false
-      }
+      },
+      "dependsOn": ["^lock"],
+      "cache": true
+    },
+    "test": {
+      "command": "poetry run python -m unittest discover",
+      "options": {
+        "cwd": "pyapps/trapper-keeper"
+      },
+      "dependsOn": ["^build"],
+      "cache": true
     },
     "lint": {
       "executor": "@nxlv/python:ruff-check",
@@ -53,24 +72,9 @@
           "trapper_keeper",
           "tests"
         ]
-      }
-    },
-    "test": {
-      "executor": "@nxlv/python:run-commands",
-      "outputs": [
-        "{workspaceRoot}/reports/pyapps/trapper-keeper/unittests",
-        "{workspaceRoot}/coverage/pyapps/trapper-keeper"
-      ],
-      "options": {
-        "command": "poetry run pytest tests/",
-        "cwd": "pyapps/trapper-keeper"
-      }
-    }
-  },
-  "tags": [],
-  "release": {
-    "version": {
-      "generator": "@nxlv/python:release-version"
+      },
+      "cache": true
     }
   }
 }
+

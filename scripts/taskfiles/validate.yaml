@@ -30,6 +30,21 @@ tasks:
       - "echo NODE_CONFIG_DIR: ${NODE_CONFIG_DIR}"
       - "echo NODE_LTS_VERSION: ${NODE_LTS_VERSION}"
 
+  internal:cmd:
+    desc: Ensure the command is available
+    run: once
+    internal: true
+    silent: true
+    cmds:
+      - |
+        # Confirm that the command is available
+        if [ -z "$(command -v ${COMMAND})" ]; then
+          echo "${COMMAND} is not installed. Do you want to install it?"
+          exit 2
+        fi
+    vars:
+      COMMAND: echo
+
   internal:xdg:
     desc: Ensure the XDG directories are set
     run: once

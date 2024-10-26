@@ -21,7 +21,7 @@ version = "1.0.0"
 include = "trapper_keeper"
 
 [tool.poetry.dependencies]
-python = ">=3.12"
+python = "<4.0,>=3.10"
 sqlalchemy = "^2.0.36"
 pandas = "^2.2.3"
 pykeepass = "^4.1.0.post1"

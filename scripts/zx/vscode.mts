@@ -12,7 +12,7 @@ import {exit} from "node:process";
 
 if (get(argv, "help")) {
   info(`
-Usage: vscode.mts [options] [file ...]
+Usage: vscode [options] [file ...]
 
 Options:
   --help    Show this help message and exit

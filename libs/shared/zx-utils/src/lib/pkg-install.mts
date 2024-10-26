@@ -1,12 +1,12 @@
 // https://github.com/lucax88x/configs/blob/main/scripts/utilities.mts
 
-import type { PathLike } from "fs";
-import type { Systeminformation } from "systeminformation";
-import { getAllData } from "systeminformation";
-import { $, fs, path, question, tmpfile, which } from "zx";
-import {error, info, warn} from "@technohouser/zx-utils";
-import { isNil, xdgCache } from "@technohouser/zx-utils";
-import { get } from 'radash'
+import type {PathLike} from "fs";
+import type {Systeminformation} from "systeminformation";
+import {getAllData} from "systeminformation";
+import {$, fs, ProcessOutput, question, tmpfile, which} from "zx";
+import {initShell, isNil} from "@technohouser/zx-utils";
+
+await initShell($);
 
 const DISTRO = {
   arch: "arch",
@@ -23,6 +23,7 @@ const OS = {
   linux: "linux",
   windows: "windows",
   darwin: "darwin",
+  macOS: "macOS",
 } as const;
 
 type Os = keyof typeof OS;
@@ -36,15 +37,13 @@ const PKG_MGR = {
   yay: "yay",
 } as const;
 
-// type Pkgmgr = keyof typeof PKG_MGR;
-
 export type SystemInformation = Systeminformation.StaticData &
   Systeminformation.DynamicData;
 
 export async function getSystemData(): Promise<SystemInformation> {
-    return await getAllData("*", "*");
-    // fs.outputJsonSync(sysInfoCacheFile, JSON.stringify(data, null, 2));
-    // return data;
+  return await getAllData("*", "*");
+  // fs.outputJsonSync(sysInfoCacheFile, JSON.stringify(data, null, 2));
+  // return data;
 
   // const cacheDir = isNil(xdgCache)
   //   ? "${os.homedir()}/.cache/sysinfo"
@@ -70,84 +69,143 @@ export async function askConfirmation(quest: string): Promise<boolean> {
 }
 
 export async function hasCommand(command: string): Promise<boolean> {
-  return !!(await which(command, { nothrow: true }));
+  return !!(await which(command, {nothrow: true}));
 }
 
-// export async function existsByPwsh(command: string) {
-//   return async (): Promise<Condition> => {
-//     try {
-//       return toCondition(!!(await $`command -v ${command}`));
-//     } catch (error) {
-//       return 'not exists';
-//     }
-//   };
-// }
-
-// export async function existsFontInUnix(font: string) {
-//   return async (): Promise<Condition> => {
-//     try {
-//       return toCondition(!!(await $`fc-list | grep -i ${font}`));
-//     } catch (error) {
-//       return 'not exists';
-//     }
-//   };
-// }
-
 export async function installByParu(pkg: string) {
-  $.verbose = true;
-  await $`paru -S --noconfirm ${pkg}`;
-
-  return true;
+  return $`paru -S --noconfirm ${pkg}`;
 }
 
 export async function installByApt(pkg: string) {
-  $.verbose = true;
-  await $`sudo apt install -y ${pkg}`;
-
-  return true;
+  return $`sudo apt install -y ${pkg}`;
 }
 
-// export async function installByNala(pkg: string) {
-//   $.verbose = true;
-//   // $`sudo nala install -y ${pkg}`.then(
-//   //   (output) => {},
-//   //   (err) => {}
-//   // );
+export async function installByPacman(pkg: string) {
+  return $`sudo pacman -S --noconfirm ${pkg}`;
+}
 
-//   return true;
-// }
+async function findByPacman(command: string) {
+  return $`pacman -F ${command}`;
+}
 
-export async function getPackageManager(os: Os, distro: Distro) {
-  const pkgMgrs = [];
+async function installByYay(pkg: string) {
+  return $`yay -S --noconfirm ${pkg}`;
+}
 
-  if (os === OS.linux) {
-    switch (distro) {
-      case DISTRO.arch:
-        if (await hasCommand(PKG_MGR.pacman)) {
-          pkgMgrs.push(PKG_MGR.pacman);
-        } else {
-          throw new Error("pacman cannot be missing for an arch install");
-        }
-        if (await hasCommand(PKG_MGR.yay)) {
-          pkgMgrs.push(PKG_MGR.yay);
-        }
-        break;
-      case DISTRO.debian:
-      case DISTRO.pengwin:
-      case DISTRO.ubuntu:
-        if (await hasCommand(PKG_MGR.apt)) {
-          pkgMgrs.push(PKG_MGR.apt);
-        } else {
-          throw new Error("apt cannot be missing for a debian install");
-        }
-        if (await hasCommand(PKG_MGR.nala)) {
-          pkgMgrs.push(PKG_MGR.nala);
-        }
-        break;
-      default:
-        throw new Error(`Could not determine pkgMgr for OS: ${os}`);
+function installByNala(pkg: string) {
+  return $`sudo nala install -y ${pkg}`;
+}
+
+/**
+ * Install a pkg for the given OS and distro.  Either pkg, command, or both values must be provided.
+ * If pkg is provided, then a 1:1 mapping will be assumed:
+ *
+ *  e.g. pkg = "git" => apt install git
+ *  not pkg = "fd" => apt install fd-find
+ *
+ * @param pkg
+ */
+export async function installPkg(pkg: string): Promise<ProcessOutput> {
+
+  const sysinfo = await getSystemData();
+  const os = sysinfo.os.platform as Os;
+  const distro = sysinfo.os.distro as Distro;
+
+  // always bet on brew (non-cask)
+  if (await hasCommand(PKG_MGR.brew)) {
+    const retVal = await findByBrew(pkg);
+    if (retVal.exitCode === 0) {
+      return installByBrew(pkg);
     }
   }
+
+  switch (os) {
+    case OS.windows:
+      if (await hasCommand(PKG_MGR.scoop)) {
+        const retVal = await findByScoop(pkg);
+        if (retVal.exitCode === 0) {
+          return installByScoop(pkg);
+        }
+      }
+      break;
+    case OS.linux:
+      switch (distro) {
+        case DISTRO.arch:
+          if (await hasCommand(PKG_MGR.pacman)) {
+            const retVal = await findByPacman(pkg);
+
+            if (retVal.exitCode === 0) {
+              return installByPacman(pkg);
+            }
+          }
+          if (await hasCommand(PKG_MGR.yay)) {
+            const retVal = await findByYay(pkg);
+            if (retVal.exitCode === 0) {
+              return installByYay(pkg);
+            }
+          }
+          break;
+        case DISTRO.debian:
+        case DISTRO.pengwin:
+        case DISTRO.ubuntu:
+          if (await hasCommand(PKG_MGR.apt)) {
+            const retVal = await findByApt(pkg);
+            if (retVal.exitCode === 0) {
+              return installByApt(pkg);
+            }
+          }
+
+          if (await hasCommand(PKG_MGR.nala)) {
+            const retVal = await findByNala(pkg);
+            if (retVal.exitCode === 0) {
+              return installByNala(pkg);
+            }
+          }
+          break;
+        default:
+          throw new Error(`Could not determine pkgMgr for OS: ${os}`);
+      }
+      break;
+    default:
+      throw new Error(`Could not determine pkgMgr for OS: ${os}`);
+  }
+  throw new Error(`Could not find package: ${pkg} on OS: ${os} and distro: ${distro}`);
+}
+
+async function findByApt(pkg: string) {
+  return $`apt search ${pkg}`;
+}
+
+async function findByNala(pkg: string) {
+  return $`nala search ${pkg}`;
+}
+
+async function findByScoop(pkg: string) {
+  return $`scoop search ${pkg}`;
+}
+
+async function findByYay(pkg: string) {
+  return $`yay -Ss ${pkg}`;
+}
+
+async function findPkg(pkg: string, pkgMgr: string) {
+  switch (pkgMgr) {
+    case PKG_MGR.apt:
+      return findByApt(pkg);
+    case PKG_MGR.brew:
+      return findByBrew(pkg);
+    case PKG_MGR.pacman:
+      return findByPacman(pkg);
+    case PKG_MGR.nala:
+      return findByNala(pkg);
+    case PKG_MGR.scoop:
+      return findByScoop(pkg);
+    case PKG_MGR.yay:
+      return findByYay(pkg);
+    default:
+      throw new Error(`Unknown package manager: ${pkgMgr}`);
+  }
+
 }
 
 export async function downloadScript(url: URL) {
@@ -163,58 +221,43 @@ export async function downloadScript(url: URL) {
 // and output are displayed closer to realtime
 export async function executeScript(file: PathLike) {
   fs.chmodSync(file, "0500");
-  await $`NONINTERACTIVE=1; ${file}`.verbose(true).run();
+  return $`NONINTERACTIVE=1; ${file}`.verbose(true).run();
 }
 
 export async function ensureBrew() {
-  return downloadScript(
-    new URL(
-      "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
-    )
-  ).then(
-    async (file) => {
-      return await executeScript(file);
-    },
-    (err: Error) => {
-      error(err.message);
-    }
-  );
+  if (await hasCommand("brew")) {
+    return $`brew --version`;
+  }
+
+  const file = await downloadScript(new URL("https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"));
+
+  if (isNil(file)) {
+    throw new Error("Error downloading Homebrew install script");
+  }
+
+  return executeScript(file);
 }
 
 export async function installByFlatpak(pkg: string) {
-  $.verbose = true;
-  await $`flatpak install ${pkg}`;
-
-  return true;
+  return $`flatpak install ${pkg}`;
 }
 
 export async function installByGh(pkg: string) {
-  $.verbose = true;
-  await $`gh release download ${pkg}`;
+  return $`gh release download ${pkg}`;
+}
 
-  return true;
+export async function findByBrew(pkg: string) {
+  return $`brew search ${pkg}`;
 }
 
 export async function installByBrew(pkg: string, asCask = false) {
-  if (isNil(await hasCommand(PKG_MGR.brew))) {
-    warn("Homebrew not installed.  Installing now...");
-    ensureBrew().catch((result) => {
-      error(`There was a problem installing brew: ${result}`);
-    });
-  }
-
-  $.verbose = true;
   if (asCask) {
-    await $`brew install --cask ${pkg}`;
+    return $`brew install --cask ${pkg}`;
   } else {
-    await $`brew install ${pkg}`;
+    return $`brew install ${pkg}`;
   }
-  return true;
 }
 
 export async function installByScoop(pkg: string) {
-  $.verbose = true;
-  await $`scoop install ${pkg}`;
-
-  return true;
+  return $`scoop install ${pkg}`;
 }

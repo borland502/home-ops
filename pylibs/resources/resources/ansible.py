@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-from components.dasbootstrap.resources.paths import Directories
+from resources.paths import Directories
 
 
 def find_yaml_files(path) -> list[str]:

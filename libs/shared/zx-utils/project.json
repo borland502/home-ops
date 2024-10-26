@@ -15,9 +15,13 @@
         "outputPath": "dist/libs/shared/zx-utils",
         "main": "libs/shared/zx-utils/src/index.mjs",
         "tsConfig": "libs/shared/zx-utils/tsconfig.lib.json",
-        "assets": ["libs/shared/zx-utils/*.md"],
+        "assets": [
+          "libs/shared/zx-utils/*.md"
+        ],
         "bundle": true,
-        "format": ["esm"],
+        "format": [
+          "esm"
+        ],
         "minify": true,
         "esbuildOptions": {
           "outExtension": ".js=.mjs"

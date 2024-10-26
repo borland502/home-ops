@@ -1,8 +1,17 @@
-import {$, detectShell, error, getSystemData, hasCommand, info, installByBrew} from "@technohouser/zx-utils"
+import {
+  $,
+  ensureBrew,
+  error,
+  getSystemData,
+  hasCommand,
+  info,
+  initShell,
+  installByBrew
+} from "@technohouser/zx-utils"
 
 const sysinfo = await getSystemData()
 
-$.shell = await detectShell()
+await initShell($);
 
 async function installPipxPackages() {
   const pipxPackages = await $`chezmoi data --format json | jq -rce '.pipx.packages[]'`.lines()
@@ -37,6 +46,11 @@ async function installNpmPackages() {
 }
 
 async function installBrew(brewPackages: Promise<string[]>, brewCasks?: Promise<string[]>) {
+  const pkgResult = await ensureBrew()
+  if (pkgResult.exitCode !== 0) {
+    error(pkgResult.text('utf-8'))
+  }
+
   if (await hasCommand("chezmoi") === null) {
     $`brew install chezmoi`
   }

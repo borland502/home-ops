@@ -26,22 +26,32 @@
     "@nxlv/python",
     {
       "plugin": "@nx/eslint/plugin",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
         "targetName": "pylint",
         "lintFilePatterns": [
-          "libs/**/*.mts", "apps/**/*.mts", "scripts/**/*.mts"
+          "libs/**/*.mts",
+          "apps/**/*.mts",
+          "scripts/**/*.mts"
         ],
         "eslintConfig": "eslint.config.js"
       }
     },
     {
-      "plugin": "@nx/jest/plugin",
+      "plugin": "@nx/jest",
       "options": {
-        "targetName": "test"
+        "targetName": "test",
+        "options": {
+          "jestConfig": "jest.config.mts",
+          "passWithNoTests": true
+        }
       },
       "include": [
-        "jest.config.mts"
+        "libs/**/*.mts",
+        "apps/**/*.mts",
+        "scripts/**/*.mts"
       ],
       "exclude": [
         "apps/watchyourlan-api-e2e/**/*"
@@ -51,6 +61,12 @@
       "plugin": "@nx/playwright/plugin",
       "options": {
         "targetName": "e2e"
+      }
+    },
+    {
+      "plugin": "@nx/jest",
+      "options": {
+        "targetName": "test"
       }
     }
   ],
@@ -66,17 +82,13 @@
       ]
     },
     "test": {
-      "executor": "nx:run-commands",
-      "dependsOn": [
-        "build"
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectName}"
       ],
-      "inputs": [
-        "default"
-      ],
-      "outputs": [],
       "options": {
-        "cwd": "{projectRoot}",
-        "command": "node --experimental-vm-modules --no-warnings --enable-source-maps --loader ts-node/esm ../../node_modules/jest/bin/jest.js"
+        "jestConfig": "jest.config.mts",
+        "passWithNoTests": true
       },
       "cache": true
     },
