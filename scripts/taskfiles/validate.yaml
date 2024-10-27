@@ -1,18 +1,6 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
-vars:
-  NODE_LTS_VERSION:
-    sh: |
-      # Confirm that nvm is installed, and if not, install it
-      if [[ $(command -v nvm) ]]; then
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-        export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-      fi
-      source "${NVM_DIR}/nvm.sh"
-      nvm ls-remote --lts | tail -n 1 | grep -oE '\d+\.\d+\.\d+' | echo
-
 tasks:
 
   debug:
@@ -28,22 +16,6 @@ tasks:
       - "echo XDG_DATA_DIRS: ${XDG_DATA_DIRS}"
       - "echo XDG_LIB_HOME: ${XDG_LIB_HOME}"
       - "echo NODE_CONFIG_DIR: ${NODE_CONFIG_DIR}"
-      - "echo NODE_LTS_VERSION: ${NODE_LTS_VERSION}"
-
-  internal:cmd:
-    desc: Ensure the command is available
-    run: once
-    internal: true
-    silent: true
-    cmds:
-      - |
-        # Confirm that the command is available
-        if [ -z "$(command -v ${COMMAND})" ]; then
-          echo "${COMMAND} is not installed. Do you want to install it?"
-          exit 2
-        fi
-    vars:
-      COMMAND: echo
 
   internal:xdg:
     desc: Ensure the XDG directories are set

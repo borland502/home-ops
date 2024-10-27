@@ -1,16 +1,24 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
+vars:
+  HOME_OPS_DIR: "{{.XDG_DATA_HOME}}/automation/home-ops"
+  SCRIPTS:
+    sh: fd --glob --full-path '{{.HOME_OPS_DIR}}/scripts/*'
+
+# This high level taskfile is used control the development of home-ops.  On deploy another taskfile
+# is used to run the applications and scripts
 includes:
   scripts:
-    taskfile: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts/scripts.yaml"
-    dir: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts"
+    taskfile: "./scripts/scripts.yaml"
   chez:
-    taskfile: "{{.XDG_CONFIG_HOME}}/taskfiles/chezmoi.yaml"
-    dir: "{{.CHEZMOI_HOME}}"
+    taskfile: "./scripts/dotfiles/dot_config/taskfiles/chezmoi.yaml"
   keepassxc:
-    taskfile: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts/taskfiles/keepassxc.yaml"
-    dir: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts/taskfiles"
+    taskfile: "./scripts/taskfiles/keepassxc.yaml"
+  validate:
+    taskfile: "./scripts/taskfiles/validate.yaml"
+  install:
+    taskfile: "./scripts/taskfiles/install.yaml"
 
 tasks:
   nx:show:
@@ -91,6 +99,7 @@ tasks:
       - task: lint
       - task: build
       - task: test
+      - task: chez:sync
 #      - task: e2e
     cmds:
       # - npx nx run-many --target=deploy --parallel --all
