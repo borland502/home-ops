@@ -2,20 +2,10 @@
 version: "3"
 
 tasks:
-
   debug:
     desc: Print the environment variables
     cmds:
-      - "echo XDG_DATA_HOME: ${XDG_DATA_HOME}"
-      - "echo XDG_CONFIG_HOME: ${XDG_CONFIG_HOME}"
-      - "echo XDG_BIN_HOME: ${XDG_BIN_HOME}"
-      - "echo XDG_CACHE_HOME: ${XDG_CACHE_HOME}"
-      - "echo XDG_RUNTIME_DIR: ${XDG_RUNTIME_DIR}"
-      - "echo XDG_STATE_HOME: ${XDG_STATE_HOME}"
-      - "echo XDG_CONFIG_DIRS: ${XDG_CONFIG_DIRS}"
-      - "echo XDG_DATA_DIRS: ${XDG_DATA_DIRS}"
-      - "echo XDG_LIB_HOME: ${XDG_LIB_HOME}"
-      - "echo NODE_CONFIG_DIR: ${NODE_CONFIG_DIR}"
+      - printenv
 
   internal:xdg:
     desc: Ensure the XDG directories are set
@@ -102,4 +92,3 @@ tasks:
           echo "The permissions for the keepassxc database are not set correctly. Please set them to 600."
           exit 4
         fi
-

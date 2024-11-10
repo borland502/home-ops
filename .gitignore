@@ -49,3 +49,9 @@ test-results
 **/*.coverage
 
 __pycache__
+
+# Don't check in code available in the git submodule
+.devcontainer/*
+!.devcontainer/devcontainer.json
+!.devcontainer/Dockerfile
+!.devcontainer/docker-compose.yml

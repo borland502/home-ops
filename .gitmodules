@@ -1,3 +1,7 @@
 [submodule "dotfiles"]
 	path = scripts/dotfiles
 	url = https://github.com/borland502/dotfiles
+
+[submodule "devcontainer-features"]
+	path = scripts/devcontainer-features
+	url = https://github.com/borland502/devcontainer-features

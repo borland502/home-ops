@@ -156,3 +156,13 @@ await hasCommand("softwareupdate").then((hasSoftwareUpdate) => {
     })
   }
 })
+
+await hasCommand("flatpak").then((hasFlatpak) => {
+  if (hasFlatpak === null || !hasFlatpak) {
+    $`brew install flatpak`
+  }
+
+  $`flatpak update -y`.catch((reason: unknown) => {
+    error(`Error: ${reason}`)
+  })
+})

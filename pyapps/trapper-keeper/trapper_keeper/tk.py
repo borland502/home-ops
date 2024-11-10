@@ -3,17 +3,30 @@
 from __future__ import annotations
 
 import contextlib
+from dataclasses import dataclass
 from enum import StrEnum, auto
 from pathlib import Path
+from typing import Dict, Any
 
-from pandas import DataFrame
-from pykeepass.entry import Entry
+from pykeepass import create_database
 
+from trapper_keeper.conf import TkSettings
+from trapper_keeper.keegen import gen_utf8, gen_passphrase
 from trapper_keeper.stores.bolt_kvstore import BoltStore
+
 from trapper_keeper.stores.keepass_store import KeepassStore
 
 
-# TODO: Factory pattern would probably suit here
+@dataclass
+class KeeAuth:
+  """KeePass authentication information.
+
+  Args:
+      kp_key
+      kp_token
+  """
+
+
 class DbTypes(StrEnum):
   """Types of datastores that can be used.
 
@@ -26,57 +39,36 @@ class DbTypes(StrEnum):
   KP: str = auto()
   SQLITE: str = auto()
 
+def get_tk_settings() -> TkSettings:
+  return TkSettings.get_instance("trapper_keeper", xdg_config=True, auto_create=True)
 
-def open_tk_store(db_type: DbTypes, db_path: Path, **kwargs) -> contextlib.AbstractContextManager:
+def _get_tk_store(settings: TkSettings) -> contextlib.AbstractContextManager:
   """Open a Trapper Keeper store based on the db_type."""
-  match db_type:
-    case DbTypes.BOLT:
-      readonly: bool = kwargs["readonly"]
-      return BoltStore(bp_fp=db_path, readonly=readonly)
-    case DbTypes.KP:
-      key: Path = kwargs["key"]
-      token: Path = kwargs["token"]
-      return KeepassStore(kp_fp=db_path, kp_key=key, kp_token=token)
-    case _:
-      raise TypeError(f"Unknown db type {db_type}")
+  return KeepassStore(kp_fp=settings.get("db"), kp_key=settings.get("key"), kp_token=settings.get("token"))
 
+def _get_chezmoi_store(settings: TkSettings) -> contextlib.AbstractContextManager:
+  """Open the Chezmoi (bolt) store."""
+  return BoltStore(settings.get("chezmoi_db"), True)
 
-# TODO: Remove
-def validate_tk_store(db_type: DbTypes, db_path: Path, **kwargs) -> bool:
-  """Validate a Trapper Keeper store based on the db_type."""
-  match db_type:
-    case DbTypes.KP:
-      key: Path = kwargs["key"]
-      token: Path = kwargs["token"]
-      with open_tk_store(db_type, db_path, key=key, token=token) as kp_db:
-        return len(kp_db.entries) >= 0
+def get_store(settings: TkSettings, db_type: DbTypes) -> contextlib.AbstractContextManager:
+  """Get a store based on the db_type.
 
+  Args:
+      settings (TkSettings): TkSettings instance.
+      db_type (DbTypes): Type of store to open.
 
-# TODO: Remove
-def save_dataframe(df: DataFrame, db_type: DbTypes, db_path: Path, **kwargs):
-  """Save a DataFrame to a Trapper Keeper store based on the db_type."""
-  match db_type:
-    case DbTypes.KP:
-      key: Path = kwargs["key"]
-      token: Path = kwargs["token"]
-      with open_tk_store(db_type, db_path, key=key, token=token) as kp_db:
-        # TODO: dataclass for each db entry
-        # TODO: delete, find existing then save if new
-        # TODO: symmetric difference on uuid
-        for _idx, row in df.iterrows():
-          # entry: Entry = kp_db.find_entries(recursive=True, uuid=row["UUID"])
-          entry: Entry = next(entry for entry in kp_db.entries if entry is not None and entry.title == row["Title"])
-          if entry is None:
-            kp_db.add_entry(
-              destination_group=kp_db.root_group,
-              url=row["URL"],
-              title=row["Title"],
-              username=row["UserName"],
-              password=row["Password"],
-            )
-          else:
-            # TODO: update
-            pass
-        kp_db.save()
-    case _:
-      raise TypeError("Unknown db type")
+  Returns:
+      contextlib.AbstractContextManager: Store instance.
+
+  Raises:
+      ValueError: Unsupported db_type
+  """
+  if db_type == DbTypes.BOLT:
+    return _get_chezmoi_store(settings)
+  elif db_type == DbTypes.KP:
+    return _get_tk_store(settings)
+  else:
+    raise ValueError(f"Unsupported db_type: {db_type}")
+
+# TODO: Pack, Unpack stores to/from tk store
+

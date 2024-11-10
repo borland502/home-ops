@@ -1,0 +1,38 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-outside-of-docker-compose
+{
+	"name": "Docker from Docker Compose",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+	"customizations": {
+		"settings": {
+			"json.schemas": [
+				{
+					"fileMatch": [
+						"*/devcontainer-feature.json"
+					],
+					"url": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainerFeature.schema.json"
+				}
+			]
+		}
+	},
+
+	// Use this environment variable if you need to bind mount your local source code into a new container.
+	"remoteEnv": {
+		"LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
+	},
+	"containerEnv": {},
+	"features": {
+		"./common-dev": {},
+		"./nodejs-dev": {},
+		"./python-dev": {}
+	},
+
+	// Before installing features, jerry rig the devcontainer to install features sourced in a submodule
+	"initializeCommand": "cp -r ./scripts/docker/devcontainer-features/src/* .devcontainer",
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	"remoteUser": "vscode"
+}

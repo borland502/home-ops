@@ -1,3 +1,6 @@
+[project.scripts]
+tkeeper = "python -m trapper_keeper"
+
 [tool.coverage.run]
 branch = true
 source = ["trapper_keeper"]
@@ -29,6 +32,9 @@ boltdb = "^0.0.2"
 faker = "^30.8.1"
 benedict = "^0.3.2"
 sqlite-utils = "^3.37"
+fire = "^0.7.0"
+xkcdpass = "^1.19.9"
+simple-toml-settings = "^0.8.0"
 
 [tool.poetry.dependencies.resources]
 path = "../../pylibs/resources"

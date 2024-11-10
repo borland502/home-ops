@@ -19,6 +19,8 @@ includes:
     taskfile: "./scripts/taskfiles/validate.yaml"
   install:
     taskfile: "./scripts/taskfiles/install.yaml"
+  inventory:
+    taskfile: "./scripts/ansible/inventory.yaml"
 
 tasks:
   nx:show:

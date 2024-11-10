@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+env:
+  NMAP_INVENTORY: "${HOME}/.ansible/inventory/nmap.yaml"
+  LDAP_INVENTORY: "${HOME}/.ansible/inventory/ldap.yaml"
+  PROXMOX_INVENTORY: "${HOME}/.ansible/inventory/proxmox.yaml"
+
+tasks:
+  default:
+    cmds:
+      - task: nmap
+      - task: ldap
+      - task: proxmox
+
+  nmap:
+    desc: "Display inventory with the ansible nmap dynamic plugin"
+    cmds:
+      - "ansible-inventory -i ${NMAP_INVENTORY} --list"
+
+#  ldap:
+#    desc: "Display inventory with the ansible ldap dynamic plugin"
+#    cmds:
+#      - "ansible-inventory -i ${LDAP_INVENTORY} --list"
+#
+#  proxmox:
+#    desc: "Display inventory with the ansible proxmox dynamic plugin"
+#    cmds:
+#      - "ansible-inventory -i ${PROXMOX_INVENTORY} --list"
+

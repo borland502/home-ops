@@ -2,25 +2,35 @@
 
 ## Overview
 
-Home Ops is a free-ranging attempt at learning the monorepo framework [NX](https://nx.dev/).  
+Home Ops is a free-ranging attempt at learning the monorepo framework [NX](https://nx.dev/) and to see if by using some focal points (NX, Taskfiles, Ansible, XDG Spec, submodules) I can gather all my automation sandbox projects into a usable old-style monolith.  All personal automation is local in nature, but this project will be even more so -- centered on products I use and coherent enough to provide a leg up when the next personal project takes my fancy.
+
+While I do hope useful elements can be mined for similar projects, if only by counter-example, you might be better served by attempts which shoot for a coherent meta-framework:
+
+### Examples
+
+* [DebOps](https://docs.debops.org/)
+* [Install Doctor](https://install.doctor)
+* [Polylith](https://polylith.gitbook.io/polylith)
+
+> Generic, less-opinionated, frameworks (ZX, NX, Chezmoi, etc.) are referenced at the end
 
 ## Apps
 
-- [watchyourlan-api](./apps/watchyourlan-api/README.md)
-- [scripts](./scripts/README.md)
+* [watchyourlan-api](./apps/watchyourlan-api/README.md)
+* [scripts](./scripts/README.md)
 
 ## Libs
 
 ### Shared
 
-- [log](./libs/shared/log/README.md)
-- [pkg-install](./libs/shared/pkg-install/README.md)
-- [utils](./libs/shared/utils/README.md)
-- [zx-utils](./libs/shared/zx-utils/README.md)
+* [log](./libs/shared/log/README.md)
+* [pkg-install](./libs/shared/pkg-install/README.md)
+* [utils](./libs/shared/utils/README.md)
+* [zx-utils](./libs/shared/zx-utils/README.md)
 
 ### Project
 
-- [watchyourlan-api](./libs/watchyourlan-api/README.md)
+* [watchyourlan-api](./libs/watchyourlan-api/README.md)
 
 ## Run tasks
 
@@ -29,33 +39,31 @@ Home Ops is a free-ranging attempt at learning the monorepo framework [NX](https
 ```shell
 npm run build:all
 ```
+
 ### Lint all projects
+
 ```shell
 npm run lint:all
 ```
 
 ## Frameworks Used
 
-- [NX](https://nx.dev/)
-- [ESBuild](https://esbuild.github.io/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [ESLint](https://eslint.org/)
-- [Prettier](https://prettier.io/)
-- [Jest](https://jestjs.io/)
-- [Poetry](https://python-poetry.org/docs/)
-- [Playwright](https://playwright.dev/)
-- [ZX](https://google.github.io/zx/)
-- [TSX](https://tsx.is/)
+* [NX](https://nx.dev/)
+* [ESBuild](https://esbuild.github.io/)
+* [Chezmoi](https://www.chezmoi.io/quick-start/)
+* [TypeScript](https://www.typescriptlang.org/)
+* [ESLint](https://eslint.org/)
+* [Prettier](https://prettier.io/)
+* [Jest](https://jestjs.io/)
+* [Poetry](https://python-poetry.org/docs/)
+* [Playwright](https://playwright.dev/)
+* [ZX](https://google.github.io/zx/)
+* [Taskfiles](https://taskfiles.dev)
+* [TSX](https://tsx.is/)
 
 ## Links
 
 Sources:
-
-- https://github.com/bhouston/template-typescript-monorepo/blob/main/nx.json
-- https://dev.to/a0viedo/nodejs-typescript-and-esm-it-doesnt-have-to-be-painful-438e
-- https://eisenbergeffect.medium.com/an-esbuild-setup-for-typescript-3b24852479fe
-- https://dev.to/zauni/create-a-zx-nodejs-script-as-binary-with-pkg-5abf
-- https://esbuild.github.io/content-types/#typescript-caveats
 
 ## TODO:
 
