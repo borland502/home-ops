@@ -1,4 +1,5 @@
 """Keepass store for trapper-keeper."""
+
 from __future__ import annotations
 
 import os
@@ -10,7 +11,7 @@ from pathlib import Path
 from pykeepass import PyKeePass, create_database
 
 
-def _create_kp_db(kp_fp: Path, kp_token: Path, kp_key: Path | None = None) -> PyKeePass:
+def create_kp_db(kp_fp: Path, kp_token: Path, kp_key: Path | None = None) -> PyKeePass:
   """Create a new keepass vault in the KEEPASS_DB_PATH, with the KEEPASS_DB_KEY, and KEEPASS_DB_TOKEN."""
   if not kp_fp.is_file():
     # make the directory at least if the database does not exist
@@ -67,11 +68,12 @@ def _parse_ref(ref: str) -> tuple[list[str], str]:
 
 class KeepassStore(PyKeePass):
   """Keepass store for trapper-keeper."""
+
   def __init__(self, kp_fp: Path, kp_token: Path, kp_key: Path | None = None):
     """Initialize the KeepassStore."""
     super().__init__(
       filename=kp_fp,
-      password=kp_token.read_text(encoding="utf-8"),
+      password=kp_token,
       keyfile=kp_key,
     )
 

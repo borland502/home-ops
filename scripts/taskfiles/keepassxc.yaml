@@ -6,13 +6,13 @@ vars:
   HA_TOKEN: "78bd91ec-a925-41ac-81de-2a91bc4916d9_ha_token"
 
 includes:
-    validate:
-        taskfile: "./validate.yaml"
+  validate:
+    taskfile: "./validate.yaml"
 
 tasks:
-
   internal:keepassxc:validate:
     desc: Validate the keepassxc database
+    internal: true
     preconditions:
       - sh: |
           # Confirm that keepassxc-cli is installed

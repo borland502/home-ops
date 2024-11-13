@@ -1,0 +1,9 @@
+[trapper_keeper]
+bolt_db = "/var/folders/sj/cx1l0stn4d74qkg4mgt1_l400000gn/T/tmpmpqdgogm/bolt.db"
+chezmoi_db = "/Users/jhettenh/.local/share/chezmoi/chezmoistate.boltdb"
+db = "/var/folders/sj/cx1l0stn4d74qkg4mgt1_l400000gn/T/tmpmpqdgogm/kp.kdbx"
+key = "/var/folders/sj/cx1l0stn4d74qkg4mgt1_l400000gn/T/tmpmpqdgogm/key"
+schema_version = "none"
+sqlite_db = "/var/folders/sj/cx1l0stn4d74qkg4mgt1_l400000gn/T/tmpmpqdgogm/sqlite.sqlite"
+token = "/var/folders/sj/cx1l0stn4d74qkg4mgt1_l400000gn/T/tmpmpqdgogm/token"
+token_path = "/var/folders/sj/cx1l0stn4d74qkg4mgt1_l400000gn/T/tmp3k30nmji/token"
