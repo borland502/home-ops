@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "scripts/dotfiles"
+		},
+		{
+			"path": "../dasbootstrap"
+		},
+		{
+			"path": "scripts"
+		}
+	],
+	"settings": {
+		"cSpell.words": [
+			"smul"
+		]
+	}
+}

@@ -3,22 +3,14 @@
 from __future__ import annotations
 
 import contextlib
-from dataclasses import dataclass
 from enum import StrEnum, auto
+from pathlib import Path
 
 from trapper_keeper.conf import TkSettings
 from trapper_keeper.stores.bolt_kvstore import BoltStore
+from trapper_keeper.stores.dict_store import PersistentDict
 from trapper_keeper.stores.keepass_store import KeepassStore
-
-
-@dataclass
-class KeeAuth:
-  """KeePass authentication information.
-
-  Args:
-      kp_key
-      kp_token
-  """
+from trapper_keeper.stores.sqlite_store import SqliteStore
 
 
 class DbTypes(StrEnum):
@@ -32,28 +24,28 @@ class DbTypes(StrEnum):
   BOLT: str = auto()
   KP: str = auto()
   SQLITE: str = auto()
+  KV: str = auto()
 
 
-def get_tk_settings() -> TkSettings:
-  """Get the Trapper Keeper settings.
-
-  Returns:
-      TkSettings: _description_
-  """
-  return TkSettings.get_instance("trapper_keeper", xdg_config=True, auto_create=True)
-
-
-def _get_tk_store(settings: TkSettings) -> contextlib.AbstractContextManager:
+def _get_tk_store(kp_fp: Path, kp_token: Path, kp_key: Path | None = None) -> contextlib.AbstractContextManager:
   """Open a Trapper Keeper store based on the db_type."""
-  return KeepassStore(kp_fp=settings.get("db"), kp_key=settings.get("key"), kp_token=settings.get("token"))
+  return KeepassStore(kp_fp, kp_token, kp_key)
+
+def _get_kv_store(db_fp: Path) -> contextlib.AbstractContextManager:
+  """Open a key/value store."""
+  return PersistentDict(filename=db_fp, flag="c", format="json", mode=0o600, encoding="utf-8", errors="strict", indent=2)
+
+def _get_sqlite_store(db_fp: Path) -> contextlib.AbstractContextManager:
+  """Open a sqlite store."""
+  return SqliteStore(db_fp)
+
+def _get_bolt_store(db_fp: Path, readonly: bool = True) -> contextlib.AbstractContextManager:
+  """Open the boltdb store."""
+  return BoltStore(db_fp, readonly)
 
 
-def _get_chezmoi_store(settings: TkSettings, readonly: bool = True) -> contextlib.AbstractContextManager:
-  """Open the Chezmoi (bolt) store."""
-  return BoltStore(settings.get("chezmoi_db"), readonly)
-
-
-def get_store(settings: TkSettings, db_type: DbTypes) -> contextlib.AbstractContextManager:
+# noinspection PyCompatibility
+def get_store(db_type: DbTypes, **kwargs) -> contextlib.AbstractContextManager:
   """Get a store based on the db_type.
 
   Args:
@@ -66,11 +58,22 @@ def get_store(settings: TkSettings, db_type: DbTypes) -> contextlib.AbstractCont
   Raises:
       ValueError: Unsupported db_type
   """
-  if db_type == DbTypes.BOLT:
-    return _get_chezmoi_store(settings)
-  if db_type == DbTypes.KP:
-    return _get_tk_store(settings)
-  raise ValueError(f"Unsupported db_type: {db_type}")
-
-
-# TODO: Pack, Unpack stores to/from tk store
+  match db_type:
+    case DbTypes.BOLT:
+      db_fp: Path = kwargs["db_fp"]
+      readonly: bool = kwargs["readonly"]
+      return _get_bolt_store(db_fp=db_fp, readonly=readonly)
+    case DbTypes.KP:
+      kp_fp: Path = kwargs["kp_fp"]
+      kp_token: Path = kwargs["kp_token"]
+      kp_key: Path | None = kwargs.get("kp_key")
+      return _get_tk_store(kp_fp=kp_fp, kp_token=kp_token, kp_key=kp_key)
+    case DbTypes.SQLITE:
+      db_fp: Path = kwargs["db_fp"]
+      return _get_sqlite_store(db_fp=db_fp)
+    case DbTypes.KV:
+      db_fp: Path = kwargs["db_fp"]
+      readonly: bool = kwargs["readonly"]
+      return _get_kv_store(db_fp=db_fp, readonly=readonly)
+    case _:
+      raise ValueError(f"Unsupported db_type: {db_type}")

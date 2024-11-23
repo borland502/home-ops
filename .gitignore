@@ -47,7 +47,8 @@ test-results
 .task
 .coverage
 **/*.coverage
-
+coverage
+**/coverage
 __pycache__
 
 # Don't check in code available in the git submodule
@@ -55,3 +56,9 @@ __pycache__
 !.devcontainer/devcontainer.json
 !.devcontainer/Dockerfile
 !.devcontainer/docker-compose.yml
+
+scripts/docker/compose/**/*
+!scripts/docker/compose/**/*.yaml
+!scripts/docker/compose/**/*.dockerfile
+
+config.toml

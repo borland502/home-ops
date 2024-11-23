@@ -11,7 +11,7 @@ from collections import namedtuple
 from xkcdpass import xkcd_password as xp
 
 # num words
-TOKEN_SIZE: int = 4
+TOKEN_SIZE: int = 5
 KEY_SIZE: int = 190
 
 UnicodePlane = namedtuple("UnicodePlane", ["min", "max"])
@@ -33,14 +33,16 @@ def gen_passphrase(length=TOKEN_SIZE):
     [
       secrets.choice(string.digits),
       xp.generate_xkcdpassword(wordlist, numwords=1).upper(),
-      secrets.choice(string.punctuation),
+      secrets.choice("!@#$%^&*()_+{}|:<>?"),
     ]
   )
-  passwd: str = xp.generate_xkcdpassword(wordlist, numwords=length, random_delimiters=True, valid_delimiters=VALID_DELIMITERS)
+  passwd: str = xp.generate_xkcdpassword(
+    wordlist, numwords=int(length), random_delimiters=True, valid_delimiters=VALID_DELIMITERS
+  )
   return f"{passwd}{pass_complexity_chk}"
 
 
-def gen_utf8(length=TOKEN_SIZE, smp=True, start=None, separator=""):
+def gen_utf8(length=KEY_SIZE, smp=True, start=None, separator=""):
   """Return a random string made up of UTF-8 letters characters.
 
   Follows `RFC 3629`_.
@@ -60,9 +62,36 @@ def gen_utf8(length=TOKEN_SIZE, smp=True, start=None, separator=""):
   output_string = "".join(secrets.choice(unicode_letters) for _ in range(length))
 
   if start:
-    output_string = f"{start}{separator}{output_string}"[0:length]
+    output_string = f"{start}{separator}{output_string}"[:length]
   return output_string
 
+def generate_ed25519_key_pair() -> tuple[str, str]:
+    """Generate a valid ed25519 SSH key pair."""
+    from cryptography.hazmat.primitives.asymmetric import ed25519
+    from cryptography.hazmat.primitives import serialization
+
+    # Generate private key
+    private_key = ed25519.Ed25519PrivateKey.generate()
+
+    # Serialize private key
+    private_key_bytes = private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption()
+    )
+    private_key_str = private_key_bytes.decode('utf-8')
+
+    # Generate public key
+    public_key = private_key.public_key()
+
+    # Serialize public key
+    public_key_bytes = public_key.public_bytes(
+        encoding=serialization.Encoding.OpenSSH,
+        format=serialization.PublicFormat.OpenSSH
+    )
+    public_key_str = public_key_bytes.decode('utf-8')
+
+    return private_key_str, public_key_str
 
 def _unicode_letters_generator(smp=True):
   """Generate unicode characters in the letters category.
@@ -76,3 +105,4 @@ def _unicode_letters_generator(smp=True):
     char = chr(i)
     if unicodedata.category(char).startswith("L"):
       yield char
+

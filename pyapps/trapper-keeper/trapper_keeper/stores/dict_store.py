@@ -1,14 +1,13 @@
 """Offer a persistent dictionary with an API compatible with shelve and anydbm."""
+
+import contextlib
 import csv
 import json
 import os
 import pickle
 import shutil
 
-import benedict
-
-
-class PersistentDict(benedict):
+class PersistentDict:
   """https://code.activestate.com/recipes/576642-persistent-dict-with-multiple-standard-file-format/.
   Persistent dictionary with an API compatible with shelve and anydbm.
 
@@ -40,7 +39,7 @@ class PersistentDict(benedict):
     if self.flag == "r":
       return
     filename = self.filename
-    tempname = filename + ".tmp"
+    tempname = f"{filename}.tmp"
     fileobj = open(tempname, "wb" if self.format == "pickle" else "w")
     try:
       self.dump(fileobj)
@@ -74,7 +73,7 @@ class PersistentDict(benedict):
     elif self.format == "pickle":
       pickle.dump(dict(self), fileobj, 2)
     else:
-      raise NotImplementedError("Unknown format: " + repr(self.format))
+      raise NotImplementedError(f"Unknown format: {self.format!r}")
 
   def load(self, fileobj):
     """Load from file."""
@@ -82,24 +81,7 @@ class PersistentDict(benedict):
     for loader in (pickle.load, json.load, csv.reader):
       fileobj.seek(0)
       # noinspection PyBroadException
-      try:
+      with contextlib.suppress(Exception):
         return self.update(loader(fileobj))
-      except Exception:
-        pass
     raise ValueError("File not in a supported format")
 
-
-if __name__ == "__main__":
-  """Demonstrate the PersistentDict class."""
-  import random
-
-  # Make and use a persistent dictionary
-  with PersistentDict("/tmp/demo.json", "c", file_format="json") as d:
-    print(d, "start")
-    d["abc"] = "123"
-    d["rand"] = random.randrange(10000)
-    print(d, "updated")
-
-  # Show what the file looks like on disk
-  with open("/tmp/demo.json", "rb") as f:
-    print(f.read())

@@ -1,6 +1,11 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
+dotenv:
+  - ${HOME}/.env
+  - ${HOME}/.zshrc
+  - ${HOME}/.zshenv
+
 vars:
   HOME_OPS_DIR: "{{.XDG_DATA_HOME}}/automation/home-ops"
   SCRIPTS:
@@ -19,8 +24,8 @@ includes:
     taskfile: "./scripts/taskfiles/validate.yaml"
   install:
     taskfile: "./scripts/taskfiles/install.yaml"
-  inventory:
-    taskfile: "./scripts/ansible/inventory.yaml"
+  pya:
+    taskfile: "./pyapps/pyapps.yaml"
 
 tasks:
   nx:show:
@@ -63,7 +68,7 @@ tasks:
     desc: Install all the projects
     run: once
     summary: |
-      This task installs all packages npm/poetry packages
+      This task installs all npm/poetry packages
     cmds:
       - npm install
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
@@ -72,6 +77,7 @@ tasks:
     run: once
     deps:
       - task: lint
+      - task: install
     desc: Build all the projects
     summary: |
       This task builds all the projects locally
@@ -107,14 +113,16 @@ tasks:
     summary: |
       This task verifies, configures, and deploys projects locally much like a [Mobile Construction Vehicle](https://cnc.fandom.com/wiki/Mobile_construction_vehicle)
     deps:
+      - task: validate:internal:xdg
+      - task: validate:internal:scripts
+      - task: validate:internal:nvm
+    cmds:
       - task: lint
       - task: install
       - task: build
       - task: test
       - task: chez:sync
-    #      - task: e2e
-    cmds:
-      # - npx nx run-many --target=deploy --parallel --all
+      - task: scripts:deploy
       - task: deploy:local
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 

@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+tasks:
+  init:
+    desc: "Initialize Trapper Keeper"
+    cmds:
+      - poetry install
+
+  build:
+    internal: true
+    silent: true
+    deps:
+      - init
+    desc: "Build Trapper Keeper"
+    cmds:
+      - nx build trapper-keeper
+    sources:
+      - trapper-keeper/trapper_keeper/**/*.py
+
+  update:
+    desc: "Update Trapper Keeper Dependencies"
+    cmds:
+      - nx update trapper-keeper
+
+  install:
+    internal: true
+    silent: true
+    deps:
+      - build
+    desc: "Install Trapper Keeper"
+    cmds:
+      - nx install trapper-keeper --force
+    sources:
+      - trapper-keeper/pyproject.toml
+      - trapper-keeper/poetry.lock
+
+  run:
+    desc: "Run Trapper Keeper Command"
+    summary: |
+
+    deps:
+      - install
+    cmds:
+      - poetry run python -m trapper_keeper {{.CLI_ARGS}}
+
+#  run:help:
+#    deps:
+#      - install
+#    desc: "Run Trapper Keeper Help"
+#    cmds:
+#      - poetry run python -m trapper_keeper --help
+#
+#  run:pack:
+#    desc: "Run Trapper Keeper pack"
+#    deps:
+#      - install
+#    cmds:
+#      - poetry run python -m trapper_keeper pack
+#
+#  run:unpack:
+#    desc: "Run Trapper Keeper Unpack"
+#    deps:
+#      - install
+#    cmds:
+#      - poetry run python -m trapper_keeper unpack
