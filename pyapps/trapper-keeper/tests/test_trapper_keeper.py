@@ -9,7 +9,7 @@ from faker import Faker
 
 from trapper_keeper.conf import TkSettings
 from trapper_keeper.stores.keepass_store import create_kp_db
-from trapper_keeper.tk import _get_chezmoi_store
+from trapper_keeper.tk import _get_bolt_store
 
 
 class TestTrapperKeeper(unittest.TestCase):
@@ -23,38 +23,38 @@ class TestTrapperKeeper(unittest.TestCase):
       self.parent_dir = Path(tmpdir)
       settings = TkSettings("trapper_keeper", auto_create=False, local_file=True)
 
-      kp_key = f"{tmpdir}/key"
-      kp_token = f"{tmpdir}/token"
+      fp_key = f"{tmpdir}/key"
+      fp_token = f"{tmpdir}/token"
       kp_db = f"{tmpdir}/kp.kdbx"
 
-      Path(kp_key).write_text(self.fake.password())
-      Path(kp_token).write_text(self.fake.password())
+      Path(fp_key).write_text(self.fake.password())
+      Path(fp_token).write_text(self.fake.password())
 
       # Create keepass db file
       # TODO: Migrate to Pathlike rather than Path
-      fresh_db = create_kp_db(Path(kp_db), Path(kp_token),
-                 Path(kp_key))
+      fresh_db = create_kp_db(Path(kp_db), Path(fp_token),
+                 Path(fp_key))
       fresh_db.save()
 
-      prop_path = f"{tmpdir}/sqlite.sqlite"
-      bolt_path = f"{tmpdir}/bolt.db"
+      self.prop_path = f"{tmpdir}/sqlite.sqlite"
+      self.bolt_path = f"{tmpdir}/bolt.db"
 
-      settings.set("key", kp_key)
-      settings.set("token", kp_token)
+      settings.set("key", fp_key)
+      settings.set("token", fp_token)
       settings.set("db", kp_db)
-      settings.set("sqlite_db", prop_path)
-      settings.set("bolt_db", bolt_path)
+      settings.set("sqlite_db", self.prop_path)
+      settings.set("bolt_db", self.bolt_path)
       settings.save()
 
       self.settings = settings
 
-  def test_chezmoi_bolt_db_rw(self):
+  def test_bolt_bolt_db_rw(self):
     """Test that we can read and write to a bolt db."""
     # Create boltdb file
     self.bolt_path = self.settings.get("bolt_db")
 
     Path(self.bolt_path).touch()
-    with _get_chezmoi_store(self.settings, readonly=False) as tx:
+    with _get_bolt_store(self.bolt_path, readonly=False) as tx:
       config_state = tx.create_bucket(b"configState")
       config_state.put(b"configState", b"1")
       tx.entry_state = tx.create_bucket(b"entryState")
@@ -64,7 +64,7 @@ class TestTrapperKeeper(unittest.TestCase):
       tx.git_hub_tags = tx.create_bucket(b"gitHubTagsState")
       tx.script_state = tx.create_bucket(b"scriptState")
 
-    with _get_chezmoi_store(self.settings) as tx:
+    with _get_bolt_store(self.bolt_path) as tx:
       self.assertIsNotNone(tx)
       config_state = tx.bucket(b"configState")
       self.assertIsNotNone(config_state)
@@ -141,7 +141,6 @@ class TestTrapperKeeper(unittest.TestCase):
     """Tears down the test environment."""
     Path(self.settings.key).unlink(missing_ok=True)
     Path(self.settings.token).unlink(missing_ok=True)
-    Path(self.settings.chezmoi_db).unlink(missing_ok=True)
     shutil.rmtree(self.parent_dir)
 
 if __name__ == "__main__":

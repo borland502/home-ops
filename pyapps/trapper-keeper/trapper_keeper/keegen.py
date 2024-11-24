@@ -67,8 +67,8 @@ def gen_utf8(length=KEY_SIZE, smp=True, start=None, separator=""):
 
 def generate_ed25519_key_pair() -> tuple[str, str]:
     """Generate a valid ed25519 SSH key pair."""
-    from cryptography.hazmat.primitives.asymmetric import ed25519
     from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric import ed25519
 
     # Generate private key
     private_key = ed25519.Ed25519PrivateKey.generate()
@@ -79,7 +79,7 @@ def generate_ed25519_key_pair() -> tuple[str, str]:
         format=serialization.PrivateFormat.PKCS8,
         encryption_algorithm=serialization.NoEncryption()
     )
-    private_key_str = private_key_bytes.decode('utf-8')
+    private_key_str = private_key_bytes.decode("utf-8")
 
     # Generate public key
     public_key = private_key.public_key()
@@ -89,7 +89,7 @@ def generate_ed25519_key_pair() -> tuple[str, str]:
         encoding=serialization.Encoding.OpenSSH,
         format=serialization.PublicFormat.OpenSSH
     )
-    public_key_str = public_key_bytes.decode('utf-8')
+    public_key_str = public_key_bytes.decode("utf-8")
 
     return private_key_str, public_key_str
 

@@ -5,3 +5,8 @@
 [submodule "devcontainer-features"]
 	path = scripts/devcontainer-features
 	url = https://github.com/borland502/devcontainer-features
+
+[submodule "technohouser"]
+	path = scripts/ansible/collections/ansible_collections/technohouser
+	url = https://github.com/borland502/technohouser
+

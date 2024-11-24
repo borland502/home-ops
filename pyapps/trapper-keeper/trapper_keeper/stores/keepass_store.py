@@ -1,34 +1,47 @@
-"""Keepass store for trapper-keeper."""
+"""Keepass store for trapper-keeper.  This store in particular serves as the focal point of
+trapper-keeper and all other stores can (and should) be embedded within this store.
+
+"""
 
 from __future__ import annotations
 
 from contextlib import AbstractContextManager
 from pathlib import Path
-from typing import IO
 from uuid import UUID
 
 from pykeepass import PyKeePass, create_database
 from pykeepass.entry import Entry
 from pykeepass.group import Group
-from utils.file import pathify, get_file_io, stringify_path, get_file_bytes
+from utils import file
 
-from trapper_keeper.conf import TkSettings, TgtSettings
+from trapper_keeper.conf import TkSettings
 from trapper_keeper.keegen import gen_passphrase, gen_utf8
 
-BOOTSTRAP: str = "A9906776-8CEB-4044-8D65-97B5A93920DD"
-BOOTSTRAP_ENTRY: str = "36EF1A2C-773E-4F9D-AE8A-07B21E21C317"
 settings = TkSettings.get_instance("trapper_keeper", xdg_config=True, auto_create=True)
 
-def _create_kp_db_bootstrap_group(kp_db: PyKeePass) -> None:
-  """Create the top-level bootstrap groups."""
+BOOTSTRAP = settings.get("bootstrap_uuid")
+BOOTSTRAP_ENTRY = settings.get("bootstrap_entry")
 
-  # Create the bootstrap group in a new database
+
+def _create_kp_db_bootstrap_group(kp_db: PyKeePass) -> None:
+  """Create the top-level bootstrap groups in the Keepass database.
+
+  Args:
+      kp_db (PyKeePass): The Keepass database instance.
+  """
   kp_db.add_group(group_name=f"{BOOTSTRAP}", destination_group=kp_db.root_group)
   kp_db.save()
 
 def _create_kp_db_bootstrap_entries(kp_db: PyKeePass) -> None:
-  """Create the bootstrap entries in a new database."""
+  """Create the bootstrap entries in the Keepass database.
 
+  Args:
+      kp_db (PyKeePass): The Keepass database instance.
+
+  Raises:
+      ValueError: If the source database path is the current working directory.
+      ValueError: If the bootstrap group is not found in the database.
+  """
   src_db_path = settings.get("src_db")
   if src_db_path == Path.cwd():
       raise ValueError("The source database path cannot be the current working directory.")
@@ -45,37 +58,66 @@ def _create_kp_db_bootstrap_entries(kp_db: PyKeePass) -> None:
     password="",
   )
 
-  src_files: list[Path] = pathify(*settings.get("src_files")[BOOTSTRAP_ENTRY])
+  src_files: list[Path] = file.pathify(*settings.get("src_files")[BOOTSTRAP_ENTRY])
 
   for idx, src_file in enumerate(src_files):
-    kp_db.add_binary(data=get_file_bytes(src_file), compressed=True)
-    entry.add_attachment(idx, src_file.name)
+    if file.ensure_path(src_file):
+      kp_db.add_binary(data=file.get_file_bytes(src_file), compressed=False)
+      entry.add_attachment(idx, src_file.name)
 
   src_env: dict[str, str] = {k: v for k, v in settings.get("src_env").items() if v and v.isprintable()}
   [entry.set_custom_property(k, v) for k, v in src_env.items()]
 
   kp_db.save()
 
+def view_kp_db(fp_kp_db: Path, fp_token: Path, fp_key: Path | None = None) -> None:
+  """View the contents of the Keepass database.
 
-def create_kp_db(kp_fp: Path, kp_token: Path, kp_key: Path | None = None) -> PyKeePass:
-  """Create a new keepass vault in the KEEPASS_DB_PATH, with the KEEPASS_DB_KEY, and KEEPASS_DB_TOKEN."""
-  print(f"Creating new Keepass database at {kp_fp}")
-  if not kp_fp.is_file():
-    # make the directory at least if the database does not exist
-    kp_fp.parent.mkdir(mode=0o700, exist_ok=True, parents=True)
-  if not kp_token.is_file():
-    # make the directory at least if the database does not exist
-    kp_token.parent.mkdir(mode=0o700, exist_ok=True, parents=True)
-    kp_token.write_text(gen_passphrase(length=5), "utf-8")
-    print(f"Token file created at {kp_token}")
-  if kp_key is not None and not kp_key.is_file():
-    # make the directory at least if the database does not exist
-    kp_key.parent.mkdir(mode=0o700, exist_ok=True, parents=True)
-    kp_key.write_text(gen_utf8(length=64), "utf-8")
+  Args:
+      fp_kp_db (Path): The path to the Keepass database file.
+      fp_token (Path): The path to the token file.
+      fp_key (Path | None, optional): The path to the key file. Defaults to None.
+  """
+  kp_db: PyKeePass = PyKeePass(
+    filename=fp_kp_db,
+    password=fp_token.read_text(settings.get("encoding")),
+    keyfile=fp_key,
+  )
+  for group in kp_db.groups:
+    print(f"Group: {group.name}")
+    for entry in group.entries:
+      print(f"  Entry: {entry.title}")
+      for k, v in entry.custom_properties.items():
+        print(f"    {k}: {v}")
+      for attachment in entry.attachments:
+        print(f"    Attachment: {attachment.id}: {attachment.filename}")
+
+
+def create_kp_db(fp_kp_db: Path, fp_token: Path, fp_key: Path | None = None) -> PyKeePass:
+  """Create a new Keepass database.
+
+  Args:
+      fp_kp_db (Path): The path to the Keepass database file.
+      fp_token (Path): The path to the token file.
+      fp_key (Path | None, optional): The path to the key file. Defaults to None.
+
+  Returns:
+      PyKeePass: The created Keepass database instance.
+  """
+  print(f"Creating new Keepass database at {fp_kp_db}")
+  if not fp_kp_db.is_file():
+    fp_kp_db.parent.mkdir(mode=settings.get("user_dir_mode"), exist_ok=True, parents=True)
+  if not fp_token.is_file():
+    fp_token.parent.mkdir(mode=settings.get("user_dir_mode"), exist_ok=True, parents=True)
+    fp_token.write_text(gen_passphrase(length=settings.get("passphrase_length")), settings.get("encoding"))
+    print(f"Token file created at {fp_token}")
+  if fp_key is not None and not fp_key.is_file():
+    fp_key.parent.mkdir(mode=settings.get("user_dir_mode"), exist_ok=True, parents=True)
+    fp_key.write_text(gen_utf8(length=settings.get("key_length")), settings.get("encoding"))
   kp_db: PyKeePass = create_database(
-    kp_fp,
-    password=kp_token.read_text("utf-8"),
-    keyfile=kp_key,
+    fp_kp_db,
+    password=fp_token.read_text(settings.get("encoding")),
+    keyfile=fp_key,
   )
 
   _create_kp_db_bootstrap_group(kp_db)
@@ -84,50 +126,21 @@ def create_kp_db(kp_fp: Path, kp_token: Path, kp_key: Path | None = None) -> PyK
 
   return kp_db
 
-
-REF_PREFIX = "ref@"
-REF_SEP = "/"
-REF_SEP2 = ":"
-ATTR_TITLE = "__title__"
-ATTR_USERNAME = "__username__"
-ATTR_PASSWORD = "__password__"
-ATTR_URL = "__url__"
-
-
-# def _validate_ref(ref: str) -> None:
-#   """Validate the ref string."""
-#   if not ref:
-#     raise ValueError("Empty ref")
-#   if not ref.startswith(REF_PREFIX):
-#     raise ValueError(f"Invalid ref: {ref}, prefix {REF_PREFIX!r} expected")
-#   if ref.removeprefix(REF_PREFIX).count(REF_SEP) < 1:
-#     raise ValueError(
-#       f"Invalid ref: {ref}, at least 1 separator {REF_SEP!r} expected",
-#     )
-#   if ref.removeprefix(REF_PREFIX).count(REF_SEP2) != 1:
-#     raise ValueError(
-#       f"Invalid ref: {ref}, exactly 1 separator {REF_SEP2!r} expected",
-#     )
-
-
-# def _parse_ref(ref: str) -> tuple[list[str], str]:
-#   """Parse the ref string."""
-#   _validate_ref(ref)
-#   ref = ref.removeprefix(REF_PREFIX)
-#   _path, attribute = ref.rsplit(REF_SEP2, maxsplit=1)
-#   path = _path.split(REF_SEP)
-#   return path, attribute
-
-
 class KeepassStore(PyKeePass):
   """Keepass store for trapper-keeper."""
 
-  def __init__(self, kp_fp: Path, kp_token: Path, kp_key: Path | None = None):
-    """Initialize the KeepassStore."""
+  def __init__(self, fp_kp_db: Path, fp_token: Path, fp_key: Path | None = None):
+    """Initialize the KeepassStore.
+
+    Args:
+        fp_kp_db (Path): The path to the Keepass database file.
+        fp_token (Path): The path to the token file.
+        fp_key (Path | None, optional): The path to the key file. Defaults to None.
+    """
     super().__init__(
-      filename=kp_fp,
-      password=kp_token.read_text("utf-8"),
-      keyfile=kp_key,
+      filename=fp_kp_db,
+      password=fp_token.read_text(settings.get("encoding")),
+      keyfile=fp_key,
     )
 
     if not self.find_groups(name=BOOTSTRAP, first=True):
@@ -135,100 +148,43 @@ class KeepassStore(PyKeePass):
       _create_kp_db_bootstrap_entries(self)
 
   def __enter__(self) -> AbstractContextManager:
-    """Context manager enter."""
+    """Context manager enter.
+
+    Returns:
+        AbstractContextManager: The context manager instance.
+    """
     super().__enter__()
     return self
 
   def get_bootstrap_entry(self, uuid: UUID):
-    """Get the value by UUID in the bootstrap group."""
+    """Get the value by UUID in the bootstrap group.
+
+    Args:
+        uuid (UUID): The UUID of the entry.
+
+    Returns:
+        Entry: The entry found by UUID.
+    """
     return self.find_entries(group=self.root_group, name=uuid, first=True)
 
-  # def load_ref(self, ref: str) -> str:
-  #   """Load a reference."""
-  #   path, attribute = _parse_ref(ref)
-  #   entry = self.find_entries(path=path)
-  #   if entry is None:
-  #     raise KeyError(f"Entry {path!r} not found")
-  #   if attribute == ATTR_TITLE:
-  #     out: str = entry.title
-  #   elif attribute == ATTR_USERNAME:
-  #     out = entry.username
-  #   elif attribute == ATTR_PASSWORD:
-  #     out = entry.password
-  #   elif attribute == ATTR_URL:
-  #     out = entry.url
-  #   else:
-  #     out = entry.custom_properties[attribute]
-  #   if out.startswith(REF_PREFIX):
-  #     if attribute == ATTR_TITLE:
-  #       raise ValueError(f"Invalid ref: {ref}, title cannot be a ref")
-  #     return self.load_ref(out)
-  #   return out
-
-  # def load_env(self, entry_path: Sequence[str]) -> None:
-  #   """Load the environment."""
-  #   env = self.env(entry_path=entry_path)
-  #   for k, v in env.items():
-  #     os.environ[k] = v
-
-  # def env(self, entry_path: Sequence[str]) -> dict[str, str]:
-  #   """:param self:
-  #   :param entry_path:
-  #   :return:
-  #   """
-  #   entry = self.find_entries(path=entry_path)
-  #   if entry is None:
-  #     raise KeyError(f"Entry {entry_path!r} not found")
-  #   kv = entry.custom_properties
-  #   return {k: self.load_ref(v) if v.startswith(REF_PREFIX) else v for k, v in kv.items()}
-
-  # def write_env(
-  #   self,
-  #   entry_path: Sequence[str],
-  #   env: dict[str, str],
-  #   create_if_not_exists: bool = True,
-  # ) -> None:
-  #   """Write the environment."""
-  #   entry = self.find_entries(path=entry_path)
-  #   if entry is None:
-  #     if create_if_not_exists:
-  #       entry = self.add_entry(
-  #         group=self.root_group,
-  #         title=entry_path[-1],
-  #         username="",
-  #         password="",
-  #         url="",
-  #       )
-  #     else:
-  #       raise KeyError(f"Entry {entry_path!r} not found and create_if_not_exists is False")
-
-  #     raise KeyError(f"Entry {entry_path!r} not found")
-  #   for k, v in env.items():
-  #     entry.set_custom_property(k, v)
-  #   self.save()
-
-  # def dump_env(self, entry_path: Sequence[str], output_format: str) -> StringIO:
-  #   """Dump the environment."""
-  #   with StringIO() as sink:
-  #     for k, v in self.env(entry_path):
-  #       match output_format:
-  #         case "env":
-  #           if output_format == "env":
-  #             sink.write(f"{k}={v}")
-  #           elif output_format == "docker":
-  #             sink.write(f"-e {k}={v}")
-  #           elif output_format == "shell":
-  #             sink.write(f"bootstrap {k}={v}")
-  #           else:
-  #             raise ValueError(f"Invalid format: {output_format!r}")
-  #     return sink
-
   def __exit__(self, __exc_type, __exc_value, __traceback):
-    """Context manager exit."""
+    """Context manager exit.
+
+    Args:
+        __exc_type: The exception type.
+        __exc_value: The exception value.
+        __traceback: The traceback object.
+    """
     super().__exit__(__exc_type, __exc_value, __traceback)
 
   def copy_group(self, src: KeepassStore, src_group: Group, dest_group: Group):
-    """Copy a group from the source database to the destination database."""
+    """Copy a group from the source database to the destination database.
+
+    Args:
+        src (KeepassStore): The source Keepass store.
+        src_group (Group): The source group.
+        dest_group (Group): The destination group.
+    """
     for entry in src.find_entries(group=src_group):
       self.add_entry(
         destination_group=dest_group,
@@ -244,7 +200,11 @@ class KeepassStore(PyKeePass):
         force_creation=True)
 
   def copy_bootstrap_entries(self, src: KeepassStore):
-    """Copy the bootstrap entries from the source database."""
+    """Copy the bootstrap entries from the source database.
+
+    Args:
+        src (KeepassStore): The source Keepass store.
+    """
     for entry in src.find_entries(group=src.get_bootstrap_group()):
       self.add_entry(
         destination_group=self.get_bootstrap_group(),
@@ -261,4 +221,10 @@ class KeepassStore(PyKeePass):
       )
 
   def get_bootstrap_group(self) -> Group | None:
+    """Get the bootstrap group.  The bootstrap group contains entries with key/values and
+    attachments for a new system.
+
+    Returns:
+        Group | None: The bootstrap group if found, otherwise None.
+    """
     return self.find_groups(name=f"{BOOTSTRAP}", first=True)

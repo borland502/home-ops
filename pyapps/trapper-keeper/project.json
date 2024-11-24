@@ -1,6 +1,6 @@
 {
   "name": "trapper-keeper",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "$schema": "./node_modules/@nxlv/python/schema.json",
   "projectType": "application",
   "sourceRoot": "pyapps/trapper-keeper/trapper_keeper",
   "release": {
@@ -55,6 +55,10 @@
       },
       "dependsOn": ["^lock"],
       "cache": true
+    },
+    "pack": {
+      "command": "task pya:tk:run -- pack",
+      "dependsOn": ["^build", "^lint", "^test", "^install"]
     },
     "test": {
       "command": "poetry run python -m unittest discover",

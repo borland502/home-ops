@@ -6,7 +6,6 @@ import contextlib
 from enum import StrEnum, auto
 from pathlib import Path
 
-from trapper_keeper.conf import TkSettings
 from trapper_keeper.stores.bolt_kvstore import BoltStore
 from trapper_keeper.stores.dict_store import PersistentDict
 from trapper_keeper.stores.keepass_store import KeepassStore
@@ -27,9 +26,9 @@ class DbTypes(StrEnum):
   KV: str = auto()
 
 
-def _get_tk_store(kp_fp: Path, kp_token: Path, kp_key: Path | None = None) -> contextlib.AbstractContextManager:
+def _get_tk_store(fp_kp_db: Path, fp_token: Path, fp_key: Path | None = None) -> contextlib.AbstractContextManager:
   """Open a Trapper Keeper store based on the db_type."""
-  return KeepassStore(kp_fp, kp_token, kp_key)
+  return KeepassStore(fp_kp_db, fp_token, fp_key)
 
 def _get_kv_store(db_fp: Path) -> contextlib.AbstractContextManager:
   """Open a key/value store."""
@@ -49,14 +48,14 @@ def get_store(db_type: DbTypes, **kwargs) -> contextlib.AbstractContextManager:
   """Get a store based on the db_type.
 
   Args:
-      settings (TkSettings): TkSettings instance.
       db_type (DbTypes): Type of store to open.
+      **kwargs: Additional arguments required for the specific store type.
 
   Returns:
       contextlib.AbstractContextManager: Store instance.
 
   Raises:
-      ValueError: Unsupported db_type
+      ValueError: If the db_type is unsupported.
   """
   match db_type:
     case DbTypes.BOLT:
@@ -64,10 +63,10 @@ def get_store(db_type: DbTypes, **kwargs) -> contextlib.AbstractContextManager:
       readonly: bool = kwargs["readonly"]
       return _get_bolt_store(db_fp=db_fp, readonly=readonly)
     case DbTypes.KP:
-      kp_fp: Path = kwargs["kp_fp"]
-      kp_token: Path = kwargs["kp_token"]
-      kp_key: Path | None = kwargs.get("kp_key")
-      return _get_tk_store(kp_fp=kp_fp, kp_token=kp_token, kp_key=kp_key)
+      fp_kp_db: Path = kwargs["fp_kp_db"]
+      fp_token: Path = kwargs["fp_token"]
+      fp_key: Path | None = kwargs.get("fp_key")
+      return _get_tk_store(fp_kp_db=fp_kp_db, fp_token=fp_token, fp_key=fp_key)
     case DbTypes.SQLITE:
       db_fp: Path = kwargs["db_fp"]
       return _get_sqlite_store(db_fp=db_fp)

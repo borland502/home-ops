@@ -8,6 +8,7 @@ version: "3"
 tasks:
   debug:
     desc: Print the environment variables
+    internal: true
     cmds:
       - printenv
 

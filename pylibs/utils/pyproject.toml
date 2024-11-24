@@ -38,33 +38,91 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
-exclude = [
-  ".ruff_cache",
-  ".svn",
-  ".tox",
-  ".venv",
-  "dist",
-]
-
-line-length = 88
-indent-width = 4
+  exclude = [
+    ".svn",
+    ".tox",
+    ".eggs",
+    ".git",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".venv",
+    "tests",
+    "__pypackages__",
+    "__pycache__",
+    "build",
+    "dist",
+  ]
+  indent-width = 2
+  line-length = 128
+  target-version = "py312"
 
 [tool.ruff.lint]
-select = [
-  # pycodestyle
-  "E",
-  # Pyflakes
-  "F",
-  # pyupgrade
-  "UP",
-  # flake8-bugbear
-  "B",
-  # flake8-simplify
-  "SIM",
-  # isort
-  "I",
-]
-ignore = []
+  ignore = [
+    "PLR0912",
+    "D104",
+    "D203",
+    "D213",
+    "E501",
+    "PGH003",
+    "RET504",
+    "D205",
+    "ISC001",
+    "E111",
+    "N999",
+    "PT009",
+  ]
+  select = [
+    "A",
+    "ASYNC",
+    "B",
+    "D",
+    "DTZ",
+    "E",
+    "F",
+    "FLY",
+    "I",
+    "ISC",
+    "N",
+    "NPY",
+    "PERF",
+    "PGH",
+    "PIE",
+    "PL",
+    "PT",
+    "Q",
+    "RET",
+    "RUF",
+    "RSE",
+    "SIM",
+    "TID",
+    "UP",
+    "W",
+    "YTT",
+  ]
+  unfixable = ["F401", "F841"]
 
-fixable = ["ALL"]
-unfixable = []
+[tool.ruff.lint.pydocstyle]
+  convention = "google"
+
+[tool.ruff.lint.isort]
+  section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "tests",
+    "local-folder",
+    "fixable",
+    "unfixable",
+  ]
+
+[tool.ruff.lint.isort.sections]
+  fixable = ["ALL"]
+  tests = ["test"]
+  unfixable = []
+
+[tool.ruff.format]
+  line-ending = "lf"

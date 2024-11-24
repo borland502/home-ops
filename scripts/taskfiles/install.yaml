@@ -90,7 +90,7 @@ tasks:
       - task: validate:internal:xdg
       - task: validate:internal:scripts
     status:
-      - test -n ${PYENV_ROOT+x}
+      - test -z ${PYENV_ROOT+x}
       - test -d ${PYENV_ROOT}
     cmds:
       - |

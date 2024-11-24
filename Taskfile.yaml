@@ -18,7 +18,7 @@ includes:
     taskfile: "./scripts/scripts.yaml"
   chez:
     taskfile: "./scripts/dotfiles/dot_config/taskfiles/chezmoi.yaml"
-  keepassxc:
+  kp:
     taskfile: "./scripts/taskfiles/keepassxc.yaml"
   validate:
     taskfile: "./scripts/taskfiles/validate.yaml"
@@ -26,6 +26,8 @@ includes:
     taskfile: "./scripts/taskfiles/install.yaml"
   pya:
     taskfile: "./pyapps/pyapps.yaml"
+  git:
+    taskfile: "./scripts/taskfiles/git.yaml"
 
 tasks:
   nx:show:
@@ -35,20 +37,6 @@ tasks:
     cmds:
       - npx nx show projects --affected
 
-  #  serve:
-  #    desc: Serve the application
-  #    cmds:
-  #      - npx nx run-many --target=serve --parallel --all
-  #    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
-  #
-  #  e2e:
-  #    desc: Run the end-to-end tests
-  #    run: once
-  #    deps:
-  #      - task: serve
-  #    cmds:
-  #      - npx nx run-many --target=e2e --parallel --all
-  #    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
   deploy:local:
     desc: Deploy the applications locally
     cmds:
@@ -97,16 +85,19 @@ tasks:
       - npm run test:all
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
-  #    mcv:pack:
-  #      desc: Pack all the projects
-  #      summary: |
-  #        This task packs all the projects locally
-  #      deps:
-  #        - task: lint
-  #        - task: nx:build
-  #      cmds:
-  #        - npx nx run-many --target=pack --parallel --all
-  #      dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+  mcv:pack:
+    desc: Pack all the projects
+    summary: |
+      This task packs all the projects locally
+    deps:
+      - task: validate:internal:xdg
+      - task: validate:internal:scripts
+      - task: install:npm
+      - task: install:python
+      - task: install:brew
+    cmds:
+      - npx nx run-many --target=pack --parallel --all
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   mcv:unpack:
     desc: Deploy all the system and home directory projects
