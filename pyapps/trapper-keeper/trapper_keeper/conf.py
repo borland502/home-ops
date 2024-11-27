@@ -82,19 +82,17 @@ class TkSettings(TOMLSettings):
   # keepass binary attachments index (target assumed to be new each time)
   src_files: ClassVar[dict[UUID, list[Path]]] = {
     bootstrap_entry: [
-      f"{ansible_home}/inventory/microsoft.ad.ldap.yaml",
-      f"{ansible_home}/inventory/nmap.yaml",
-      f"{ansible_home}/inventory/proxmox.yaml",
-      f"{ansible_home}/inventory/sqlite.yaml",
-      f"{ansible_home}/inventory/group_vars/all.yaml",
-      f"{sshconfig_home}/hosts.conf",
-      f"{sshconfig_home}/networks.conf",
-      f"{sshconfig_home}/ssh.conf",
       f"{ssh_home}/config",
       f"{ssh_home}/id_ed25519",
       f"{ssh_home}/id_ed25519.pub",
       f"{home}/.npmrc",
       f"{xdg_config_home}/chezmoi/chezmoistate.boltdb"
+    ]
+  }
+
+  src_dirs: ClassVar[dict[UUID, list[Path]]] = {
+    bootstrap_entry: [
+      f"{ansible_home}/inventory"
     ]
   }
 

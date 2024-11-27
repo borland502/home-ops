@@ -37,3 +37,6 @@ collections:
 
   - name: community.zabbix
     version: "*"
+
+  - name: hasnimehdi91.keepass
+    version: "*"

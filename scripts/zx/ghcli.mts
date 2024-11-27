@@ -15,9 +15,9 @@ $.verbose = config.get("zx.verbose");
 syncProcessCwd(true);
 
 // Get the GitHub organization from the config file
-const ghOrg = config.get("gh.org");
-const ghLimit = config.get("gh.limit");
-const rootDir = path.resolve(os.homedir(), config.get("gh.rootDir"));
+const ghOrg = config.get("ghcli.org");
+const ghLimit = config.get("ghcli.limit");
+const rootDir = path.resolve(os.homedir(), config.get("ghcli.rootDir"));
 
 async function processRepos(
   action: (repo: string) => Promise<void>,

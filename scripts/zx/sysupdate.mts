@@ -3,7 +3,7 @@ import {
   ensureBrew,
   error,
   getSystemData,
-  hasCommand,
+  which,
   info,
   initShell,
   installByBrew
@@ -13,6 +13,18 @@ const sysinfo = await getSystemData()
 
 await initShell($);
 
+async function installAptPackages() {
+  const aptPackages = await $`chezmoi data --format json | jq -rce '.apt.packages[]'`.lines()
+    .catch((reason: unknown) => {
+      error(`Error: ${reason}`)
+      return [] as string[]
+    })
+
+  for (const pkg of aptPackages) {
+    await $`sudo apt install -y ${pkg}`
+  }
+}
+
 async function installPipxPackages() {
   const pipxPackages = await $`chezmoi data --format json | jq -rce '.pipx.packages[]'`.lines()
     .catch((reason: unknown) => {
@@ -21,7 +33,7 @@ async function installPipxPackages() {
     })
 
   for (const pkg of pipxPackages) {
-    hasCommand(pkg).then((hasPkg) => {
+    which(pkg).then((hasPkg) => {
       if (hasPkg === null || !hasPkg) {
         $`pipx install ${pkg}`
       } else {
@@ -81,6 +93,14 @@ async function installBrew(brewPackages: Promise<string[]>, brewCasks?: Promise<
   }
 }
 
+await which("apt").then(() => {
+    await installAptPackages()
+
+    await $`sudo apt update && sudo apt dist-upgrade -y`.catch((reason: unknown) => {
+      error(`Error: ${reason}`)
+    })
+})
+
 await $`brew update`.then(() => {
   $`brew upgrade`
 }).then(() => {
@@ -105,7 +125,7 @@ await $`brew update`.then(() => {
   $`brew cleanup -s`
 })
 
-await hasCommand("npm").then((hasNPM) => {
+await which("npm").then((hasNPM) => {
   if (hasNPM === null || !hasNPM) {
     $`brew install npm`
   }
@@ -124,7 +144,7 @@ await hasCommand("npm").then((hasNPM) => {
 
 })
 
-await hasCommand("pipx").then((hasPipx) => {
+await which("pipx").then((hasPipx) => {
   if (hasPipx === null || !hasPipx) {
     $`brew install pipx`
   }
@@ -139,7 +159,7 @@ await hasCommand("pipx").then((hasPipx) => {
   })
 })
 
-await hasCommand("tldr").then((hasTLDR) => {
+await which("tldr").then((hasTLDR) => {
   if (hasTLDR === null || !hasTLDR) {
     $`brew install tldr`
   }
@@ -149,7 +169,7 @@ await hasCommand("tldr").then((hasTLDR) => {
   })
 })
 
-await hasCommand("softwareupdate").then((hasSoftwareUpdate) => {
+await which("softwareupdate").then((hasSoftwareUpdate) => {
   if (hasSoftwareUpdate !== null && sysinfo.os.distro === "macOS") {
     $`softwareupdate --install --all --force`.catch((reason: unknown) => {
       error(`Error: ${reason}`)
@@ -157,9 +177,10 @@ await hasCommand("softwareupdate").then((hasSoftwareUpdate) => {
   }
 })
 
-await hasCommand("flatpak").then((hasFlatpak) => {
+await which("flatpak").then((hasFlatpak: boolean) => {
   if (hasFlatpak === null || !hasFlatpak) {
-    $`brew install flatpak`
+        // TODO: Use generic package manager
+      $`apt install flatpak`
   }
 
   $`flatpak update -y`.catch((reason: unknown) => {

@@ -5,6 +5,7 @@ trapper-keeper and all other stores can (and should) be embedded within this sto
 
 from __future__ import annotations
 
+import os
 from contextlib import AbstractContextManager
 from pathlib import Path
 from uuid import UUID
@@ -12,7 +13,7 @@ from uuid import UUID
 from pykeepass import PyKeePass, create_database
 from pykeepass.entry import Entry
 from pykeepass.group import Group
-from utils import file
+from utils.file import pathify, ensure_path, get_file_bytes
 
 from trapper_keeper.conf import TkSettings
 from trapper_keeper.keegen import gen_passphrase, gen_utf8
@@ -58,17 +59,27 @@ def _create_kp_db_bootstrap_entries(kp_db: PyKeePass) -> None:
     password="",
   )
 
-  src_files: list[Path] = file.pathify(*settings.get("src_files")[BOOTSTRAP_ENTRY])
+  src_files: list[Path] = pathify(*settings.get("src_files")[BOOTSTRAP_ENTRY])
 
+  src_dirs: list[Path] = pathify(*settings.get("src_dirs")[BOOTSTRAP_ENTRY])
+
+  for dir_file in src_dirs:
+      for root, _, files in os.walk(dir_file):
+          for file in files:
+              src_files.append(Path(root) / file)
+
+  store_attachments(entry, kp_db, src_files)
+
+def store_attachments(entry, kp_db, src_files):
   for idx, src_file in enumerate(src_files):
-    if file.ensure_path(src_file):
-      kp_db.add_binary(data=file.get_file_bytes(src_file), compressed=False)
+    if ensure_path(src_file):
+      kp_db.add_binary(data=get_file_bytes(src_file), compressed=False)
       entry.add_attachment(idx, src_file.name)
-
-  src_env: dict[str, str] = {k: v for k, v in settings.get("src_env").items() if v and v.isprintable()}
+  src_env: dict[str, str] = {k: v for k, v in settings.get("src_env").items() if
+                             v and v.isprintable()}
   [entry.set_custom_property(k, v) for k, v in src_env.items()]
-
   kp_db.save()
+
 
 def view_kp_db(fp_kp_db: Path, fp_token: Path, fp_key: Path | None = None) -> None:
   """View the contents of the Keepass database.

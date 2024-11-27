@@ -144,6 +144,7 @@ tasks:
 
             # missing something about heredocs in yaml
             echo "#!/usr/bin/env zsh" > ${XDG_BIN_HOME}/${base_name}
+            echo "nvm use --lts" >> ${XDG_BIN_HOME}/${base_name}
             echo "NODE_ENV=prod npx tsx --tsconfig "${XDG_DATA_HOME}/automation/home-ops/tsconfig.base.json" $file" >> ${XDG_BIN_HOME}/${base_name}
 
             chmod +x ${XDG_BIN_HOME}/${base_name}

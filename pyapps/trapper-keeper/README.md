@@ -1,3 +1,38 @@
 # trapper-keeper
 
-Project description here.
+# Trapper Keeper
+## Overview
+Trapper Keeper aims to be a thin wrapper over KeePassXC using PyKeepass for the niche goal of packing various
+environment variables, ssh keys, and other sensitive artifacts into the password manager to then unpack at a
+destination vm/lxc/docker image.
+
+### Chezmoi Adjacent
+I love [chezmoi](https://www.chezmoi.io), which handles this goal with more encryption options and with better
+instructions.  If you are really industrious, you can integrate with 1password or self-hosted bitwarden instances.
+But simplicity in secrets management is key for me. Most TK operations are straight from the [PyKeepass](https://pykeepass.readthedocs.io/en/latest/)
+library and the wrapped TK database binary will be accessible from the various KeePassXC [clients](https://github.com/lgg/awesome-keepass).
+TK does not aim to alter any object it stores or the location where that object is expected
+
+## Commands
+
+### Pack
+
+This will create any files which are missing as well as the Keepass database itself.  The user is expected to supply
+only a password token `~/.local/state/keepass_token` and a key `~/.config/trapper_keeper/key.txt`.  The key can be
+anything at all so long as it never changes.
+
+```shell
+task pya:tk:run -- pack
+```
+
+or
+
+```shell
+poetry run python -m trapper_keeper pack
+```
+
+## Links
+* [KeePassXC](https://keepassxc.org)
+* [PyKeepass](https://pykeepass.readthedocs.io/en/latest/)
+* [XDG Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
+* [xdg-base-dirs library](https://github.com/srstevenson/xdg-base-dirs)

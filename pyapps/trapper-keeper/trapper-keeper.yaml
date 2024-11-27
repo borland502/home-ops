@@ -44,23 +44,3 @@ tasks:
     cmds:
       - poetry run python -m trapper_keeper {{.CLI_ARGS}}
 
-#  run:help:
-#    deps:
-#      - install
-#    desc: "Run Trapper Keeper Help"
-#    cmds:
-#      - poetry run python -m trapper_keeper --help
-#
-#  run:pack:
-#    desc: "Run Trapper Keeper pack"
-#    deps:
-#      - install
-#    cmds:
-#      - poetry run python -m trapper_keeper pack
-#
-#  run:unpack:
-#    desc: "Run Trapper Keeper Unpack"
-#    deps:
-#      - install
-#    cmds:
-#      - poetry run python -m trapper_keeper unpack
