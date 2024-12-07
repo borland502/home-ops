@@ -5,3 +5,7 @@ includes:
   tk:
     taskfile: "./trapper-keeper/trapper-keeper.yaml"
     dir: "./trapper-keeper"
+
+  ac:
+    taskfile: "./ansible-commands/ansible-commands.yaml"
+    dir: "./ansible-commands"

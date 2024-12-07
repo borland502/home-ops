@@ -5,8 +5,8 @@ vars:
   NVM_VER: "0.40.1"
 
 includes:
-    validate:
-        taskfile: "./validate.yaml"
+  validate:
+    taskfile: "./validate.yaml"
 
 tasks:
   brew:
@@ -42,7 +42,6 @@ tasks:
           brew install chezmoi
         fi
 
-
   nvm:
     desc: Ensure the NVM is installed
     run: once
@@ -52,12 +51,12 @@ tasks:
     #        internal: true
     #        silent: true
     status:
-      - test -n ${NVM_DIR+x}
+      - test -z ${NVM_DIR+x}
       - test -d ${NVM_DIR}
     cmds:
       - |
         # Confirm that nvm is installed, and if not, install it
-        if ! [[ $(command -v nvm) ]]; then
+        if [[ -z ${NVM_DIR+x}  ]]; then
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v{{.NVM_VER}}/install.sh | bash
           export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm

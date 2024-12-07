@@ -8,7 +8,7 @@ from pathlib import Path
 
 from trapper_keeper.stores.bolt_kvstore import BoltStore
 from trapper_keeper.stores.dict_store import PersistentDict
-from trapper_keeper.stores.keepass_store import KeepassStore
+from trapper_keeper.stores.keepass_store import KeepassStore, create_kp_db
 from trapper_keeper.stores.sqlite_store import SqliteStore
 
 
@@ -66,6 +66,10 @@ def get_store(db_type: DbTypes, **kwargs) -> contextlib.AbstractContextManager:
       fp_kp_db: Path = kwargs["fp_kp_db"]
       fp_token: Path = kwargs["fp_token"]
       fp_key: Path | None = kwargs.get("fp_key")
+      if fp_kp_db is None or fp_token is None:
+        raise ValueError("fp_kp_db and fp_token are required for KeepassStore.")
+      if not fp_kp_db.exists():
+        create_kp_db(fp_kp_db=fp_kp_db, fp_token=fp_token, fp_key=fp_key)
       return _get_tk_store(fp_kp_db=fp_kp_db, fp_token=fp_token, fp_key=fp_key)
     case DbTypes.SQLITE:
       db_fp: Path = kwargs["db_fp"]

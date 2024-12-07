@@ -4,32 +4,28 @@ from __future__ import annotations
 
 import os
 
-from resources.paths import Directories
+from utils.paths import AnsiblePaths
 
+
+# def find_yaml_files_in_dir(path: str) -> list[str]:
+#   """Finds all YAML files in the given directory."""
+#   yield (os.path.join(path, file) for file in os.listdir(path) if file.endswith((".yaml", ".yml")))
+
+from itertools import chain
 
 def find_yaml_files(path) -> list[str]:
-  """Finds all YAML files recursively under the given path.
+    """Finds all YAML files recursively under the given path.
 
-  Args:
-      path: The base path to search.
+    Args:
+        path: The base path to search.
 
-  Returns:
-      A list of absolute paths to all YAML files found.
-  """
-  # Initialize an empty list to store file paths
-  yaml_files: list = []
-
-  # Loop through all files and subdirectories in the path
-  for root, _, files in os.walk(path):
-    for file in files:
-      # Check if the file extension is .yaml
-      if file.endswith((".yaml", ".yml")):
-        # Construct the absolute path to the YAML file
-        yaml_path = str(os.path.join(root, file))
-        # Add the path to the list
-        yaml_files.append(yaml_path)
-
-  return yaml_files
+    Returns:
+        A list of absolute paths to all YAML files found.
+    """
+    return chain.from_iterable(
+        (os.path.join(root, file) for file in files if file.endswith((".yaml", ".yml")))
+        for root, _, files in os.walk(path)
+    )
 
 
 def find_playbook(app_name: str) -> str | None:
@@ -63,7 +59,7 @@ def find_playbooks() -> list[str]:
   playbooks (presumably defined in `Directories.PBROOT`). It returns the list
   of file paths obtained from `find_yaml_files`.
   """
-  return find_yaml_files(Directories.PBROOT)
+  return find_yaml_files(AnsiblePaths.PBROOT)
 
 
 def find_host(app_name: str) -> str:
@@ -97,4 +93,4 @@ def find_hosts() -> list[str]:
   hosts (presumably defined in `Directories.HVHOME`). It returns the list
   of file paths obtained from `find_yaml_files`.
   """
-  return find_yaml_files(Directories.HVHOME)
+  return find_yaml_files(AnsiblePaths.HVHOME)

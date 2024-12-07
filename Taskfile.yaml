@@ -18,6 +18,7 @@ includes:
     taskfile: "./scripts/scripts.yaml"
   chez:
     taskfile: "./scripts/dotfiles/dot_config/taskfiles/chezmoi.yaml"
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
   kp:
     taskfile: "./scripts/taskfiles/keepassxc.yaml"
   validate:
@@ -28,6 +29,8 @@ includes:
     taskfile: "./pyapps/pyapps.yaml"
   git:
     taskfile: "./scripts/taskfiles/git.yaml"
+  unison:
+    taskfile: "./scripts/dotfiles/dot_config/taskfiles/unison.yaml"
 
 tasks:
   nx:show:

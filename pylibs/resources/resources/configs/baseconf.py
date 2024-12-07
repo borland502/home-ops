@@ -4,10 +4,7 @@ This module defines the configuration self for Trapper Keeper.
 """
 
 import hashlib
-import os
 from pathlib import Path
-from typing import ClassVar
-from uuid import UUID
 
 from simple_toml_settings import TOMLSettings
 from xdg_base_dirs import (
@@ -31,10 +28,12 @@ def file_hash(file: Path):
     return sha256.hexdigest()
   return None
 
-class TkSettings(TOMLSettings):
-  """Common settings for Trapper Keeper."""
+
+class BaseConfig(TOMLSettings):
+  """Common settings for all Python Projects."""
+
   __file__ = "config.toml"
-  __section__ = "trapper_keeper"
+  __section__ = "home-ops"
 
   # Constants
   passphrase_length = 7
@@ -47,11 +46,10 @@ class TkSettings(TOMLSettings):
   bootstrap_entry = "36EF1A2C-773E-4F9D-AE8A-07B21E21C317"
   default_username = "ansible"
 
-
   ## XDG Base Directories for system
   xdg_data_home = str(xdg_data_home())
   xdg_config_home = str(xdg_config_home())
-  xdg_state_home  = str(xdg_state_home())
+  xdg_state_home = str(xdg_state_home())
   xdg_cache_home = str(xdg_cache_home())
   xdg_runtime_dir = str(xdg_runtime_dir())
   xdg_config_dirs = str(xdg_config_dirs())
@@ -60,7 +58,7 @@ class TkSettings(TOMLSettings):
   home = str(Path.home())
   ansible_home = str(Path.home() / ".ansible")
   ssh_home = str(Path.home() / ".ssh")
-  sshconfig_home = f"{xdg_config_home}/sshconfig"
+  gnupg_home = str(Path.home() / ".gnupg")
 
   ## KeeShare of BOOTSTRAP group
   bootstrap_db = f"{xdg_data_home}/{__section__}/bootstrap.kdbx"
@@ -71,38 +69,3 @@ class TkSettings(TOMLSettings):
   src_key = f"{xdg_state_home}/keepass/secrets.keyx"
   src_token = f"{xdg_config_home}/keepass/secrets.token"
   src_yubikey = f"{xdg_config_home}/keepass/yubikey.serial"
-
-  # Resource UUIDs
-  export_entry_pairs: ClassVar[dict[str,tuple[UUID,UUID]]] = {
-    # The first entry is always the group that will contain the index of essential entries
-    "BOOTSTRAP": (bootstrap_uuid, bootstrap_entry)
-  }
-
-  # Files to export from source.  The index will serve as the index for the target
-  # keepass binary attachments index (target assumed to be new each time)
-  src_files: ClassVar[dict[UUID, list[Path]]] = {
-    bootstrap_entry: [
-      f"{ssh_home}/config",
-      f"{ssh_home}/id_ed25519",
-      f"{ssh_home}/id_ed25519.pub",
-      f"{home}/.npmrc",
-      f"{xdg_config_home}/chezmoi/chezmoistate.boltdb"
-    ]
-  }
-
-  src_dirs: ClassVar[dict[UUID, list[Path]]] = {
-    bootstrap_entry: [
-      f"{ansible_home}/inventory"
-    ]
-  }
-
-  # TODO: trim these down to just the essentials
-  src_env: ClassVar[dict[str, str]] = dict(os.environ)
-
-  # Target Keepass database
-  db = f"{xdg_data_home}/{__section__}/secrets.kdbx"
-  key = f"{xdg_state_home}/{__section__}/secrets.keyx"
-  token = f"{xdg_config_home}/{__section__}/secrets.token"
-
-class TgtSettings(TkSettings):
-  """Target Config file to create."""

@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+includes:
+    validate:
+        taskfile: "../../taskfiles/validate.yaml"
+    install:
+        taskfile: "../../taskfiles/install.yaml"
+
+
+tasks:
+
+  sync:docker:
+    desc: Sync the docker-compose files
+    cmds:
+      - |
+        rsync-bak
