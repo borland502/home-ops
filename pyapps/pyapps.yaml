@@ -6,6 +6,6 @@ includes:
     taskfile: "./trapper-keeper/trapper-keeper.yaml"
     dir: "./trapper-keeper"
 
-  ac:
+  ans:
     taskfile: "./ansible-commands/ansible-commands.yaml"
     dir: "./ansible-commands"

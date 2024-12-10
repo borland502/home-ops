@@ -8,29 +8,45 @@ dotenv:
 
 vars:
   HOME_OPS_DIR: "{{.XDG_DATA_HOME}}/automation/home-ops"
+  NODE_CONFIG_DIR: "{{.XDG_CONFIG_HOME}}/home-ops"
   SCRIPTS:
     sh: fd --glob --full-path '{{.HOME_OPS_DIR}}/scripts/*'
 
-# This high level taskfile is used control the development of home-ops.  On deploy another taskfile
-# is used to run the applications and scripts
+# This high level taskfile is used control the development of home-ops.  On deploy a global taskfile
+# is used to run the applications and scripts in the users home directory.  These subordinate taskfiles
+# are symlinked to the xdg config directory
 includes:
+  # Build taskfiles
   scripts:
+    internal: true
     taskfile: "./scripts/scripts.yaml"
+  pya:
+    internal: true
+    taskfile: "./pyapps/pyapps.yaml"
+
+  # Ops taskfiles
+  ansible:
+#    internal: true
+    taskfile: "./scripts/taskfiles/ansible.yaml"
   chez:
-    taskfile: "./scripts/dotfiles/dot_config/taskfiles/chezmoi.yaml"
+    internal: true
+    taskfile: "./scripts/taskfiles/chezmoi.yaml"
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
   kp:
+    internal: true
     taskfile: "./scripts/taskfiles/keepassxc.yaml"
   validate:
+    internal: true
     taskfile: "./scripts/taskfiles/validate.yaml"
   install:
+    internal: true
     taskfile: "./scripts/taskfiles/install.yaml"
-  pya:
-    taskfile: "./pyapps/pyapps.yaml"
   git:
+    internal: true
     taskfile: "./scripts/taskfiles/git.yaml"
   unison:
-    taskfile: "./scripts/dotfiles/dot_config/taskfiles/unison.yaml"
+    internal: true
+    taskfile: "./scripts/taskfiles/unison.yaml"
 
 tasks:
   nx:show:
@@ -52,7 +68,7 @@ tasks:
     summary: |
       This task lints all the projects locally
     cmds:
-      - npm run lint:all
+      - npm run lint:all -- --fix
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   install:
@@ -99,7 +115,9 @@ tasks:
       - task: install:python
       - task: install:brew
     cmds:
-      - npx nx run-many --target=pack --parallel --all
+      - task: pya:tk:run
+        vars:
+            CLI_ARGS: "pack"
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   mcv:unpack:
@@ -107,18 +125,21 @@ tasks:
     summary: |
       This task verifies, configures, and deploys projects locally much like a [Mobile Construction Vehicle](https://cnc.fandom.com/wiki/Mobile_construction_vehicle)
     deps:
+      - task: install:npm
+      - task: install:python
+      - task: install:brew
       - task: validate:internal:xdg
       - task: validate:internal:scripts
-      - task: validate:internal:nvm
     cmds:
       - task: lint
       - task: install
       - task: build
       - task: test
       - task: chez:sync
-      - task: scripts:deploy
       - task: deploy:local
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+    vars:
+      NODE_CONFIG_DIR: "{{.NODE_CONFIG_DIR}}"
 
   pyapp:create:
     desc: Create a new Python application

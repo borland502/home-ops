@@ -56,10 +56,6 @@
       "dependsOn": ["^lock"],
       "cache": true
     },
-    "pack": {
-      "command": "task pya:tk:run -- pack",
-      "dependsOn": ["^build", "^lint", "^test", "^install"]
-    },
     "test": {
       "command": "poetry run python -m unittest discover",
       "options": {

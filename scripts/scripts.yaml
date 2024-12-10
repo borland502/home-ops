@@ -38,7 +38,8 @@ tasks:
         mkdir -p "${XDG_BIN_HOME}"
       - |
         # Confirm that NODE_CONFIG_DIR is set and not empty
-        if [ -z "${NODE_CONFIG_DIR+x}" ]; then
+        echo ${NODE_CONFIG_DIR}
+        if [ -n "${NODE_CONFIG_DIR+x}" ]; then
           echo "NODE_CONFIG_DIR is not set. Please set it to the directory where the configuration files are stored."
           exit 2
         fi
@@ -59,9 +60,32 @@ tasks:
         # Copy the configuration files to the target directory
         ln -sf "$source_dir"/*.toml "$target_dir"
     sources:
-      - "{{.HOMEOPS_DIR}}/scripts/config/*"
+      - "{{.HOMEOPS_DIR}}/config/*"
     generates:
       - "{{.XDG_CONFIG_HOME}}/home-ops"
+
+  internal:deploy:ansible:
+    silent: true
+    internal: true
+    desc: Deploy the ansible playbooks, roles, etc to the ~/.ansible directory
+    cmds:
+      - |
+        # Define the source directories and the target directory
+        source_dirs=("{{.HOMEOPS_DIR}}/scripts/ansible/playbooks" "{{.HOMEOPS_DIR}}/scripts/ansible/roles")
+        source_dirs+=("{{.HOMEOPS_DIR}}/scripts/ansible/collections")
+        target_dir="${XDG_CONFIG_HOME}/ansible"
+
+        # Create the target directory if it doesn't exist
+        mkdir -p "$target_dir"
+
+        # Copy the ansible playbooks and roles to the target directory
+        for dir in "${source_dirs[@]}"; do
+          files=$(find "$dir" -type f)
+          for file in $files; do
+            base_name=$(basename "$file")
+            ln -sf "${file}" ${XDG_CONFIG_HOME}/ansible/${base_name}
+          done
+        done
 
   internal:deploy:taskfiles:
     silent: true

@@ -1,6 +1,9 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
+vars:
+  ANSIBLE_HOME: "${HOME}/.ansible"
+
 tasks:
   init:
     internal: true
@@ -21,6 +24,8 @@ tasks:
       - ansible-command/ansible_commands/**/*.py
 
   update:
+    internal: true
+    silent: true
     desc: "Update Ansible Command Dependencies"
     cmds:
       - nx update ansible-commands
@@ -46,5 +51,3 @@ tasks:
     cmds:
       - poetry run python -m ansible_commands {{.CLI_ARGS}}
     dir: "{{.ANSIBLE_HOME}}"
-
-

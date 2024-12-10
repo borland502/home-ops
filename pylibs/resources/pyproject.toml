@@ -41,7 +41,7 @@
   requires = ["poetry-core"]
 
 [tool.ruff]
-  indent-width = 2
+  indent-width = 4
   line-length = 128
   target-version = "py312"
 

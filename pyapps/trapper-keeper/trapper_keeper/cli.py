@@ -7,9 +7,10 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from resources.configs.tk_conf import TkSettings, TgtSettings
+from resources.configs.tk_conf import TgtSettings, TkSettings
 from utils import file
 from utils.file import pathify
+
 from .keegen import gen_passphrase, gen_utf8
 from .stores.keepass_store import view_kp_db
 from .tk import DbTypes, get_store
@@ -66,7 +67,9 @@ class TrapperKeeper:
 
         Settings will either be loaded or generated if they do not exist.
         """
-        self.settings: TkSettings = TkSettings.get_instance("trapper_keeper", xdg_config=True, auto_create=True)
+        self.settings: TkSettings = TkSettings.get_instance(
+            "trapper_keeper", xdg_config=True, auto_create=True
+        )
 
     def backup(self):
         """Backup Trapper Keeper."""
@@ -80,19 +83,32 @@ class TrapperKeeper:
         # Unpack the files
         file.unpack(in_file=src_file, out_dir=Path(temp_dir))
 
-        db, token, key = pathify(self.settings.get("db"), self.settings.get("token"), self.settings.get("key"))
+        db, token, key = pathify(
+            self.settings.get("db"),
+            self.settings.get("token"),
+            self.settings.get("key"),
+        )
         if db.exists() or token.exists() or key.exists():
-          raise Exception("Files already exist. Please remove them before unpacking.")
+            raise Exception("Files already exist. Please remove them before unpacking.")
 
-        src_db, src_token, src_key = pathify(f"{temp_dir}/{db.name}", f"{temp_dir}/{token.name}", f"{temp_dir}/{key.name}")
+        src_db, src_token, src_key = pathify(
+            f"{temp_dir}/{db.name}",
+            f"{temp_dir}/{token.name}",
+            f"{temp_dir}/{key.name}",
+        )
 
-        with src_db.open("rb") as src_db, src_token.open("rb") as src_token, src_key.open("rb") as src_key:
-          db.write_bytes(src_db.read())
-          token.write_bytes(src_token.read())
-          key.write_bytes(src_key.read())
+        with src_db.open("rb") as src_db, src_token.open(
+            "rb"
+        ) as src_token, src_key.open("rb") as src_key:
+            db.write_bytes(src_db.read())
+            token.write_bytes(src_token.read())
+            key.write_bytes(src_key.read())
 
-        view_kp_db(fp_kp_db=Path(self.settings.get("db")), fp_token=Path(self.settings.get("token")), fp_key=Path(self.settings.get("key")))
-
+        view_kp_db(
+            fp_kp_db=Path(self.settings.get("db")),
+            fp_token=Path(self.settings.get("token")),
+            fp_key=Path(self.settings.get("key")),
+        )
 
     def pack(self):
         """Pack the Trapper Keeper.
@@ -104,22 +120,40 @@ class TrapperKeeper:
         temp_dir = tempfile.mkdtemp()
         os.chdir(temp_dir)
 
-        tgt_settings: TgtSettings = TgtSettings.get_instance("trapper_keeper", local_file=True, auto_create=True)
+        tgt_settings: TgtSettings = TgtSettings.get_instance(
+            "trapper_keeper", local_file=True, auto_create=True
+        )
 
         # Define the paths for the new store and credentials
         tgt_settings.set("db", f"{temp_dir}/secrets.kdbx", autosave=True)
         tgt_settings.set("key", f"{temp_dir}/secrets.key", autosave=True)
         tgt_settings.set("token", f"{temp_dir}/secrets.token", autosave=True)
 
-        gen_key(length=tgt_settings.get("passphrase_length"), fp_key=Path(tgt_settings.get("key")))
+        gen_key(
+            length=tgt_settings.get("passphrase_length"),
+            fp_key=Path(tgt_settings.get("key")),
+        )
         self.passphrase(length=7, fp_token=Path(tgt_settings.get("token")))
-        with get_store(DbTypes.KP, fp_kp_db=Path(tgt_settings.get("db")), fp_token=Path(tgt_settings.get("token")), fp_key=Path(tgt_settings.get("key"))) as tgt_store:
-          with get_store(DbTypes.KP, fp_kp_db=Path(self.settings.get("bootstrap_db")), fp_token=Path(self.settings.get("bootstrap_token")), fp_key=None) as src_store:
+        with get_store(
+            DbTypes.KP,
+            fp_kp_db=Path(tgt_settings.get("db")),
+            fp_token=Path(tgt_settings.get("token")),
+            fp_key=Path(tgt_settings.get("key")),
+        ) as tgt_store, get_store(
+            DbTypes.KP,
+            fp_kp_db=Path(self.settings.get("bootstrap_db")),
+            fp_token=Path(self.settings.get("bootstrap_token")),
+            fp_key=None,
+        ) as src_store:
             tgt_store.copy_bootstrap_entries(src_store)
 
         pack_dir = Path(temp_dir)
         file.pack(src_dir=pack_dir, out_file=pack_dir / "trapper_keeper.zst")
-        view_kp_db(fp_kp_db=Path(tgt_settings.get("db")), fp_token=Path(tgt_settings.get("token")), fp_key=Path(tgt_settings.get("key")))
+        view_kp_db(
+            fp_kp_db=Path(tgt_settings.get("db")),
+            fp_token=Path(tgt_settings.get("token")),
+            fp_key=Path(tgt_settings.get("key")),
+        )
         print(f"Trapper Keeper packed to {pack_dir / 'trapper_keeper.zst'}")
 
     @staticmethod
@@ -155,7 +189,9 @@ class TrapperKeeper:
         else:
             print(_fp_token)
 
-    def export_attachment_from_origin(self, entry_path: str, attachment_name: str, export_file: Path):
+    def export_attachment_from_origin(
+        self, entry_path: str, attachment_name: str, export_file: Path
+    ):
         """Get a binary from Trapper Keeper.
 
         Args:
@@ -181,7 +217,12 @@ class TrapperKeeper:
         ]
 
         # Run the command and pipe the password into stdin
-        process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = subprocess.Popen(
+            command,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
         stdout, stderr = process.communicate(input=password.encode())
 
     def refresh_config(self) -> None:
@@ -194,7 +235,9 @@ class TrapperKeeper:
             file.delete_files(config_path)
 
         # Doesn't really matter if the file doesn't exist as the method's goal is accomplished either way
-        self.settings = TkSettings.get_instance("trapper_keeper", xdg_config=True, auto_create=True)
+        self.settings = TkSettings.get_instance(
+            "trapper_keeper", xdg_config=True, auto_create=True
+        )
 
     def add_export_entry(self, attachment_name: str, export_file: Path):
         """Add an export entry.
@@ -227,7 +270,12 @@ class TrapperKeeper:
         ]
 
         # Run the command and pipe the password into stdin
-        process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = subprocess.Popen(
+            command,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
         stdout, stderr = process.communicate(input=password.encode())
 
         # Check for errors

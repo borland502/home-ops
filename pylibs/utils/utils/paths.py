@@ -6,8 +6,8 @@ in a system, including XDG base directories and project-specific paths.
 
 from __future__ import annotations
 
-import dataclasses
 import tempfile
+from enum import StrEnum
 from itertools import chain
 from pathlib import Path
 
@@ -21,34 +21,120 @@ from xdg_base_dirs import (
     xdg_state_home,
 )
 
+SKIP_FILES = [
+    ".project",
+    ".classpath",
+    ".launch",
+    ".settings",
+    "extensions.json",
+    ".gitkeep",
+    "ci.yml",
+]
 
-@dataclasses.dataclass
-class BasePaths:
-    """Base paths for all systems.
+# List of directories to ignore
+SKIP_DIRS = [
+    ".cache",
+    "collections",
+    ".c9",
+    ".devcontainer",
+    ".DS_Store",
+    ".idea",
+    ".git",
+    ".run",
+    ".sass-cache",
+    ".settings",
+    ".sublime-workspace",
+    ".task",
+    ".vscode",
+    ".venv",
+    ".mypy_cache",
+    ".nx",
+    "__pycache__",
+    "ansible_collections",
+    "connect.lock",
+    "coverage",
+    "dist",
+    "libpeerconnection.log",
+    "node_modules",
+    "npm-debug.log",
+    "out-tsc",
+    "reports",
+    "tests",
+    "test-results",
+    "testem.log",
+    "Thumbs.db",
+    "tmp",
+    "trapper_keeper",
+    "typings",
+    "venv",
+]
+
+
+class SkipPaths:
+    """Utility class for filtering paths."""
+
+    @staticmethod
+    def filter_dirs(
+        root: Path,
+        exclude_dirs: list[str] | None = None,
+        exclude_files: list[str] | None = None,
+    ) -> chain:
+        """Generate a chain of directories to be exported."""
+        if exclude_dirs is None:
+            exclude_dirs = SKIP_DIRS
+        if exclude_files is None:
+            exclude_files = SKIP_FILES
+        for item in root.iterdir():
+            if SkipPaths.is_ignored(item, exclude_dirs, exclude_files):
+                continue
+            yield item
+            if item.is_dir():
+                yield from SkipPaths.filter_dirs(item)
+
+    @staticmethod
+    def is_ignored(
+        path: Path,
+        exclude_dirs: list[str] | None = None,
+        exclude_files: list[str] | None = None,
+    ) -> bool:
+        """Check if a path matches any of the ignore patterns."""
+        if exclude_dirs is None:
+            exclude_dirs = SKIP_DIRS
+        if exclude_files is None:
+            exclude_files = SKIP_FILES
+
+        return path.name in exclude_dirs or path.name in exclude_files
+
+    @staticmethod
+    def get_files(*paths, exclude_dirs=None, exclude_files=None):
+        """Flatten directories and filter out ignored paths."""
+        for path in paths:
+            if path is None or not path.exists():
+                continue
+            yield SkipPaths.filter_dirs(path, exclude_dirs, exclude_files)
+
+
+def export_paths() -> chain[str]:
+    """Generate a chain of paths to be exported."""
+    return chain(AnsiblePaths, SecretsPaths, HomeOpsPaths)
+
+
+class BasePaths(StrEnum):
+    """Base paths for the system.
 
     Attributes:
         HOME (str): The home directory path.
         TMP (str): The temporary directory path.
-        SSH_HOME (str): The SSH directory path.
-        SSH_KNOW_HOSTS (str): The SSH known hosts file path.
-        GNUPG_HOME (str): The GnuPG directory path.
-        KNOWN_HOSTS (str): The known hosts file path.
     """
 
     HOME = str(Path.home())
     TMP = tempfile.gettempdir()
-    SSH_HOME = f"{HOME}/.ssh"
-    SSH_KNOW_HOSTS = f"{SSH_HOME}/known_hosts"
-    GNUPG_HOME = f"{HOME}/.gnupg"
-    KNOWN_HOSTS = f"{HOME}/.ssh/known_hosts"
 
 
-@dataclasses.dataclass()
-class XdgPaths:
-    """XDG Base Directories for system.
+class XdgPaths(StrEnum):
+    """XDG Base Directories for the system.
 
     Attributes:
-        _base_paths (BasePaths): An instance of BasePaths.
         XDG_DATA_HOME (str): The XDG data home directory path.
         XDG_CACHE_HOME (str): The XDG cache home directory path.
         XDG_CONFIG_HOME (str): The XDG config home directory path.
@@ -59,13 +145,6 @@ class XdgPaths:
         XDG_BIN_HOME (str): The XDG bin home directory path.
         XDG_LIB_HOME (str): The XDG lib home directory path.
     """
-
-    _base_paths: BasePaths = dataclasses.field(default_factory=BasePaths)
-
-    def __post_init__(self):
-        """Post-initialization to set attributes from BasePaths."""
-        for key, value in vars(self._base_paths).items():
-            setattr(self, key, value)
 
     XDG_DATA_HOME = str(xdg_data_home())
     XDG_CACHE_HOME = str(xdg_cache_home())
@@ -78,28 +157,51 @@ class XdgPaths:
     XDG_LIB_HOME = f"{BasePaths.HOME}/.local/lib"
 
 
-@dataclasses.dataclass
-class HomeOpsPaths:
+class SecretsPaths(StrEnum):
+    """Paths for secrets files.
+
+    Attributes:
+        BOOTSTRAP_DB (str): The bootstrap database file path.
+        BOOTSTRAP_TOKEN (str): The bootstrap token file path.
+        BOOTSTRAP_CONFIG (str): The bootstrap config file path.
+        DB (str): The secrets database file path.
+        KEY (str): The secrets key file path.
+        TOKEN (str): The secrets token file path.
+        SRC_DB (str): The source database file path.
+        SRC_KEY (str): The source key file path.
+        SRC_TOKEN (str): The source token file path.
+        SRC_YUBIKEY (str): The source YubiKey serial file path.
+        SSH_HOME (str): The SSH home directory path.
+        SSH_KNOW_HOSTS (str): The SSH known hosts file path.
+        GNUPG_HOME (str): The GnuPG home directory path.
+        KNOWN_HOSTS (str): The known hosts file path.
+    """
+
+    BOOTSTRAP_DB = f"{XdgPaths.XDG_DATA_HOME}/trapper_keeper/bootstrap.kdbx"
+    BOOTSTRAP_TOKEN = f"{XdgPaths.XDG_CONFIG_HOME}/trapper_keeper/bootstrap.token"
+    BOOTSTRAP_CONFIG = f"{XdgPaths.XDG_STATE_HOME}/trapper_keeper/config.toml"
+    DB = f"{XdgPaths.XDG_DATA_HOME}/trapper_keeper/secrets.kdbx"
+    KEY = f"{XdgPaths.XDG_STATE_HOME}/trapper_keeper/secrets.keyx"
+    TOKEN = f"{XdgPaths.XDG_CONFIG_HOME}/trapper_keeper/secrets.token"
+    SRC_DB = f"{XdgPaths.XDG_DATA_HOME}/keepass/secrets.kdbx"
+    SRC_KEY = f"{XdgPaths.XDG_STATE_HOME}/keepass/secrets.keyx"
+    SRC_TOKEN = f"{XdgPaths.XDG_CONFIG_HOME}/keepass/secrets.token"
+    SRC_YUBIKEY = f"{XdgPaths.XDG_CONFIG_HOME}/keepass/yubikey.serial"
+    SSH_HOME = f"{BasePaths.HOME}/.ssh"
+    SSH_KNOW_HOSTS = f"{SSH_HOME}/known_hosts"
+    GNUPG_HOME = f"{BasePaths.HOME}/.gnupg"
+    KNOWN_HOSTS = f"{BasePaths.HOME}/.ssh/known_hosts"
+
+
+class HomeOpsPaths(StrEnum):
     """Path constants for the project.
 
     Attributes:
-        _xdg_paths (XdgPaths): An instance of XdgPaths.
-        _base_paths (BasePaths): An instance of BasePaths.
         AUTOMATION_HOME (str): The automation home directory path.
         PROOT (str): The project root directory path.
         PROJECT_ROOT (str): The project root directory path.
         HOME_OPS_HOME (str): The home operations home directory path.
     """
-
-    _xdg_paths: XdgPaths = dataclasses.field(default_factory=XdgPaths)
-    _base_paths: BasePaths = dataclasses.field(default_factory=BasePaths)
-
-    def __post_init__(self):
-        """Post-initialization to set attributes from XdgPaths and BasePaths."""
-        for key, value in chain(
-            vars(self._xdg_paths).items(), vars(self._base_paths).items()
-        ):
-            setattr(self, key, value)
 
     AUTOMATION_HOME = f"{XdgPaths.XDG_DATA_HOME}/automation"
     PROOT = f"{AUTOMATION_HOME}/home-ops"
@@ -107,13 +209,10 @@ class HomeOpsPaths:
     HOME_OPS_HOME = PROOT
 
 
-@dataclasses.dataclass
-class AnsiblePaths:
+class AnsiblePaths(StrEnum):
     """Path constants for both the project and for the user level ansible installation at HOME/.ansible.
 
     Attributes:
-        _xdg_paths (XdgPaths): An instance of XdgPaths.
-        _base_paths (BasePaths): An instance of BasePaths.
         PBROOT (str): The playbook root directory path.
         PLAYBOOK_ROOT (str): The playbook root directory path.
         AHOME (str): The ansible home directory path.
@@ -140,16 +239,6 @@ class AnsiblePaths:
         INVENTORY_ALL (str): The inventory all directory path.
     """
 
-    _xdg_paths: XdgPaths = dataclasses.field(default_factory=XdgPaths)
-    _base_paths: BasePaths = dataclasses.field(default_factory=BasePaths)
-
-    def __post_init__(self):
-        """Post-initialization to set attributes from XdgPaths and BasePaths."""
-        for key, value in chain(
-            vars(self._xdg_paths).items(), vars(self._base_paths).items()
-        ):
-            setattr(self, key, value)
-
     PBROOT = f"{HomeOpsPaths.PROOT}/ansible/playbooks"
     PLAYBOOK_ROOT = PBROOT
     AHOME = f"{BasePaths.HOME}/.ansible"
@@ -159,14 +248,12 @@ class AnsiblePaths:
     IHOME = f"{AHOME}/inventory"
     GVHOME = f"{IHOME}/group_vars"
     HVHOME = f"{IHOME}/host_vars"
-
     COLLECTIONS_REQS = f"{CHOME}/requirements.yml"
     ROLES_REQS = f"{RHOME}/requirements.yml"
     ALL_KVM_VARS = f"{GVHOME}/proxmox_all_kvm.yaml"
     ALL_VARS = f"{GVHOME}/all.yaml"
     ALL_LXC_VARS = f"{GVHOME}/proxmox_all_lxc.yaml"
     CHEZMOI_DATA = f"{GVHOME}/chezmoi_data.yaml"
-
     STATIC_HOSTS = f"{IHOME}/hosts.yaml"
     STATIC_HOSTS_YAML = STATIC_HOSTS
     STATIC_HOSTS_TOML = f"{IHOME}/hosts.toml"

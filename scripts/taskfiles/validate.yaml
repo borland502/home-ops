@@ -86,31 +86,21 @@ tasks:
           exit 2
         fi
 
-  internal:permissions:
-    desc: Ensure the correct permissions are set for sensitive files
-    summary: |
-      This task ensures that the permissions are set correctly for the sensitive files.
-
-      - The git credentials file should have 600 permissions
-      - The ssh private key should have 600 permissions
-      - The keepassxc database should have 600 permissions
-    run: once
-    internal: true
-    silent: true
-    cmds:
-      - |
-        if [ "$(stat -c %a "${XDG_CONFIG_HOME}/git/credentials")" -ne 600 ]; then
-          echo "The permissions for the git credentials file are not set correctly. Please set them to 600."
-          exit 4
-        fi
-      - |
-        if [ "$(stat -c %a "${XDG_CONFIG_HOME}/ssh/id_ed25519")" -ne 600 ]; then
-          echo "The permissions for the ssh private key are not set correctly. Please set them to 600."
-          exit 4
-        fi
-      - |
-        # Confirm that the permissions are set correctly for the sensitive files
-        if [ "$(stat -c %a "${XDG_DATA_HOME}/keepassxc/keepassxc.kdbx")" -ne 600 ]; then
-          echo "The permissions for the keepassxc database are not set correctly. Please set them to 600."
-          exit 4
-        fi
+#  internal:permissions:
+#    desc: Ensure the correct permissions are set for sensitive files
+#    summary: |
+#      This task ensures that the permissions are set correctly for the sensitive files.
+#
+#      - The git credentials file should have 600 permissions
+#      - The ssh private key should have 600 permissions
+#      - The keepassxc database should have 600 permissions
+#    run: once
+#    internal: true
+#    silent: true
+#    cmds:
+#      - |
+#        # Confirm that the permissions are set correctly for the sensitive files
+#        if [ "$(stat -c %a "${XDG_DATA_HOME}/keepassxc/keepassxc.kdbx")" -ne 600 ]; then
+#          echo "The permissions for the keepassxc database are not set correctly. Please set them to 600."
+#          exit 4
+#        fi

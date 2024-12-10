@@ -56,7 +56,7 @@ build-backend = "poetry.core.masonry.api"
     "build",
     "dist",
   ]
-  indent-width = 2
+  indent-width = 4
   line-length = 128
   target-version = "py312"
 

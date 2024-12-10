@@ -1,11 +1,9 @@
-"""Keepass store for trapper-keeper.  This store in particular serves as the focal point of
+"""Keepass store for trapper-keeper. This store in particular serves as the focal point of
 trapper-keeper and all other stores can (and should) be embedded within this store.
-
 """
 
 from __future__ import annotations
 
-import os
 from contextlib import AbstractContextManager
 from pathlib import Path
 from uuid import UUID
@@ -15,6 +13,7 @@ from pykeepass.entry import Entry
 from pykeepass.group import Group
 from resources.configs.tk_conf import TkSettings
 from utils.file import get_file_bytes, pathify
+from utils.paths import SkipPaths
 
 from trapper_keeper.keegen import gen_passphrase, gen_utf8
 
@@ -62,44 +61,40 @@ def _create_kp_db_bootstrap_entries(kp_db: PyKeePass) -> None:
         password="",
     )
 
-    src_files: list[Path] = pathify(*settings.get("src_files")[BOOTSTRAP_ENTRY])
-
-    src_dirs: list[Path] = pathify(*settings.get("src_dirs")[BOOTSTRAP_ENTRY])
-
-    seen_files = set()
-    for dir_file in src_dirs:
-        for root, _, files in os.walk(dir_file):
-            for file in files:
-                file_path = Path(root) / file
-                if file_path not in seen_files:
-                    seen_files.add(file_path)
-                    src_files.append(file_path)
+    src_files = SkipPaths.get_files(
+        *pathify(*settings.get("src_files")[BOOTSTRAP_ENTRY])
+    )
 
     store_attachments(entry, kp_db, src_files)
+    store_env_vars(entry, kp_db)
 
 
 def store_attachments(entry, kp_db, src_files):
     """Store attachments in the Keepass database.
 
     Args:
-        entry (_type_): _description_
-        kp_db (_type_): _description_
-        src_files (_type_): _description_
+        entry (Entry): The entry to which attachments will be added.
+        kp_db (PyKeePass): The Keepass database instance.
+        src_files (Iterable[Path]): The source files to be attached.
     """
-    for idx, src_file in enumerate(src_files):
-        # the file does not exist
-        if not src_file.exists():
-            print(f"Skipping {src_file} as it does not exist.")
-            continue
-
+    for idx, src_file in enumerate(next(src_files)):
         data: bytes | None = get_file_bytes(src_file)
         if data:
             kp_db.add_binary(data=get_file_bytes(src_file), compressed=False)
             entry.add_attachment(idx, src_file.name)
             entry.set_custom_property(f"file_{idx}", f"{src_file}")
+            print(f"Added attachment {src_file} to {entry.title}")
         else:
             print(f"Skipping {src_file} as there is a problem.")
 
+
+def store_env_vars(entry, kp_db):
+    """Store environment variables in the Keepass database.
+
+    Args:
+        entry (Entry): The entry to which environment variables will be added.
+        kp_db (PyKeePass): The Keepass database instance.
+    """
     src_env: dict[str, str] = {
         k: v for k, v in settings.get("src_env").items() if v and v.isprintable()
     }
@@ -141,13 +136,12 @@ def create_kp_db(
         fp_key (Path | None, optional): The path to the key file. Defaults to None.
 
     Returns:
-        KeepassStore: The wrapped Keepass database instance.
+        PyKeePass: The Keepass database instance.
     """
     print(f"Creating new Keepass database at {fp_kp_db}")
     if not fp_kp_db.is_file():
-        fp_kp_db.parent.mkdir(
-            mode=settings.get("user_dir_mode"), exist_ok=True, parents=True
-        )
+        dir_mode = int(settings.get("user_dir_mode"))
+        fp_kp_db.parent.mkdir(mode=dir_mode, exist_ok=True, parents=True)
     if not fp_token.is_file():
         fp_token.parent.mkdir(
             mode=settings.get("user_dir_mode"), exist_ok=True, parents=True
@@ -271,7 +265,7 @@ class KeepassStore(PyKeePass):
         self.save()
 
     def get_bootstrap_group(self) -> Group | None:
-        """Get the bootstrap group.  The bootstrap group contains entries with key/values and
+        """Get the bootstrap group. The bootstrap group contains entries with key/values and
         attachments for a new system.
 
         Returns:

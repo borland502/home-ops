@@ -40,3 +40,6 @@ collections:
 
   - name: hasnimehdi91.keepass
     version: "*"
+
+  - name: viczem.keepass
+    version: "*"
