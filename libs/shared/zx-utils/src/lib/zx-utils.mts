@@ -19,15 +19,13 @@ export const homeopsConfig = config;
 // export const fs = zx.fs;
 //
 
-// // override defaults
-// zx.$.arguments = argv;
-// zx.$.verbose = homeopsConfig.get("zx.verbose") || zx.$.verbose;
-// zx.$.nothrow = homeopsConfig.get("zx.nothrow") || zx.$.nothrow;
-// zx.$.log = logProcessor;
-//
-// // export augmented zx functions and options
-//
-// export const $ = zx.$;
+export async function initShell($$: zx.Shell & zx.Options) {
+  // override defaults
+  $$.shell = homeopsConfig.get("zx.shell") || await detectShell();
+  $$.verbose = homeopsConfig.get("zx.verbose") || zx.$.verbose;
+  $$.nothrow = homeopsConfig.get("zx.nothrow") || zx.$.nothrow;
+  $$.log = logProcessor;
+}
 
 export * from "zx";
 
@@ -61,7 +59,7 @@ export async function detectShell(): Promise<string | boolean> {
  * custom
  * retry
  */
-function logProcessor(entry: zx.LogEntry) {
+export function logProcessor(entry: zx.LogEntry) {
   switch (entry.kind) {
     case "stdout":
       logger.info(entry.data.toString());

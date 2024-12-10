@@ -1,0 +1,12 @@
+services:
+
+  sftp:
+    build:
+        context: .
+        dockerfile: Dockerfile
+    env_file:
+      - "secrets.env"
+    ports:
+      - "2222:22"
+    volumes:
+        - "./data:/data"

@@ -3,13 +3,20 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "pylibs/resources/resources",
+  "release": {
+    "version": {
+      "generator": "@nxlv/python:release-version"
+    }
+  },
+  "tags": [],
   "targets": {
     "lock": {
       "executor": "@nxlv/python:run-commands",
       "options": {
         "command": "poetry lock --no-update",
         "cwd": "pylibs/resources"
-      }
+      },
+      "cache": true
     },
     "add": {
       "executor": "@nxlv/python:add",
@@ -28,12 +35,22 @@
       "outputs": [
         "{projectRoot}/dist"
       ],
+      "dependsOn": ["lint","lock", "install"],
       "options": {
         "outputPath": "pylibs/resources/dist",
         "publish": false,
         "lockedVersions": true,
         "bundleLocalDependencies": true
-      }
+      },
+      "cache": true
+    },
+    "test": {
+      "command": "poetry run python -m unittest discover",
+      "options": {
+        "cwd": "pylibs/resources"
+      },
+      "dependsOn": ["build"],
+      "cache": true
     },
     "install": {
       "executor": "@nxlv/python:install",
@@ -43,7 +60,9 @@
         "cacheDir": ".cache/pypoetry",
         "verbose": false,
         "debug": false
-      }
+      },
+      "dependsOn": ["^lock"],
+      "cache": true
     },
     "lint": {
       "executor": "@nxlv/python:ruff-check",
@@ -53,24 +72,8 @@
           "resources",
           "tests"
         ]
-      }
-    },
-    "test": {
-      "executor": "@nxlv/python:run-commands",
-      "outputs": [
-        "{workspaceRoot}/reports/pylibs/resources/unittests",
-        "{workspaceRoot}/coverage/pylibs/resources"
-      ],
-      "options": {
-        "command": "poetry run pytest tests/",
-        "cwd": "pylibs/resources"
-      }
-    }
-  },
-  "tags": [],
-  "release": {
-    "version": {
-      "generator": "@nxlv/python:release-version"
+      },
+      "cache": true
     }
   }
 }

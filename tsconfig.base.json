@@ -38,10 +38,10 @@
   },
   "include": [
     "**/*.mts",
-    "./jest.config.ts",
+    "./jest.config",
     "eslint.config.js",
     "playwright.config.mts",
-    "jest.config.mts"
+    "jest.config"
   ],
   "exclude": [
     "node_modules",

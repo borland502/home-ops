@@ -1,9 +1,14 @@
 {
   "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc",
+    "module": "NodeNext",
+    "types": ["jest", "node"]
+  },
   "include": [
     "jest.config.mts",
-    "src/**/*.test.mts",
-    "src/**/*.spec.mts",
-    "src/**/*.d.mts"
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.d.ts"
   ]
 }

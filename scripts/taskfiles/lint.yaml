@@ -1,0 +1,132 @@
+version: "3"
+
+includes:
+  validate:
+    taskfile: "./taskfiles/validate.yaml"
+  install:
+    taskfile: "./taskfiles/install.yaml"
+
+tasks:
+    bandit:
+      internal: true
+      silent: true
+      desc: Run bandit
+      deps:
+        - task: internal:cmd
+          vars:
+            COMMAND: bandit
+        - task: internal:xdg
+      cmds:
+        - "bandit -c {{.PROJ_ROOT}}/pyproject.toml -r $(find . -name '*.py' -not -path './.venv/*')"
+      vars:
+        PROJ_ROOT: "${XDG_DATA_HOME}/automation/home-ops"
+
+    internal:lint:shell:
+        internal: true
+        silent: true
+        desc: Lint the shell scripts
+        cmds:
+        - |
+            # Lint the shell scripts
+            shellcheck scripts/*.sh
+        sources:
+        - scripts/*.sh
+
+    internal:lint:yaml:
+        internal: true
+        silent: true
+        desc: Lint the YAML files
+        cmds:
+        - |
+            # Lint the YAML files
+            yamllint .
+        sources:
+        - ./*.yaml
+
+    internal:lint:markdown:
+        internal: true
+        silent: true
+        desc: Lint the Markdown files
+        cmds:
+        - |
+            # Lint the Markdown files
+            markdownlint .
+        sources:
+        - ./*.md
+
+    internal:lint:json:
+        internal: true
+        silent: true
+        desc: Lint the JSON files
+        cmds:
+        - |
+            # Lint the JSON files
+            jsonlint .
+        sources:
+        - ./*.json
+
+    internal:lint:python:
+        internal: true
+        silent: true
+        desc: Lint the Python files
+        cmds:
+        - |
+            # Lint the Python files
+            pylint scripts/*.py
+        sources:
+        - scripts/*.py
+
+    internal:lint:typescript:
+        internal: true
+        silent: true
+        desc: Lint the TypeScript files
+        cmds:
+        - |
+            # Lint the TypeScript files
+            tsx
+        sources:
+        - scripts/*.tsx
+
+    internal:lint:javascript:
+        internal: true
+        silent: true
+        desc: Lint the JavaScript files
+        cmds:
+        - |
+            # Lint the JavaScript files
+            eslint scripts/*.js
+        sources:
+        - scripts/*.js
+
+    internal:lint:shell:fix:
+        internal: true
+        silent: true
+        desc: Fix the shell scripts
+        cmds:
+        - |
+            # Fix the shell scripts
+            shellcheck --fix scripts/*.sh
+        sources:
+        - scripts/*.sh
+
+    internal:lint:yaml:fix:
+        internal: true
+        silent: true
+        desc: Fix the YAML files
+        cmds:
+        - |
+            # Fix the YAML files
+            yamllint --fix .
+        sources:
+        - ./*.yaml
+
+    internal:lint:markdown:fix:
+        internal: true
+        silent: true
+        desc: Fix the Markdown files
+        cmds:
+        - |
+            # Fix the Markdown files
+            markdownlint --fix .
+        sources:
+        - ./*.md

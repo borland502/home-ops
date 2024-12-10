@@ -2,17 +2,31 @@
 version: "3"
 
 vars:
-  HOMEOPS_DB: "{{.XDG_DATA_HOME}}/automation/home_ops.kdbx"
-  HA_TOKEN: "78bd91ec-a925-41ac-81de-2a91bc4916d9_ha_token"
+  TK_DB: "{{.XDG_DATA_HOME}}/trapper_keeper/bootstrap.kdbx"
+  TK_CONFIG: "{{.XDG_CONFIG_HOME}}/trapper_keeper/config.toml"
+  TK_TOKEN: "{{.XDG_CONFIG_HOME}}/trapper_keeper/bootstrap.token"
+  KP_DB: "{{.XDG_DATA_HOME}}/keepass/secrets.kdbx"
+  KP_KEY: "{{.XDG_STATE_HOME}}/keepass/secrets.keyx"
+  KP_TOKEN: "{{.XDG_CONFIG_HOME}}/keepass/secrets.token"
+  KP_YUBIKEY:
+    sh: |
+      cat "${XDG_CONFIG_HOME}/keepass/yubikey.serial"
 
 includes:
-    validate:
-        taskfile: "./validate.yaml"
+  validate:
+    taskfile: "./validate.yaml"
 
 tasks:
 
+  internal:dasel:
+    required:
+      - DASEL_SELECTOR
+      - DASEL_FILE
+    cmd: dasel --selector {{.DASEL_SELECTOR}} --file {{.DASEL_FILE}}
+
   internal:keepassxc:validate:
     desc: Validate the keepassxc database
+    internal: true
     preconditions:
       - sh: |
           # Confirm that keepassxc-cli is installed
@@ -24,12 +38,33 @@ tasks:
     deps:
       - task: validate:internal:xdg
     cmds:
-      - test -f {{.HOMEOPS_DB}}
+      - test -f {{.KP_DB}}
+      - test -f {{.TK_DB}}
 
   open:
-    desc: Open the keepassxc database
+    desc: Open the main keepassxc database
     interactive: true
     deps:
       - task: internal:keepassxc:validate
     cmds:
-      - keepassxc-cli open {{.HOMEOPS_DB}}
+      - keepassxc-cli open --key-file {{.KP_KEY}} --yubikey {{.KP_YUBIKEY}} {{.KP_DB}}
+
+  open:tk:
+    desc: Open the trapper_keeper keepassxc database
+    interactive: true
+    deps:
+      - task: internal:keepassxc:validate
+    cmds:
+      - keepassxc-cli open {{.TK_DB}}
+
+  extract-attachment:
+    desc: Extract an attachment from the main keepassxc database by name
+    requires:
+      vars:
+        - ATTACHMENT_NAME
+        - OUTPUT_PATH
+    interactive: true
+    deps:
+      - task: internal:keepassxc:validate
+    cmds:
+      - keepassxc-cli attachment-export --key-file {{.KP_KEY}} --yubikey {{.KP_YUBIKEY}} {{.KP_DB}} "{{.ATTACHMENT_NAME}}" "{{.OUTPUT_PATH}}"

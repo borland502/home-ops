@@ -11,21 +11,33 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["libs/watchyourlan-api/src/**/*.mts"],
+        "lintFilePatterns": [
+          "libs/watchyourlan-api/src/**/*.mts"
+        ],
         "eslintConfig": "eslint.config.js",
         "format": "stylish",
         "fix": true
       },
       "cache": true,
-      "dependsOn": ["^nx-stylelint:lint", "^build", "^gtsLint"]
+      "dependsOn": [
+        "^nx-stylelint:lint",
+        "^build",
+        "^gtsLint"
+      ]
     },
     "stylelint": {
       "executor": "nx-stylelint:lint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["apps/watchyourlan-api/**/*.css"],
+        "lintFilePatterns": [
+          "apps/watchyourlan-api/**/*.css"
+        ],
         "formatter": "github"
       },
       "cache": true
@@ -36,7 +48,9 @@
         "outputPath": "dist/libs/watchyourlan-api",
         "main": "libs/watchyourlan-api/src/index.mjs",
         "tsConfig": "libs/watchyourlan-api/tsconfig.lib.json",
-        "assets": ["libs/watchyourlan-api/*.md"],
+        "assets": [
+          "libs/watchyourlan-api/*.md"
+        ],
         "bundle": true,
         "deleteOutputPath": true,
         "thirdParty": false

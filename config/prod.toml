@@ -16,9 +16,6 @@
   red = "#fc618d"
   yellow = "#fcd566"
 
-[nx]
-  bundler = "esbuild"
-
 [express]
   apiBase = "/api"
   assetsFolder = "assets"
@@ -30,6 +27,22 @@
 [express.headers]
   origin = "*"
 
+[ghcli]
+  org = "technohouser"
+  limit = "500"
+  rootdir = "."
+
+[nx]
+  bundler = "esbuild"
+
+[os]
+
+[os.darwin]
+
+[os.linux]
+
+[os.windows]
+
 [watchyourlan.api]
   apiBase = "/api"
   host = "localhost"
@@ -38,14 +51,6 @@
 [watchyourlan.db]
   dbFileName = "/watchyourlan/db.sqlite"
   dialect = "sqlite"
-
-[os]
-
-[os.linux]
-
-[os.windows]
-
-[os.darwin]
 
 [zx]
   verbose = true

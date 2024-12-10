@@ -1,23 +1,66 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
+dotenv:
+  - ${HOME}/.env
+  - ${HOME}/.zshrc
+  - ${HOME}/.zshenv
+
+vars:
+  HOME_OPS_DIR: "{{.XDG_DATA_HOME}}/automation/home-ops"
+  NODE_CONFIG_DIR: "{{.XDG_CONFIG_HOME}}/home-ops"
+  SCRIPTS:
+    sh: fd --glob --full-path '{{.HOME_OPS_DIR}}/scripts/*'
+
+# This high level taskfile is used control the development of home-ops.  On deploy a global taskfile
+# is used to run the applications and scripts in the users home directory.  These subordinate taskfiles
+# are symlinked to the xdg config directory
 includes:
+  # Build taskfiles
   scripts:
-    taskfile: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts/scripts.yaml"
-    dir: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts"
+    internal: true
+    taskfile: "./scripts/scripts.yaml"
+  pya:
+    internal: true
+    taskfile: "./pyapps/pyapps.yaml"
+
+  # Ops taskfiles
+  ansible:
+#    internal: true
+    taskfile: "./scripts/taskfiles/ansible.yaml"
   chez:
-    taskfile: "{{.XDG_CONFIG_HOME}}/taskfiles/chezmoi.yaml"
-    dir: "{{.CHEZMOI_HOME}}"
-  keepassxc:
-    taskfile: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts/taskfiles/keepassxc.yaml"
-    dir: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts/taskfiles"
+    internal: true
+    taskfile: "./scripts/taskfiles/chezmoi.yaml"
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+  kp:
+    internal: true
+    taskfile: "./scripts/taskfiles/keepassxc.yaml"
+  validate:
+    internal: true
+    taskfile: "./scripts/taskfiles/validate.yaml"
+  install:
+    internal: true
+    taskfile: "./scripts/taskfiles/install.yaml"
+  git:
+    internal: true
+    taskfile: "./scripts/taskfiles/git.yaml"
+  unison:
+    internal: true
+    taskfile: "./scripts/taskfiles/unison.yaml"
 
 tasks:
   nx:show:
     desc: Show the available nx commands
+    run: once
     silent: true
     cmds:
       - npx nx show projects --affected
+
+  deploy:local:
+    desc: Deploy the applications locally
+    cmds:
+      - task: scripts:deploy
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   lint:
     desc: Lint all the projects
@@ -25,13 +68,23 @@ tasks:
     summary: |
       This task lints all the projects locally
     cmds:
-      - npm run lint:all
+      - npm run lint:all -- --fix
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+
+  install:
+    desc: Install all the projects
+    run: once
+    summary: |
+      This task installs all npm/poetry packages
+    cmds:
+      - npm install
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   build:
     run: once
     deps:
       - task: lint
+      - task: install
     desc: Build all the projects
     summary: |
       This task builds all the projects locally
@@ -51,29 +104,42 @@ tasks:
       - npm run test:all
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
-  #    mcv:pack:
-  #      desc: Pack all the projects
-  #      summary: |
-  #        This task packs all the projects locally
-  #      deps:
-  #        - task: lint
-  #        - task: nx:build
-  #      cmds:
-  #        - npx nx run-many --target=pack --parallel --all
-  #      dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+  mcv:pack:
+    desc: Pack all the projects
+    summary: |
+      This task packs all the projects locally
+    deps:
+      - task: validate:internal:xdg
+      - task: validate:internal:scripts
+      - task: install:npm
+      - task: install:python
+      - task: install:brew
+    cmds:
+      - task: pya:tk:run
+        vars:
+            CLI_ARGS: "pack"
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   mcv:unpack:
     desc: Deploy all the system and home directory projects
     summary: |
       This task verifies, configures, and deploys projects locally much like a [Mobile Construction Vehicle](https://cnc.fandom.com/wiki/Mobile_construction_vehicle)
     deps:
+      - task: install:npm
+      - task: install:python
+      - task: install:brew
+      - task: validate:internal:xdg
+      - task: validate:internal:scripts
+    cmds:
       - task: lint
+      - task: install
       - task: build
       - task: test
-    cmds:
-      # - npx nx run-many --target=deploy --parallel --all
-      - "echo hi"
+      - task: chez:sync
+      - task: deploy:local
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+    vars:
+      NODE_CONFIG_DIR: "{{.NODE_CONFIG_DIR}}"
 
   pyapp:create:
     desc: Create a new Python application
