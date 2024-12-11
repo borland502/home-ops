@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+import fire
 from resources.configs.tk_conf import TgtSettings, TkSettings
 from utils import file
 from utils.file import pathify
@@ -294,3 +295,12 @@ class TrapperKeeper:
         # Set file permissions to 0600
         output_file.chmod(0o600)
         return output_file
+
+
+def app():
+    """Trapper Keeper CLI."""
+    fire.Fire(TrapperKeeper)
+
+
+if __name__ == "__main__":
+    app()

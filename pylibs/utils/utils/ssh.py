@@ -3,7 +3,7 @@
 from paramiko import HostKeys
 from plumbum.cmd import ssh_keygen
 
-from utils.paths import BasePaths
+from utils.paths import BasePaths, SecretsPaths
 
 
 class HostKeysUtils(HostKeys):
@@ -17,7 +17,7 @@ class HostKeysUtils(HostKeys):
             `BasePaths.KNOWN_HOSTS`.
     """
 
-    def __init__(self, filename=BasePaths.KNOWN_HOSTS):
+    def __init__(self, filename=SecretsPaths.KNOWN_HOSTS):
         """Initializes the HostKeysUtils object with the specified filename.
 
         Args:

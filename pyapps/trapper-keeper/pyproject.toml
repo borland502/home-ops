@@ -22,7 +22,10 @@
   license = "MIT"
   name = "trapper-keeper"
   readme = "README.md"
-  version = "1.1.0"
+  version = "1.1.1"
+
+[tool.poetry.scripts]
+  trapper-keeper = "trapper_keeper.cli:app"
 
 [[tool.poetry.packages]]
   include = "trapper_keeper"

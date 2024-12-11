@@ -31,6 +31,13 @@ tasks:
       - unison caddy
       - unison fenrus
 
+  sync:
+    desc: "Sync all unison profiles"
+    preconditions:
+      - sh: test -f "${HOME}/.unison/default.prf"
+        msg: "Unison profile not found"
+
+
   watchyourlan:
     desc: "Watch your LAN bi-directional sync with Unison"
     preconditions:

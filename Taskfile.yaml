@@ -6,9 +6,9 @@ dotenv:
   - ${HOME}/.zshrc
   - ${HOME}/.zshenv
 
+env:
+  HOME_OPS_DIR: "{{.xdg_config_home}}/automation/home-ops"
 vars:
-  HOME_OPS_DIR: "{{.XDG_DATA_HOME}}/automation/home-ops"
-  NODE_CONFIG_DIR: "{{.XDG_CONFIG_HOME}}/home-ops"
   SCRIPTS:
     sh: fd --glob --full-path '{{.HOME_OPS_DIR}}/scripts/*'
 
@@ -26,12 +26,11 @@ includes:
 
   # Ops taskfiles
   ansible:
-#    internal: true
+    internal: true
     taskfile: "./scripts/taskfiles/ansible.yaml"
   chez:
     internal: true
     taskfile: "./scripts/taskfiles/chezmoi.yaml"
-    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
   kp:
     internal: true
     taskfile: "./scripts/taskfiles/keepassxc.yaml"
@@ -60,7 +59,6 @@ tasks:
     desc: Deploy the applications locally
     cmds:
       - task: scripts:deploy
-    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   lint:
     desc: Lint all the projects
@@ -78,6 +76,7 @@ tasks:
       This task installs all npm/poetry packages
     cmds:
       - npm install
+      - task: pya:install
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   build:
@@ -102,6 +101,26 @@ tasks:
       This task tests all the projects locally
     cmds:
       - npm run test:all
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+
+  test:functional:
+    run: once
+    desc: Test Home Ops Using Proxmox and Ansible
+    deps:
+      - task: mcv:unpack
+    cmds:
+      - task: pya:ans:run
+        vars:
+            CLI_ARGS: "create-lxc"
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+
+  sync:
+    desc: Sync all the projects
+    run: once
+    summary: |
+      This task runs all synchronization tasks
+    cmds:
+      - task: chez:sync
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   mcv:pack:
@@ -131,15 +150,8 @@ tasks:
       - task: validate:internal:xdg
       - task: validate:internal:scripts
     cmds:
-      - task: lint
-      - task: install
-      - task: build
-      - task: test
       - task: chez:sync
       - task: deploy:local
-    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
-    vars:
-      NODE_CONFIG_DIR: "{{.NODE_CONFIG_DIR}}"
 
   pyapp:create:
     desc: Create a new Python application

@@ -1144,6 +1144,17 @@ wcwidth = "*"
 tests = ["pytest", "pytest-cov", "pytest-lazy-fixtures"]
 
 [[package]]
+name = "proxmoxer"
+version = "2.1.0"
+description = "Python Wrapper for the Proxmox 2.x API (HTTP and SSH)"
+optional = false
+python-versions = "*"
+files = [
+    {file = "proxmoxer-2.1.0-py3-none-any.whl", hash = "sha256:59d69abc5742c6c1b1737ce2944599136f66cdbbb1d044cd4b7aad30100ddde6"},
+    {file = "proxmoxer-2.1.0.tar.gz", hash = "sha256:d92993782e74ed8a76ff355dc050f58aa039fa697f9349a68e643552bd0fa62e"},
+]
+
+[[package]]
 name = "ptyprocess"
 version = "0.7.0"
 description = "Run a subprocess in a pseudo terminal"
@@ -2337,4 +2348,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "<4.0,>=3.12"
-content-hash = "d45f0ed287fe1dc155baad71d046c249f6b73bddb0316e912de69128c076528a"
+content-hash = "3d1fc61d90e3edf8ca7f43aa461c863f99b9f4e1c7588771d23da5dddeb601df"

@@ -11,6 +11,8 @@ tasks:
     desc: "Initialize Ansible Command"
     cmds:
       - poetry install
+      - ansible-galaxy collection install -r {{.ANSIBLE_HOME}}/collections/requirements.yml
+      - ansible-galaxy role install -r {{.ANSIBLE_HOME}}/roles/requirements.yml
 
   build:
     internal: true
@@ -37,10 +39,13 @@ tasks:
       - build
     desc: "Install Ansible Commands"
     cmds:
-      - nx install ansible-commands --force
+      - nx install ansible-commands
+      - pipx install . --force --include-deps
     sources:
-      - ansible-command/pyproject.toml
-      - ansible-command/poetry.lock
+      - ./dist/ansible_commands-*.tar.gz
+      - ./dist/ansible_commands-*.whl
+    generates:
+      - "{{.XDG_BIN_HOME}}/ansible-commands"
 
   run:
     desc: "Run Ansible Command"

@@ -30,10 +30,13 @@ tasks:
       - build
     desc: "Install Trapper Keeper"
     cmds:
-      - nx install trapper-keeper --force
+      - nx install trapper-keeper
+      - pipx install . --force --include-deps
     sources:
-      - trapper-keeper/pyproject.toml
-      - trapper-keeper/poetry.lock
+      - ./dist/trapper_keeper-*.tar.gz
+      - ./dist/trapper_keeper-*.whl
+    generates:
+      - "{{.XDG_BIN_HOME}}/trapper_keeper"
 
   run:
     desc: "Run Trapper Keeper Command"

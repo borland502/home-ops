@@ -9,3 +9,11 @@ includes:
   ans:
     taskfile: "./ansible-commands/ansible-commands.yaml"
     dir: "./ansible-commands"
+
+tasks:
+
+  install:
+    desc: "Install all python applications"
+    cmds:
+      - task: tk:install
+      - task: ans:install

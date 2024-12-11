@@ -31,8 +31,7 @@ collections:
   - name: bodsch.systemd
     version: "*"
 
-  - name: git+https://github.com/borland502/proxmox-ansible.git
-    type: git
+  - name: cielito.proxmox
     version: "*"
 
   - name: community.zabbix
