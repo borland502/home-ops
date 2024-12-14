@@ -4,7 +4,7 @@ import type {PathLike} from "fs";
 import type {Systeminformation} from "systeminformation";
 import {getAllData} from "systeminformation";
 import {$, fs, ProcessOutput, question, tmpfile, which} from "zx";
-import {initShell, isNil} from "@technohouser/zx-utils";
+import {initShell, isNil} from "../index.mjs";
 
 await initShell($);
 
@@ -188,25 +188,25 @@ async function findByYay(pkg: string) {
   return $`yay -Ss ${pkg}`;
 }
 
-async function findPkg(pkg: string, pkgMgr: string) {
-  switch (pkgMgr) {
-    case PKG_MGR.apt:
-      return findByApt(pkg);
-    case PKG_MGR.brew:
-      return findByBrew(pkg);
-    case PKG_MGR.pacman:
-      return findByPacman(pkg);
-    case PKG_MGR.nala:
-      return findByNala(pkg);
-    case PKG_MGR.scoop:
-      return findByScoop(pkg);
-    case PKG_MGR.yay:
-      return findByYay(pkg);
-    default:
-      throw new Error(`Unknown package manager: ${pkgMgr}`);
-  }
-
-}
+// async function findPkg(pkg: string, pkgMgr: string) {
+//   switch (pkgMgr) {
+//     case PKG_MGR.apt:
+//       return findByApt(pkg);
+//     case PKG_MGR.brew:
+//       return findByBrew(pkg);
+//     case PKG_MGR.pacman:
+//       return findByPacman(pkg);
+//     case PKG_MGR.nala:
+//       return findByNala(pkg);
+//     case PKG_MGR.scoop:
+//       return findByScoop(pkg);
+//     case PKG_MGR.yay:
+//       return findByYay(pkg);
+//     default:
+//       throw new Error(`Unknown package manager: ${pkgMgr}`);
+//   }
+//
+// }
 
 export async function downloadScript(url: URL) {
   const res = await fetch(url);

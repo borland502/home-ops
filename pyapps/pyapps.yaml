@@ -12,6 +12,12 @@ includes:
 
 tasks:
 
+  build:
+    desc: "Build all python applications"
+    cmds:
+      - task: tk:build
+      - task: ans:build
+
   install:
     desc: "Install all python applications"
     cmds:

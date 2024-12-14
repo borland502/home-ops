@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+# The mcv project is a meta project that contains all the other projects for export to a new system
+# In the event the target system is a different OS, or a different architecture, the mcv project will
+# recompile all the necessary binaries and configurations for the target system on unpacking.
+# TODO: Is this the main project or a convenient distillation for local transfers to containers?
+# TODO: Or is all of the above as a backup service?
+tasks:
+  init:
+    desc: Initialize the mcv project
+    run: once
+    summary: |
+      This task initializes the mcv project
+    cmds:
+      - task: chez:init
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+
+  install:
+    desc: Install the entire packed project
+    run: once
+    summary: |
+      This task installs the entire packed project
+    cmds:
+      - echo "TODO"
+
+  sync:
+    desc: Sync all the projects
+    run: once
+    summary: |
+      This task runs all synchronization tasks
+    cmds:
+      - task: chez:sync
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+
+  pack:
+    desc: Pack all the projects
+    summary: |
+      This task packs all the projects locally
+    deps:
+      - task: validate:internal:xdg
+      - task: validate:internal:scripts
+      - task: install:npm
+      - task: install:python
+      - task: install:brew
+    cmds:
+      - task: sync
+      - |
+        trapper-keeper pack
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+    # TODO: Push secret to shared secure location
+
+  unpack:
+    desc: Deploy all the system and home directory projects
+    summary: |
+      This task verifies, configures, and deploys projects locally much like a [Mobile Construction Vehicle](https://cnc.fandom.com/wiki/Mobile_construction_vehicle)
+    deps:
+      - task: install:npm
+      - task: install:python
+      - task: install:brew
+      - task: validate:internal:xdg
+      - task: validate:internal:scripts
+    cmds:
+      - task: install
+      - task: chez:sync
+      - task: deploy:local
+      # TODO: Pull secret from shared secure location

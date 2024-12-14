@@ -3,7 +3,7 @@
 from paramiko import HostKeys
 from plumbum.cmd import ssh_keygen
 
-from utils.paths import BasePaths, SecretsPaths
+from utils.paths import SecretsPaths
 
 
 class HostKeysUtils(HostKeys):

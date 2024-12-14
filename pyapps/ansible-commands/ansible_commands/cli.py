@@ -1,3 +1,5 @@
+"""CLI for managing Ansible containers."""
+
 import typer
 from typer import Option
 from utils.paths import SecretsPaths

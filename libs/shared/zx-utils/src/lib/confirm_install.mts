@@ -1,4 +1,4 @@
-import {argv, askConfirmation, error, info, installPkg} from "@technohouser/zx-utils"
+import {argv, askConfirmation, error, info, installPkg} from "../index.mjs"
 import {get} from "radash";
 import {exit} from "node:process";
 import type {ProcessOutput} from "zx";
@@ -22,7 +22,7 @@ if (argv._.length === 0) {
   exit(2)
 }
 
-if (await askConfirmation(`Do you want to install the following packages: ${argv._} ?`)) {
+if (await askConfirmation(`Do you want to install the following packages: ${argv._.toString()} ?`)) {
   for (const arg of argv._) {
     const pkgResult: ProcessOutput = await installPkg(arg)
     if (pkgResult.exitCode !== 0) {

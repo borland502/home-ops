@@ -6,7 +6,7 @@
   "tags": [],
   "targets": {
     "lint": {
-      "command": "gts lint apps/backend/**/*.mts",
+      "command": "gts lint libs/shared/zx-utils/src/**/*.mts",
       "cache": true
     },
     "build": {

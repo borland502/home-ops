@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+tasks:
+  init:
+    desc: "Initialize Utils Library"
+    sources:
+      - pyproject.toml
+    generates:
+      - poetry.lock
+    cmds:
+      - poetry install
+
+  build:
+    internal: true
+    silent: true
+    deps:
+      - init
+    desc: "Build Utils Library"
+    cmds:
+      - nx build utils
+    sources:
+      - utils/**/*.py
+
+  update:
+    desc: "Update Utils Library Dependencies"
+    cmds:
+      - nx update utils
+
+  install:
+    internal: true
+    silent: true
+    deps:
+      - build
+    desc: "Install Utils Library"
+    cmds:
+      - nx install utils --verbose
+    sources:
+      - utils/**/*.py
+    generates:
+      - "{{.XDG_BIN_HOME}}/utils"
+
+  run:
+    desc: "Run Utils Command"
+    deps:
+      - install
+    cmds:
+      - poetry run python -m utils {{.CLI_ARGS}}

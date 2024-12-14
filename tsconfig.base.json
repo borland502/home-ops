@@ -2,50 +2,39 @@
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compileOnSave": false,
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "baseUrl": ".",
-    "paths": {
-      "@technohouser/eslint": [
-        "libs/tools/eslint/src/index.mts"
-      ],
-      "@technohouser/watchyourlan": [
-        "libs/watchyourlan-api/src/index.mts"
-      ],
-      "@technohouser/zx-utils": [
-        "libs/shared/zx-utils/src/index.mts"
-      ]
-    },
-    "verbatimModuleSyntax": true,
-    "rootDir": ".",
-    "moduleDetection": "force",
-    "useDefineForClassFields": true,
-    "sourceMap": true,
-    "declaration": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "target": "ESNext",
-    "moduleResolution": "NodeNext",
-    "module": "NodeNext",
-    "resolveJsonModule": true,
     "allowJs": true,
+    "baseUrl": ".",
+    "declaration": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "isolatedModules": true,
     "lib": [
       "esnext",
       "dom"
     ],
-    "skipLibCheck": true,
+    "module": "preserve",
+    "moduleDetection": "force",
+    "moduleResolution": "Bundler",
+    "customConditions": ["module"],
+    "noImplicitAny": true,
+    "resolveJsonModule": true,
+    "rootDir": ".",
     "skipDefaultLibCheck": true,
-    "noImplicitAny": true
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "verbatimModuleSyntax": true
   },
   "include": [
-    "**/*.mts",
-    "./jest.config",
-    "eslint.config.js",
-    "playwright.config.mts",
-    "jest.config"
+    "apps/watchyourlan-api/src/**/*.mts",
+    "libs/watchyourlan-api/src/index.mts",
+    "libs/watchyourlan-api/src/**/*.mts",
+    "libs/shared/zx-utils/src/index.mts",
+    "libs/shared/zx-utils/src/**/*.mts"
   ],
   "exclude": [
     "node_modules",
-    "dist",
     "tmp",
     "**/.eslintrc",
     "**/.eslintrc.*"

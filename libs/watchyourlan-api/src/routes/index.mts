@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {getAll, Paths} from "@technohouser/watchyourlan";
+import {getAll, Paths} from "../index.mjs";
 
 // **** Variables **** //
 

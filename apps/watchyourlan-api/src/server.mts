@@ -2,14 +2,13 @@
  * Setup express server.
  */
 
-
 import type { Request, Response } from "express";
 import express from "express"
-import { homeopsConfig } from "@technohouser/zx-utils";
+import { homeopsConfig } from "../../../libs/shared/zx-utils/src/index.mjs";
 import cors from "cors";
-import { HttpStatusCodes } from "@technohouser/zx-utils";
+import { HttpStatusCodes } from "../../../libs/shared/zx-utils/src/index.mjs";
 import { checkAndSyncTable } from "./init.mjs";
-import { BaseRouter, Paths, RouteError } from "@technohouser/watchyourlan";
+import { BaseRouter, Paths, RouteError } from "../../../libs/watchyourlan-api/src/index.mjs";
 
 // **** Types **** //
 export type RemoveIndexSignature<T> = {

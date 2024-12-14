@@ -1,5 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "exclude": ["jest.config.mts", "src/**/*.spec.mts", "src/**/*.test.mts"],
-  "include": ["src/main.mts", "../../../playwright.config.mts"]
-}

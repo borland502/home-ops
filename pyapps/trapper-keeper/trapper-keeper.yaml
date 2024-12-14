@@ -4,12 +4,17 @@ version: "3"
 tasks:
   init:
     desc: "Initialize Trapper Keeper"
+    sources:
+      - pyproject.toml
+    generates:
+      - poetry.lock
     cmds:
       - poetry install
 
   build:
     internal: true
     silent: true
+    run: once
     deps:
       - init
     desc: "Build Trapper Keeper"
@@ -26,17 +31,16 @@ tasks:
   install:
     internal: true
     silent: true
+    run: once
     deps:
       - build
     desc: "Install Trapper Keeper"
     cmds:
-      - nx install trapper-keeper
       - pipx install . --force --include-deps
     sources:
-      - ./dist/trapper_keeper-*.tar.gz
-      - ./dist/trapper_keeper-*.whl
+      - trapper-keeper/trapper_keeper/**/*.py
     generates:
-      - "{{.XDG_BIN_HOME}}/trapper_keeper"
+      - "{{.XDG_BIN_HOME}}/pipx/bin/trapper_keeper"
 
   run:
     desc: "Run Trapper Keeper Command"

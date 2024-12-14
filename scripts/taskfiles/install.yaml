@@ -12,6 +12,8 @@ tasks:
   brew:
     desc: Ensure that brew is installed
     run: once
+    silent: true
+    internal: true
     deps:
       - task: validate:internal:xdg
       - task: validate:internal:scripts
@@ -28,6 +30,8 @@ tasks:
   chezmoi:
     desc: Ensure that chezmoi is installed
     run: once
+    silent: true
+    internal: true
     deps:
       - task: brew
     status:
@@ -45,11 +49,11 @@ tasks:
   nvm:
     desc: Ensure the NVM is installed
     run: once
+    silent: true
+    internal: true
     deps:
       - task: validate:internal:xdg
       - task: validate:internal:scripts
-    #        internal: true
-    #        silent: true
     status:
       - test -z ${NVM_DIR+x}
       - test -d ${NVM_DIR}
@@ -66,6 +70,8 @@ tasks:
   npm:
     desc: Ensure the npm is installed
     run: once
+    silent: true
+    internal: true
     deps:
       - task: nvm
     status:
@@ -85,6 +91,8 @@ tasks:
   pyenv:
     desc: Ensure the pyenv is installed
     run: once
+    silent: true
+    internal: true
     deps:
       - task: validate:internal:xdg
       - task: validate:internal:scripts
@@ -108,6 +116,8 @@ tasks:
     run: once
     deps:
       - task: pyenv
+    silent: true
+    internal: true
     status:
       - test -n ${PYENV_ROOT+x}
       - test -d ${PYENV_ROOT}
@@ -126,6 +136,8 @@ tasks:
   pipx:
     desc: Ensure the pipx is installed
     run: once
+    silent: true
+    internal: true
     deps:
       - task: python
     status:

@@ -2,10 +2,10 @@
 
 import {
   fs, homeopsConfig
-} from "@technohouser/zx-utils";
-import { error, xdgState } from "@technohouser/zx-utils";
+} from "../../../libs/shared/zx-utils/src/index.mjs";
+import { error, xdgState } from "../../../libs/shared/zx-utils/src/index.mjs";
 import {Sequelize} from "sequelize-typescript";
-import {Host} from "@technohouser/watchyourlan";
+import {Host} from "../../../libs/watchyourlan-api/src/index.mjs";
 import process from "process"
 import path from "path";
 
