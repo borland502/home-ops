@@ -23,3 +23,9 @@ tasks:
     cmds:
       - task: tk:install
       - task: ans:install
+
+  deploy:
+    desc: "create executables for all python applications"
+    cmds:
+      - task: tk:deploy
+      - task: ans:deploy

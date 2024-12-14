@@ -19,7 +19,7 @@ tasks:
       - init
     desc: "Build Trapper Keeper"
     cmds:
-      - nx build trapper-keeper
+      - nx build @technohouser/apps/trapper-keeper
     sources:
       - trapper-keeper/trapper_keeper/**/*.py
 
@@ -31,14 +31,27 @@ tasks:
   install:
     internal: true
     silent: true
-    run: once
     deps:
       - build
     desc: "Install Trapper Keeper"
     cmds:
-      - pipx install . --force --include-deps
+      - nx install @technohouser/apps/trapper-keeper
     sources:
       - trapper-keeper/trapper_keeper/**/*.py
+    generates:
+      - "{{.XDG_BIN_HOME}}/pipx/bin/trapper_keeper"
+
+  deploy:
+    internal: true
+    silent: true
+    run: once
+    deps:
+      - build
+    desc: "Deploy Trapper Keeper"
+    cmds:
+      - pipx install . --force --include-deps
+    sources:
+      - dist/*.whl
     generates:
       - "{{.XDG_BIN_HOME}}/pipx/bin/trapper_keeper"
 

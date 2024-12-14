@@ -31,6 +31,19 @@ tasks:
     sources:
       - ansible-command/ansible_commands/**/*.py
 
+  deploy:
+    internal: true
+    silent: true
+    deps:
+      - build
+    desc: "Deploy Ansible Commands"
+    cmds:
+      - pipx install . --force --include-deps
+    sources:
+      - dist/*.whl
+    generates:
+      - "{{.XDG_BIN_HOME}}/ansible-commands"
+
   update:
     internal: true
     silent: true
@@ -46,9 +59,8 @@ tasks:
     desc: "Install Ansible Commands"
     cmds:
       - nx install ansible-commands
-      - pipx install . --force --include-deps
     sources:
-      - trapper-keeper/trapper_keeper/**/*.py
+      - dist/*.whl
     generates:
       - "{{.XDG_BIN_HOME}}/ansible-commands"
 
