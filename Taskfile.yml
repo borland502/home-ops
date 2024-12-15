@@ -134,6 +134,18 @@ tasks:
           CLI_ARGS: "create-lxc"
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
+  update:
+    desc: Update all the project libraries
+    run: once
+    summary: |
+      This task updates all the projects locally
+    cmds:
+      - npx nx migrate latest
+      - npx nx migrate @nxlv/python:latest
+      - npx npm-check-updates -u
+      - echo "Run 'npm install' to update the packages"
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+
 #  sync:
 #    desc: Sync all the projects
 #    run: once
