@@ -213,6 +213,21 @@ tasks:
         sh: "echo $(gum input --placeholder 'Project Name')"
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
+  nodelib:create:
+    desc: Create a new NodeJS library
+    summary: |
+      This task creates a new NodeJS library, skipping test and framework defaults for flexibility
+    cmds:
+      - >-
+        npx nx generate @nx/node:library --directory libs/{{.PROJ_NAME}} --bundler esbuild --framework none
+        --name {{.PROJ_NAME}} --docker true --e2eTestRunner none --js false --unitTestRunner none
+        --projectNameAndRootFormat as-provided --verbose
+    vars:
+      PROJ_NAME:
+        sh: "echo $(gum input --placeholder 'Library Name')"
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+
+
   pyapp:create:
     desc: Create a new Python application
     summary: |

@@ -8,7 +8,7 @@
     "build": {
       "executor": "@nx/esbuild:esbuild",
       "options": {
-        "main": "apps/watchyourlan-api/src/main.mts",
+        "main": "apps/watchyourlan-api/src/main.mjs",
         "format": [
           "esm"
         ],

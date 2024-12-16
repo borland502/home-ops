@@ -1,0 +1,19 @@
+{
+  "name": "@technohouser/shared",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./*": "./dist/*.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "tsc --build --clean tsconfig.build.json && rimraf dist",
+    "lint": "npx eslint src"
+  },
+  "author": "",
+  "license": "ISC"
+}

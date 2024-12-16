@@ -1,6 +1,6 @@
 import {type APIResponse, expect, test} from "@playwright/test";
 import Ajv from "ajv";
-import {error} from "@technohouser/zx-utils";
+import {error} from "../../../libs/shared/zx-utils/src/index.mjs";
 import fs from "fs";
 
 // https://www.mikestreety.co.uk/blog/validate-a-json-api-with-playwright-and-json-schema/
@@ -11,7 +11,6 @@ test.describe("JSON Schema Validation", () => {
     expect(response !== undefined)
   })
 
-  // @ts-expect-error - ajv is not typed
   const ajv = new Ajv();
 
   test("is valid schema", async ({request}) => {

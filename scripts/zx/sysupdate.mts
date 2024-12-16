@@ -7,7 +7,7 @@ import {
   info,
   initShell,
   installByBrew
-} from "@technohouser/zx-utils"
+} from "../../libs/shared/zx-utils/src/index.mjs";
 
 const sysinfo = await getSystemData()
 

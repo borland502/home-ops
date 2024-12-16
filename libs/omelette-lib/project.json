@@ -1,0 +1,48 @@
+{
+  "name": "omelette-lib",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/omelette-lib/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project omelette --web",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/libs/omelette-lib",
+        "format": [
+          "esm"
+        ],
+        "deleteOutputPath": true,
+        "assets": ["libs/shared/*.md"],
+        "bundle": true,
+        "thirdParty": true,
+        "main": "libs/omelette-lib/src/index.mts",
+        "tsConfig": "libs/omelette-lib/tsconfig.lib.json",
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".mjs"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "generateLockfile": true,
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".mjs"
+            }
+          }
+        }
+      }
+    }
+  }
+}

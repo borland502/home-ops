@@ -3,6 +3,7 @@
   "include": [
     "playwright.config.mts",
     "jest.config.mts",
-    "apps/watchyourlan-api/e2e/*.spec.mts"
+    "apps/watchyourlan-api/e2e/*.spec.mts",
+    "libs/shared/zx-utils/src/index.mts",
   ]
 }

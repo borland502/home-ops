@@ -21,7 +21,6 @@
       "{workspaceRoot}/.github/workflows/ci.yml"
     ]
   },
-  "neverConnectToCloud": true,
   "plugins": [
     "@nxlv/python",
     {

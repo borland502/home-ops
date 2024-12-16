@@ -1,0 +1,13 @@
+#%YAML 1.2
+---
+
+inputDir: {{ .ENV.XDG_CONFIG_HOME }}/omlette/templates
+outputDir: {{ .ENV.XDG_CACHE_HOME }}/omlette/templates
+
+datasources:
+  local:
+    chezmoi: {{ .ENV.XDG_CONFIG_HOME }}/chezmoi
+    trapperkeeper: {{ .ENV.XDG_CONFIG_HOME }}/trapper_keeper
+    ansible_all: {{ .ENV.ANSIBLE_HOME }}/GroupVars/all.yml
+
+
