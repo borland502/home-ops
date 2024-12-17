@@ -1,12 +1,16 @@
 {
-  "name": "@technohouser/shared",
+  "name": "@lib/shared",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/src",
   "projectType": "library",
   "tags": ["type:shared", "scope:shared"],
   "targets": {
     "lint": {
-      "executor": "@nx/eslint:lint"
+      "executor": "nx:run-script",
+      "options": {
+        "script": "lint"
+      },
+      "cache": true
     },
     "build": {
       "executor": "@nx/esbuild:esbuild",

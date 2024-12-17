@@ -91,22 +91,6 @@
       },
       "cache": true
     },
-    "lint": {
-      "cache": true,
-      "outputs": [
-        "{options.outputFile}"
-      ],
-      "options": {
-        "lintFilePatterns": [
-          "libs/**/*.mts"
-        ],
-        "fix": true,
-        "eslintConfig": "package.json",
-        "options": {
-          "targetName": "lint"
-        }
-      }
-    },
     "stylelint": {
       "inputs": [
         "default",

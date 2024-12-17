@@ -1,4 +1,4 @@
-import { HttpStatusCodes } from "../../../shared/zx-utils/src/index.mjs";
+import { HttpStatusCodes } from "@technohouser/shared";
 
 /**
  * Error with status code and message.

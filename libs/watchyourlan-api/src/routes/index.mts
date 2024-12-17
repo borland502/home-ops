@@ -3,7 +3,7 @@ import {getAll, Paths} from "../index.mjs";
 
 // **** Variables **** //
 
-export const apiRouter = Router();
+export const apiRouter: Router = Router();
 
 const hostRouter = Router();
 

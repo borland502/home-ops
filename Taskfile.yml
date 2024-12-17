@@ -72,7 +72,7 @@ tasks:
     summary: |
       This task lints all the projects locally
     cmds:
-      - npm run lint:all -- --fix
+      - npx nx run-many --target=lint --parallel --all --verbose
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   install:
@@ -103,13 +103,11 @@ tasks:
     run: once
     deps:
       - task: lint
-      - task: install
     desc: Build all the projects
     summary: |
       This task builds all the projects locally
     cmds:
-      - task: jsa:build
-      - task: pya:build
+        - npx nx run-many --target=build --parallel --all
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
   test:
     run: once

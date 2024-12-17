@@ -1,94 +1,57 @@
 {
-  "name": "watchyourlan-api",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "@app/watchyourlan-api",
+  "$schema": "https://raw.githubusercontent.com/nrwl/nx/refs/heads/master/packages/nx/schemas/project-schema.json",
   "sourceRoot": "apps/watchyourlan-api/src",
   "projectType": "application",
-  "tags": [],
+  "tags": [
+    "type:app",
+    "scope:watchyourlan-api"
+  ],
   "targets": {
+    "lint": {
+      "executor": "nx:run-script",
+      "options": {
+        "script": "lint"
+      },
+      "cache": true
+    },
     "build": {
       "executor": "@nx/esbuild:esbuild",
-      "options": {
-        "main": "apps/watchyourlan-api/src/main.mjs",
-        "format": [
-          "esm"
-        ],
-        "outputPath": "dist",
-        "outputFileName": "apps/watchyourlan-api/main.mjs",
-        "tsConfig": "apps/watchyourlan-api/tsconfig.app.json",
-        "assets": [
-          "apps/watchyourlan-api/*.md"
-        ],
-        "bundle": true,
-        "deleteOutputPath": true,
-        "generatePackageJson": true,
-        "thirdParty": false,
-        "esbuildOptions": {
-          "outExtension": ".js=.mjs",
-          "sourcemap": "both",
-          "banner": {
-            "js": "import { createRequire } from 'module';const require = createRequire(import.meta.url);"
-          },
-          "packages": "external"
-        }
-      },
-      "cache": true
-    },
-    "e2e": {
-      "executor": "@nx/playwright:playwright",
-      "options": {
-        "testFiles": [
-          "apps/watchyourlan-api/e2e/"
-        ],
-        "config": "playwright.config.mts"
-      },
-      "dependsOn": [
-        "build", "^serve"
-      ],
-      "cache": true
-    },
-    "serve": {
       "outputs": [
         "{options.outputPath}"
       ],
-      "command": "npx tsx dist/apps/watchyourlan-api/main.js",
-      "dependsOn": [
-        "build"
-      ]
-    },
-    "gtsLint": {
-      "command": "gts lint apps/watchyourlan-api/**/*.mts",
-      "cache": true
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
       "options": {
-        "lintFilePatterns": [
-          "apps/watchyourlan-api/**/*.mts"
+        "platform": "node",
+        "outputPath": "dist",
+        "format": [
+          "esm"
         ],
-        "eslintConfig": "eslint.config.js",
-        "format": "stylish",
-        "fix": true
-      },
-      "cache": true,
-      "dependsOn": [
-        "^nx-stylelint:lint",
-        "^build",
-        "^gtsLint"
-      ]
-    },
-    "stylelint": {
-      "executor": "nx-stylelint:lint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
-      "options": {
-        "lintFilePatterns": [
-          "apps/watchyourlan-api/**/*.css"
+        "bundle": true,
+        "thirdParty": true,
+        "main": "apps/watchyourlan-api/src/main.mjs",
+        "tsConfig": "apps/watchyourlan-api/tsconfig.app.json",
+        "assets": [
+          "apps/watchyourlan-api/src/assets"
         ],
-        "formatter": "github"
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".mjs"
+          }
+        },
+        "configurations": {
+          "development": {},
+          "production": {
+            "generateLockfile": true,
+            "esbuildOptions": {
+              "sourcemap": false,
+              "outExtension": {
+                ".js": ".mjs"
+              }
+            }
+          }
+        }
       },
       "cache": true
     },

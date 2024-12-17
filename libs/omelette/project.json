@@ -1,11 +1,17 @@
 {
-  "name": "omelette-lib",
+  "name": "@lib/omelette",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/omelette-lib/src",
   "projectType": "library",
   "tags": [],
-  "// targets": "to see all targets run: nx show project omelette --web",
   "targets": {
+    "lint": {
+      "executor": "nx:run-script",
+      "options": {
+        "script": "lint"
+      },
+      "cache": true
+    },
     "build": {
       "executor": "@nx/esbuild:esbuild",
       "outputs": [
@@ -14,7 +20,7 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/libs/omelette-lib",
+        "outputPath": "../../dist",
         "format": [
           "esm"
         ],
@@ -22,8 +28,8 @@
         "assets": ["libs/shared/*.md"],
         "bundle": true,
         "thirdParty": true,
-        "main": "libs/omelette-lib/src/index.mts",
-        "tsConfig": "libs/omelette-lib/tsconfig.lib.json",
+        "main": "libs/omelette/src/index.mts",
+        "tsConfig": "libs/omelette/tsconfig.lib.json",
         "esbuildOptions": {
           "sourcemap": true,
           "outExtension": {

@@ -23,8 +23,8 @@
     "baseUrl": ".",
     "paths": {
       "@technohouser/shared": ["libs/shared/src/index.mts"],
-      "@todo/ui": ["libs/ui/src/index.ts"]
+      "@technohouser/watchyourlan-api-lib": ["libs/watchyourlan-api/src/index.mts"]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": ["node_modules", "tmp", "dist"]
 }

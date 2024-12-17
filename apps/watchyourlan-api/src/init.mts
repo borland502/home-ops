@@ -1,11 +1,10 @@
 #!/usr/bin/env -S npx tsx --tsconfig ./scripts/tsconfig.app.json
 
 import {
-  fs, homeopsConfig
-} from "../../../libs/shared/zx-utils/src/index.mjs";
-import { error, xdgState } from "../../../libs/shared/zx-utils/src/index.mjs";
+  fs, homeopsConfig, error, xdgState
+} from "@technohouser/shared";
 import {Sequelize} from "sequelize-typescript";
-import {Host} from "../../../libs/watchyourlan-api/src/index.mjs";
+import {Host} from "@technohouser/watchyourlan-api-lib";
 import process from "process"
 import path from "path";
 

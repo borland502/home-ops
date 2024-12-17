@@ -1,6 +1,6 @@
 {
-  "name": "resources",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "@pylib/resources",
+  "$schema": "https://raw.githubusercontent.com/nrwl/nx/refs/heads/master/packages/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "pylibs/resources/resources",
   "release": {
@@ -35,7 +35,11 @@
       "outputs": [
         "{projectRoot}/dist"
       ],
-      "dependsOn": ["lint","lock", "install"],
+      "dependsOn": [
+        "lint",
+        "lock",
+        "install"
+      ],
       "options": {
         "outputPath": "pylibs/resources/dist",
         "publish": false,
@@ -49,7 +53,9 @@
       "options": {
         "cwd": "pylibs/resources"
       },
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "cache": true
     },
     "install": {
@@ -61,7 +67,9 @@
         "verbose": false,
         "debug": false
       },
-      "dependsOn": ["^lock"],
+      "dependsOn": [
+        "^lock"
+      ],
       "cache": true
     },
     "lint": {

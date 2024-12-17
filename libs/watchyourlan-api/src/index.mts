@@ -5,4 +5,4 @@ export * from "./repos/HostRepo.mjs";
 export * as BaseRouter from "./routes/index.mjs";
 export * as HostService from "./services/HostService.mjs";
 export {getAll} from "./routes/HostRoutes.mjs";
-export * as HttpStatusCodes from "../../shared/zx-utils/src/lib/common/HttpStatusCodes.mjs";
+export * as HttpStatusCodes from "@technohouser/shared";
