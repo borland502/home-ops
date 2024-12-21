@@ -10,14 +10,6 @@
   },
   "tags": [],
   "targets": {
-    "lock": {
-      "executor": "@nxlv/python:run-commands",
-      "options": {
-        "command": "poetry lock --no-update",
-        "cwd": "pylibs/resources"
-      },
-      "cache": true
-    },
     "add": {
       "executor": "@nxlv/python:add",
       "options": {}
@@ -33,15 +25,10 @@
     "build": {
       "executor": "@nxlv/python:build",
       "outputs": [
-        "{projectRoot}/dist"
-      ],
-      "dependsOn": [
-        "lint",
-        "lock",
-        "install"
+        "{options.outputPath}"
       ],
       "options": {
-        "outputPath": "pylibs/resources/dist",
+        "outputPath": "dist/pylibs/resources",
         "publish": false,
         "lockedVersions": true,
         "bundleLocalDependencies": true

@@ -9,27 +9,16 @@ dotenv:
 env:
   PYENV_ROOT: "${XDG_DATA_HOME}/pyenv"
 
+
 includes:
   # Build taskfiles
   scripts:
     internal: true
     taskfile: "./scripts/scripts.yaml"
 
-  pylibs:
-    internal: true
-    taskfile: "./pylibs/pylibs.yaml"
-
-  pya:
-    internal: true
-    taskfile: "./pyapps/pyapps.yaml"
-
-  jsa:
-    internal: true
-    taskfile: "./apps/apps.yaml"
-
-  mcv:
-    internal: true
-    taskfile: "./src/mcv.yaml"
+#  mcv:
+#    internal: true
+#    taskfile: "./src/mcv.yaml"
 
   # Ops taskfiles
   ansible:
@@ -66,8 +55,19 @@ tasks:
     desc: Deploy the applications locally
     cmds:
       - task: scripts:deploy
+
+#  init:
+#    desc: Initialize all the projects
+#    run: once
+#    summary: |
+#      This task initializes all the projects locally
+#    cmds:
+#      - npx nx run-many --target=init --parallel --all --verbose
+#    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+
   lint:
     desc: Lint all the projects
+    interactive: true
     run: once
     summary: |
       This task lints all the projects locally
@@ -76,15 +76,17 @@ tasks:
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   install:
-    desc: Install all the projects
+    desc: Install all the projects and any missing tools
     run: once
+    deps:
+      - task: build
+      - task: install:tools
     summary: |
       This task installs all npm/poetry packages
     cmds:
-      - task: jsa:install
-      - task: pylibs:install
-      - task: pya:install
-      - task: mcv:install
+      - cmd: npx nx run-many --target=install --parallel --all
+      - cmd: npx nx run-many --target=install-bin --parallel --all
+
 #      - |
 #        cp ./sea-config.json ./dist/apps/home-ops/sea-config.json
 #        source ${XDG_DATA_HOME}/nvm/nvm.sh; nvm use --lts
@@ -109,6 +111,7 @@ tasks:
     cmds:
         - npx nx run-many --target=build --parallel --all
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+
   test:
     run: once
     desc: Test all the projects
@@ -144,14 +147,16 @@ tasks:
       - echo "Run 'npm install' to update the packages"
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
-#  sync:
-#    desc: Sync all the projects
-#    run: once
-#    summary: |
-#      This task runs all synchronization tasks
-#    cmds:
-#      - task: chez:sync
-#    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+  sync:
+    desc: Sync all the projects
+    run: once
+    summary: |
+      This task runs all synchronization tasks
+    cmds:
+      - task: chez:sync
+      - task: install:asdf:sync
+      - task: unison:sync
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 #
 #  mcv:pack:
 #    desc: Pack all the projects
@@ -224,7 +229,6 @@ tasks:
       PROJ_NAME:
         sh: "echo $(gum input --placeholder 'Library Name')"
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
-
 
   pyapp:create:
     desc: Create a new Python application

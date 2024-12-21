@@ -15,6 +15,13 @@
       },
       "cache": true
     },
+    "install": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm install",
+        "cwd": "apps/watchyourlan-api"
+      }
+    },
     "build": {
       "executor": "@nx/esbuild:esbuild",
       "outputs": [

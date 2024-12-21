@@ -1,0 +1,34 @@
+[tool.nx]
+autoActivate = true
+
+[tool.poetry]
+name = "@technohouser/home-ops"
+version = "1.0.0"
+description = ""
+authors = [ ]
+license = "Proprietary"
+readme = "README.md"
+package-mode = false
+
+  [tool.poetry.dependencies]
+  python = ">=3.12,<4.0"
+
+    [tool.poetry.dependencies.ansible-commands]
+    path = "pyapps/ansible-commands"
+    develop = true
+
+    [tool.poetry.dependencies.trapper-keeper]
+    path = "pyapps/trapper-keeper"
+    develop = true
+
+    [tool.poetry.dependencies.resources]
+    path = "pylibs/resources"
+    develop = true
+
+    [tool.poetry.dependencies.utils]
+    path = "pylibs/utils"
+    develop = true
+
+[build-system]
+requires = [ "poetry-core==1.1.0" ]
+build-backend = "poetry.core.masonry.api"

@@ -4,13 +4,6 @@
   "projectType": "library",
   "sourceRoot": "pylibs/utils/utils",
   "targets": {
-    "lock": {
-      "executor": "@nxlv/python:run-commands",
-      "options": {
-        "command": "poetry lock --no-update",
-        "cwd": "pylibs/utils"
-      }
-    },
     "add": {
       "executor": "@nxlv/python:add",
       "options": {}
@@ -26,14 +19,15 @@
     "build": {
       "executor": "@nxlv/python:build",
       "outputs": [
-        "{projectRoot}/dist"
+        "{options.outputPath}"
       ],
       "options": {
-        "outputPath": "pylibs/utils/dist",
+        "outputPath": "dist/pylibs/utils",
         "publish": false,
         "lockedVersions": true,
         "bundleLocalDependencies": true
-      }
+      },
+      "cache": true
     },
     "install": {
       "executor": "@nxlv/python:install",
@@ -41,9 +35,12 @@
         "silent": false,
         "args": "",
         "cacheDir": ".cache/pypoetry",
-        "verbose": false,
+        "verbose": true,
         "debug": false
-      }
+      },
+      "dependsOn": [
+        "build"
+      ]
     },
     "lint": {
       "executor": "@nxlv/python:ruff-check",

@@ -4,13 +4,6 @@
   "projectType": "application",
   "sourceRoot": "pyapps/ansible-commands/ansible_commands",
   "targets": {
-    "lock": {
-      "executor": "@nxlv/python:run-commands",
-      "options": {
-        "command": "poetry lock --no-update",
-        "cwd": "pyapps/ansible-commands"
-      }
-    },
     "add": {
       "executor": "@nxlv/python:add",
       "options": {}
@@ -26,13 +19,20 @@
     "build": {
       "executor": "@nxlv/python:build",
       "outputs": [
-        "{projectRoot}/dist"
+      "{options.outputPath}"
       ],
       "options": {
-        "outputPath": "pyapps/ansible-commands/dist",
+        "outputPath": "dist/pyapps/ansible-commands",
         "publish": false,
         "lockedVersions": true,
         "bundleLocalDependencies": true
+      }
+    },
+    "install-bin": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pipx install . --force",
+        "cwd": "pyapps/ansible-commands"
       }
     },
     "install": {

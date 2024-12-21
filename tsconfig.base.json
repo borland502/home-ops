@@ -17,14 +17,25 @@
     "strictNullChecks": true,
     "target": "ESNext",
     "module": "NodeNext",
-    "lib": ["ESNext", "dom"],
+    "lib": [
+      "ESNext",
+      "dom"
+    ],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@technohouser/shared": ["libs/shared/src/index.mts"],
-      "@technohouser/watchyourlan-api-lib": ["libs/watchyourlan-api/src/index.mts"]
+      "@technohouser/shared": [
+        "libs/shared/src/index.mts"
+      ],
+      "@technohouser/watchyourlan-api-lib": [
+        "libs/watchyourlan-api/src/index.mts"
+      ]
     }
   },
-  "exclude": ["node_modules", "tmp", "dist"]
+  "exclude": [
+    "node_modules",
+    "tmp",
+    "dist"
+  ]
 }

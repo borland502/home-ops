@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: 3
+
+# https://sourcegraph.com/github.com/dkarter/dotfiles@9f0ebb0d05242cdcd1e0169c16403f4d0c8a4e5e/-/blob/taskfiles/brew.yml
+
+tasks:
+  sync:
+    desc: Synchronize homebrew packages
+    summary: |
+      Updates Homebrew packages
+
+      Then automatically commits the changes to the Brewfile.lock.json file, if there are any.
+    platforms: ['darwin']
+    cmds:
+      - brew bundle
+      - task: commit
+
+  commit:
+    desc: Commits the Brewfile.lock.json file if changed
+    silent: true
+    cmd: |
+      ./scripts/commit_changed_file.sh \
+          'Brewfile.lock.json' \
+          'chore(brew): update packages'
