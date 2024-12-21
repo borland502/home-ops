@@ -1,6 +1,6 @@
 {
-  "name": "resources",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "@pylib/resources",
+  "$schema": "https://raw.githubusercontent.com/nrwl/nx/refs/heads/master/packages/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "pylibs/resources/resources",
   "release": {
@@ -10,14 +10,6 @@
   },
   "tags": [],
   "targets": {
-    "lock": {
-      "executor": "@nxlv/python:run-commands",
-      "options": {
-        "command": "poetry lock --no-update",
-        "cwd": "pylibs/resources"
-      },
-      "cache": true
-    },
     "add": {
       "executor": "@nxlv/python:add",
       "options": {}
@@ -33,11 +25,10 @@
     "build": {
       "executor": "@nxlv/python:build",
       "outputs": [
-        "{projectRoot}/dist"
+        "{options.outputPath}"
       ],
-      "dependsOn": ["lint","lock", "install"],
       "options": {
-        "outputPath": "pylibs/resources/dist",
+        "outputPath": "dist/pylibs/resources",
         "publish": false,
         "lockedVersions": true,
         "bundleLocalDependencies": true
@@ -49,7 +40,9 @@
       "options": {
         "cwd": "pylibs/resources"
       },
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "cache": true
     },
     "install": {
@@ -61,7 +54,9 @@
         "verbose": false,
         "debug": false
       },
-      "dependsOn": ["^lock"],
+      "dependsOn": [
+        "^lock"
+      ],
       "cache": true
     },
     "lint": {

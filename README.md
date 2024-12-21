@@ -51,6 +51,7 @@ npm run lint:all
 * [NX](https://nx.dev/)
 * [ESBuild](https://esbuild.github.io/)
 * [Chezmoi](https://www.chezmoi.io/quick-start/)
+* [Gomplate](https://docs.gomplate.ca)
 * [TypeScript](https://www.typescriptlang.org/)
 * [ESLint](https://eslint.org/)
 * [Prettier](https://prettier.io/)
@@ -65,11 +66,13 @@ npm run lint:all
 
 Sources:
 
+* [Gomplate/Taskfiles](https://github.com/luismayta/dotfiles)
+
 ## TODO:
 
 - Add home assistant integration
 - Add secrets management via google drive & keepass
-- Don't use esbuild for production bundles
+- Complete integrating gomplate into the project
 - Add jest
 - Sort out documentation publishing
 - Add swagger docs

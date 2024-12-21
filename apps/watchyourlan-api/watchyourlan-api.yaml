@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+tasks:
+    init:
+        desc: "Initialize Project"
+        cmds:
+        - npm install
+
+    build:
+        internal: true
+        silent: true
+        deps:
+        - init
+        desc: "Build Project with esbuild"
+        cmds:
+        - nx build --executor @nrwl/esbuild:esbuild
+        sources:
+        - src/**/*.mts
+
+    update:
+        desc: "Update Project Dependencies"
+        cmds:
+        - npm update
+
+    install:
+        internal: true
+        silent: true
+        deps:
+        - build
+        desc: "Install Project"
+        cmds:
+        - npm install --force
+        sources:
+        - dist/**/*.mjs
+        generates:
+        - "{{.XDG_BIN_HOME}}/project"
+
+    run:
+        desc: "Run Project Command"
+        deps:
+        - install
+        cmds:
+        - node dist/main.mjs {{.CLI_ARGS}}
+
+

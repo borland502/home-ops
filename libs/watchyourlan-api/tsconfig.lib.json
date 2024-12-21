@@ -1,5 +1,20 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
-  "include": ["src/**/*.mts", "../../../playwright.config.mts"]
+  "compilerOptions": {
+    "outDir": "../../dist",
+    "types": [
+      "node"
+    ]
+  },
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/*.spec.tsx",
+    "**/*.test.tsx",
+    "**/*.spec.js",
+    "**/*.test.js",
+    "**/*.spec.jsx",
+    "**/*.test.jsx"
+  ],
+  "include": ["src/**/*.mjs", "src/**/*.mts", "src/**/*.ts"]
 }

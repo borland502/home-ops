@@ -181,8 +181,14 @@ class SecretsPaths(StrEnum):
     BOOTSTRAP_TOKEN = f"{XdgPaths.XDG_CONFIG_HOME}/trapper_keeper/bootstrap.token"
     BOOTSTRAP_CONFIG = f"{XdgPaths.XDG_STATE_HOME}/trapper_keeper/config.toml"
     DB = f"{XdgPaths.XDG_DATA_HOME}/trapper_keeper/secrets.kdbx"
+
     KEY = f"{XdgPaths.XDG_STATE_HOME}/trapper_keeper/secrets.keyx"
     TOKEN = f"{XdgPaths.XDG_CONFIG_HOME}/trapper_keeper/secrets.token"
+
+    # Temporary location on the host system for the target's password.  The key will be stored in the
+    # archive
+    TMP_TOKEN = f"{XdgPaths.XDG_CACHE_HOME}/trapper_keeper/secrets.token"
+
     SRC_DB = f"{XdgPaths.XDG_DATA_HOME}/keepass/secrets.kdbx"
     SRC_KEY = f"{XdgPaths.XDG_STATE_HOME}/keepass/secrets.keyx"
     SRC_TOKEN = f"{XdgPaths.XDG_CONFIG_HOME}/keepass/secrets.token"

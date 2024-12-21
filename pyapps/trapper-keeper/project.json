@@ -1,6 +1,6 @@
 {
-  "name": "trapper-keeper",
-  "$schema": "./node_modules/@nxlv/python/schema.json",
+  "name": "@pyapp/trapper-keeper",
+  "$schema": "https://raw.githubusercontent.com/nrwl/nx/refs/heads/master/packages/nx/schemas/project-schema.json",
   "projectType": "application",
   "sourceRoot": "pyapps/trapper-keeper/trapper_keeper",
   "release": {
@@ -10,14 +10,6 @@
   },
   "tags": [],
   "targets": {
-    "lock": {
-      "executor": "@nxlv/python:run-commands",
-      "options": {
-        "command": "poetry lock --no-update",
-        "cwd": "pyapps/trapper-keeper"
-      },
-      "cache": true
-    },
     "add": {
       "executor": "@nxlv/python:add",
       "options": {}
@@ -33,16 +25,22 @@
     "build": {
       "executor": "@nxlv/python:build",
       "outputs": [
-        "{projectRoot}/dist"
+        "{options.outputPath}"
       ],
-      "dependsOn": ["^lint","^lock", "^install"],
       "options": {
-        "outputPath": "pyapps/trapper-keeper/dist",
+        "outputPath": "dist/pyapps/trapper-keeper",
         "publish": false,
         "lockedVersions": true,
         "bundleLocalDependencies": true
       },
       "cache": true
+    },
+    "install-bin": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pipx install . --force",
+        "cwd": "pyapps/trapper-keeper"
+      }
     },
     "install": {
       "executor": "@nxlv/python:install",
@@ -53,7 +51,6 @@
         "verbose": false,
         "debug": false
       },
-      "dependsOn": ["^lock"],
       "cache": true
     },
     "test": {
@@ -61,7 +58,9 @@
       "options": {
         "cwd": "pyapps/trapper-keeper"
       },
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "cache": true
     },
     "lint": {

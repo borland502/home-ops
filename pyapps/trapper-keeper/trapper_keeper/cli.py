@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+import fire
 from resources.configs.tk_conf import TgtSettings, TkSettings
 from utils import file
 from utils.file import pathify
@@ -97,9 +98,11 @@ class TrapperKeeper:
             f"{temp_dir}/{key.name}",
         )
 
-        with src_db.open("rb") as src_db, src_token.open(
-            "rb"
-        ) as src_token, src_key.open("rb") as src_key:
+        with (
+            src_db.open("rb") as src_db,
+            src_token.open("rb") as src_token,
+            src_key.open("rb") as src_key,
+        ):
             db.write_bytes(src_db.read())
             token.write_bytes(src_token.read())
             key.write_bytes(src_key.read())
@@ -134,17 +137,20 @@ class TrapperKeeper:
             fp_key=Path(tgt_settings.get("key")),
         )
         self.passphrase(length=7, fp_token=Path(tgt_settings.get("token")))
-        with get_store(
-            DbTypes.KP,
-            fp_kp_db=Path(tgt_settings.get("db")),
-            fp_token=Path(tgt_settings.get("token")),
-            fp_key=Path(tgt_settings.get("key")),
-        ) as tgt_store, get_store(
-            DbTypes.KP,
-            fp_kp_db=Path(self.settings.get("bootstrap_db")),
-            fp_token=Path(self.settings.get("bootstrap_token")),
-            fp_key=None,
-        ) as src_store:
+        with (
+            get_store(
+                DbTypes.KP,
+                fp_kp_db=Path(tgt_settings.get("db")),
+                fp_token=Path(tgt_settings.get("token")),
+                fp_key=Path(tgt_settings.get("key")),
+            ) as tgt_store,
+            get_store(
+                DbTypes.KP,
+                fp_kp_db=Path(self.settings.get("bootstrap_db")),
+                fp_token=Path(self.settings.get("bootstrap_token")),
+                fp_key=None,
+            ) as src_store,
+        ):
             tgt_store.copy_bootstrap_entries(src_store)
 
         pack_dir = Path(temp_dir)
@@ -155,6 +161,10 @@ class TrapperKeeper:
             fp_key=Path(tgt_settings.get("key")),
         )
         print(f"Trapper Keeper packed to {pack_dir / 'trapper_keeper.zst'}")
+        # Move the packed file to the XDG_CACHE_HOME trapper_keeper folder
+        # file.move_file(
+        #     pack_dir / "trapper_keeper.zst", Path(self.settings.get("cache"))
+        # )
 
     @staticmethod
     def passphrase(length: int = 7, fp_token: Path | None = None):
@@ -294,3 +304,12 @@ class TrapperKeeper:
         # Set file permissions to 0600
         output_file.chmod(0o600)
         return output_file
+
+
+def app():
+    """Trapper Keeper CLI."""
+    fire.Fire(TrapperKeeper)
+
+
+if __name__ == "__main__":
+    app()

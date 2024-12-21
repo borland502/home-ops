@@ -1,11 +1,10 @@
 #!/usr/bin/env -S npx tsx --tsconfig ./scripts/tsconfig.app.json
 
 import {
-  fs, homeopsConfig
-} from "@technohouser/zx-utils";
-import { error, xdgState } from "@technohouser/zx-utils";
+  fs, homeopsConfig, error, xdgState
+} from "@technohouser/shared";
 import {Sequelize} from "sequelize-typescript";
-import {Host} from "@technohouser/watchyourlan";
+import {Host} from "@technohouser/watchyourlan-api-lib";
 import process from "process"
 import path from "path";
 

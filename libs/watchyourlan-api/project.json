@@ -1,61 +1,56 @@
 {
-  "name": "watchyourlan-lib",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "@lib/watchyourlan-api",
+  "$schema": "https://raw.githubusercontent.com/nrwl/nx/refs/heads/master/packages/nx/schemas/project-schema.json",
   "sourceRoot": "libs/watchyourlan-api/src",
   "projectType": "library",
   "tags": [],
   "targets": {
-    "gtsLint": {
-      "command": "gts lint apps/watchyourlan-api/**/*.mts",
-      "cache": true
-    },
     "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "executor": "nx:run-script",
       "options": {
-        "lintFilePatterns": [
-          "libs/watchyourlan-api/src/**/*.mts"
-        ],
-        "eslintConfig": "eslint.config.js",
-        "format": "stylish",
-        "fix": true
-      },
-      "cache": true,
-      "dependsOn": [
-        "^nx-stylelint:lint",
-        "^build",
-        "^gtsLint"
-      ]
-    },
-    "stylelint": {
-      "executor": "nx-stylelint:lint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
-      "options": {
-        "lintFilePatterns": [
-          "apps/watchyourlan-api/**/*.css"
-        ],
-        "formatter": "github"
+        "script": "lint"
       },
       "cache": true
     },
     "build": {
       "executor": "@nx/esbuild:esbuild",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "defaultConfiguration": "production",
       "options": {
+        "platform": "node",
         "outputPath": "dist/libs/watchyourlan-api",
-        "main": "libs/watchyourlan-api/src/index.mjs",
-        "tsConfig": "libs/watchyourlan-api/tsconfig.lib.json",
+        "format": [
+          "esm"
+        ],
+        "deleteOutputPath": true,
         "assets": [
-          "libs/watchyourlan-api/*.md"
+          "libs/shared/*.md"
         ],
         "bundle": true,
-        "deleteOutputPath": true,
-        "thirdParty": false
+        "thirdParty": true,
+        "main": "libs/watchyourlan-api/src/index.mts",
+        "tsConfig": "libs/watchyourlan-api/tsconfig.lib.json",
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".mjs"
+          }
+        }
       },
-      "cache": true
+      "configurations": {
+        "development": {},
+        "production": {
+          "generateLockfile": true,
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".mjs"
+            }
+          }
+        }
+      }
     }
   }
 }

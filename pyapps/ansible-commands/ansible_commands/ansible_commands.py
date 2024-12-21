@@ -86,7 +86,7 @@ class Actions:
                 "-m",
                 "import_role",
                 "-a",
-                "name=technohouser.proxmox.create_kvm",
+                "name=cielito.proxmox.create_kvm",
                 "-e",
                 self.app_path,
                 *VARS,
@@ -98,7 +98,7 @@ class Actions:
     def create_lxc(self):
         """Create a new LXC container using the specified application role.
 
-        Uses the `technohouser.proxmox.create_lxc` Ansible role to create a new
+        Uses the `cielito.proxmox.create_lxc` Ansible role to create a new
         LXC container based on the configuration defined in the application's
         playbook.
         """
@@ -110,7 +110,7 @@ class Actions:
                 "-m",
                 "import_role",
                 "-a",
-                "name=technohouser.proxmox.create_lxc",
+                "name=cielito.proxmox.create_lxc",
                 "-e",
                 self.app_path,
                 *VARS,

@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3'
+
+includes:
+  validate:
+    internal: true
+    taskfile: "../validate.yaml"
+
+  asdf:
+    internal: true
+    taskfile: "./asdf.yaml"
+
+tasks:
+
+#  install-plugins:
+#    desc: "Install nx plugins"
+#    cmds:
+#      - |
+#        nx add @nx/angular
+#        nx add @nx/esbuild
+#        nx add @nx/node
+#        nx add @nx/playwright
+#        nx add @nxrocks/nx-spring-boot
+#        nx add @nxlv/python
+#    dir: "${XDG_DATA_HOME}/automation/home-ops"
+
+  install:
+    desc: "Install nx"
+    run: once
+    silent: true
+    requires:
+      vars:
+        - NODE_VERSION
+    deps:
+      - task: validate:internal:xdg
+      - task: asdf:install
+      - task: asdf:tools:install
+    cmds:
+      # repeated here in case local node version is different
+      - asdf install
+      - npm install
+      - npm install -g nx
+#      - task: install-plugins
+    dir: "${XDG_DATA_HOME}/automation/home-ops"
+
+  sync:
+    desc: "Sync the nx workspace"
+    cmds:
+      - npx nx sync
+
+

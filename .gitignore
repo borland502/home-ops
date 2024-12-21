@@ -59,8 +59,15 @@ __pycache__
 !.devcontainer/Dockerfile
 !.devcontainer/docker-compose.yml
 
+!/scripts/shell/**/*
+
 scripts/docker/compose/**/*
 !scripts/docker/compose/**/*.yaml
 !scripts/docker/compose/**/*.dockerfile
+
+# We will leverage the nodejs sea assets folder to store everything, including vaults so do not
+# check in the assets folder except for a .gitkeep file or samples
+src/assets/*
+!src/assets/.gitkeep
 
 config.toml

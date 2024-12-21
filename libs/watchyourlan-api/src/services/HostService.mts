@@ -1,5 +1,5 @@
-import { findAllHosts, Host } from "@technohouser/watchyourlan";
-import { error } from "@technohouser/zx-utils";
+import { findAllHosts, Host } from "../index.mjs";
+import { error } from "@technohouser/shared";
 
 function handleSuccess(res: Host[]) {
   // transform to json-api format

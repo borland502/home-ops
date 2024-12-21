@@ -16,6 +16,13 @@ tasks:
     cmds:
       - "chezmoi init"
 
+  add:
+    desc: "Add new file to chezmoi"
+    interactive: true
+    run: once
+    cmds:
+      -
+
   apply:
     desc: "Apply changes"
     interactive: true

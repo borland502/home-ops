@@ -8,9 +8,7 @@ vars:
   KP_DB: "{{.XDG_DATA_HOME}}/keepass/secrets.kdbx"
   KP_KEY: "{{.XDG_STATE_HOME}}/keepass/secrets.keyx"
   KP_TOKEN: "{{.XDG_CONFIG_HOME}}/keepass/secrets.token"
-  KP_YUBIKEY:
-    sh: |
-      cat "${XDG_CONFIG_HOME}/keepass/yubikey.serial"
+  KP_YUBIKEY: "${XDG_CONFIG_HOME}/keepass/yubikey.serial"
 
 includes:
   validate:

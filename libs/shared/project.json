@@ -1,0 +1,38 @@
+{
+  "name": "@lib/shared",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/src",
+  "projectType": "library",
+  "tags": ["type:shared", "scope:shared"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-script",
+      "options": {
+        "script": "lint"
+      },
+      "cache": true
+    },
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "main": "libs/shared/src/index.mjs",
+        "format": ["esm"],
+        "platform": "node",
+        "deleteOutputPath": true,
+        "outputPath": "dist",
+        "tsConfig": "libs/shared/tsconfig.lib.json",
+        "assets": ["libs/shared/*.md"],
+        "bundle": true,
+        "thirdParty": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".mjs"
+          }
+        }
+      },
+      "cache": true
+    }
+  }
+}
