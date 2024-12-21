@@ -1,4 +1,4 @@
-import { info } from "../../../libs/shared/zx-utils/src/index.mjs";
+import { info } from "@technohouser/shared";
 import app from "./server.mjs";
 import { createServer } from "http";
 

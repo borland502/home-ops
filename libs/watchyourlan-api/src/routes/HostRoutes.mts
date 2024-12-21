@@ -1,7 +1,7 @@
 import { Host } from "../models/Host.mjs";
 import { getAllHosts } from "../services/HostService.mjs";
 import type { Request, Response } from "express";
-import { HttpStatusCodes } from "../../../shared/zx-utils/src/index.mjs";
+import { HttpStatusCodes } from "@technohouser/shared";
 import { get } from "radash";
 import * as jsonapi from "jsonapi-serializer";
 

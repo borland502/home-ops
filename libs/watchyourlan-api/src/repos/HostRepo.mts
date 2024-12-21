@@ -1,7 +1,7 @@
 import {Host} from "../models/Host.mjs";
 import {DataTypes, QueryTypes} from "sequelize";
 import {Sequelize} from "sequelize-typescript";
-import {homeopsConfig, xdgState} from "../../../shared/zx-utils/src/index.mjs";
+import {homeopsConfig, xdgState} from "@technohouser/shared";
 import path from "path";
 
 const watchYourLanDb = path.join(

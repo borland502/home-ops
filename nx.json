@@ -21,7 +21,6 @@
       "{workspaceRoot}/.github/workflows/ci.yml"
     ]
   },
-  "neverConnectToCloud": true,
   "plugins": [
     "@nxlv/python",
     {
@@ -91,22 +90,6 @@
         "passWithNoTests": true
       },
       "cache": true
-    },
-    "lint": {
-      "cache": true,
-      "outputs": [
-        "{options.outputFile}"
-      ],
-      "options": {
-        "lintFilePatterns": [
-          "libs/**/*.mts"
-        ],
-        "fix": true,
-        "eslintConfig": "package.json",
-        "options": {
-          "targetName": "lint"
-        }
-      }
     },
     "stylelint": {
       "inputs": [

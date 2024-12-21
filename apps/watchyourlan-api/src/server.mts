@@ -2,13 +2,12 @@
  * Setup express server.
  */
 
-import type { Request, Response } from "express";
+import type {Express, Request, Response} from "express";
 import express from "express"
-import { homeopsConfig } from "../../../libs/shared/zx-utils/src/index.mjs";
+import { homeopsConfig, HttpStatusCodes } from "@technohouser/shared";
 import cors from "cors";
-import { HttpStatusCodes } from "../../../libs/shared/zx-utils/src/index.mjs";
 import { checkAndSyncTable } from "./init.mjs";
-import { BaseRouter, Paths, RouteError } from "../../../libs/watchyourlan-api/src/index.mjs";
+import { BaseRouter, Paths, RouteError } from "@technohouser/watchyourlan-api-lib";
 
 // **** Types **** //
 export type RemoveIndexSignature<T> = {
@@ -26,7 +25,7 @@ const corsOptions = {
   preflightContinue: true,
 };
 
-const app = express();
+const app: Express = express();
 
 app.use(cors(corsOptions));
 
@@ -41,10 +40,14 @@ app.use("/", express.urlencoded({ extended: true }));
 app.use(Paths.default.Base, BaseRouter.apiRouter);
 
 // Add error handler
-app.use((err: RouteError, _: Request, res: Response, next: () => void) => {
-  const status: HttpStatusCodes = err.status;
-  next();
-  return res.status(status).json({ error: err.message });
+const errorHandler = (err: RouteError, _: Request, res: Response, next: () => void) => {
+    const status: HttpStatusCodes = err.status;
+    next();
+    return res.status(status).json({error: err.message});
+}
+
+app.use((err: RouteError, req: Request, res: Response, next: () => void) => {
+    errorHandler(err, req, res, next);
 });
 
 // **** Export default **** //

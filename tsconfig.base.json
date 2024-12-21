@@ -1,42 +1,41 @@
 {
-  "extends": "./node_modules/gts/tsconfig-google.json",
   "compileOnSave": false,
   "compilerOptions": {
-    "allowJs": true,
-    "baseUrl": ".",
+    "rootDir": ".",
+    "sourceMap": true,
     "declaration": true,
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "outDir": "dist",
     "esModuleInterop": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true,
     "isolatedModules": true,
+    "strictNullChecks": true,
+    "target": "ESNext",
+    "module": "NodeNext",
     "lib": [
-      "esnext",
+      "ESNext",
       "dom"
     ],
-    "module": "preserve",
-    "moduleDetection": "force",
-    "moduleResolution": "Bundler",
-    "customConditions": ["module"],
-    "noImplicitAny": true,
-    "resolveJsonModule": true,
-    "rootDir": ".",
-    "skipDefaultLibCheck": true,
     "skipLibCheck": true,
-    "sourceMap": true,
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "verbatimModuleSyntax": true
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@technohouser/shared": [
+        "libs/shared/src/index.mts"
+      ],
+      "@technohouser/watchyourlan-api-lib": [
+        "libs/watchyourlan-api/src/index.mts"
+      ]
+    }
   },
-  "include": [
-    "apps/watchyourlan-api/src/**/*.mts",
-    "libs/watchyourlan-api/src/index.mts",
-    "libs/watchyourlan-api/src/**/*.mts",
-    "libs/shared/zx-utils/src/index.mts",
-    "libs/shared/zx-utils/src/**/*.mts"
-  ],
   "exclude": [
     "node_modules",
     "tmp",
-    "**/.eslintrc",
-    "**/.eslintrc.*"
+    "dist"
   ]
 }

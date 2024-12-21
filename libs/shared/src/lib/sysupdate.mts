@@ -1,13 +1,13 @@
 import {
-  $,
-  ensureBrew,
-  error,
-  getSystemData,
-  which,
-  info,
-  initShell,
-  installByBrew
-} from "@technohouser/zx-utils"
+    $,
+    ensureBrew,
+    error,
+    getSystemData,
+    which,
+    info,
+    initShell,
+    installByBrew, hasCommand
+} from "@technohouser/shared";
 
 const sysinfo = await getSystemData()
 
@@ -93,11 +93,11 @@ async function installBrew(brewPackages: Promise<string[]>, brewCasks?: Promise<
   }
 }
 
-await which("apt").then(() => {
+await which("apt").then(async () => {
     await installAptPackages()
 
     await $`sudo apt update && sudo apt dist-upgrade -y`.catch((reason: unknown) => {
-      error(`Error: ${reason}`)
+        error(`Error: ${reason}`)
     })
 })
 
@@ -177,8 +177,8 @@ await which("softwareupdate").then((hasSoftwareUpdate) => {
   }
 })
 
-await which("flatpak").then((hasFlatpak: boolean) => {
-  if (hasFlatpak === null || !hasFlatpak) {
+await which("flatpak").then((hasFlatpak: string | null) => {
+  if (hasFlatpak === null || hasFlatpak === "") {
         // TODO: Use generic package manager
       $`apt install flatpak`
   }

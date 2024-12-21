@@ -16,7 +16,7 @@ tasks:
     desc: Ensure the XDG directories are set
     run: once
     internal: true
-    silent: false
+    silent: true
     cmds:
       - source ${HOME}/.env
       - |
