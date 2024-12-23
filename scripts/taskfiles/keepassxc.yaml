@@ -66,3 +66,8 @@ tasks:
       - task: internal:keepassxc:validate
     cmds:
       - keepassxc-cli attachment-export --key-file {{.KP_KEY}} --yubikey {{.KP_YUBIKEY}} {{.KP_DB}} "{{.ATTACHMENT_NAME}}" "{{.OUTPUT_PATH}}"
+
+  sync:
+    desc: Synchronize the file system with the trapper_keeper bootstrap database
+    interactive: true
+

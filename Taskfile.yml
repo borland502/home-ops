@@ -6,19 +6,15 @@ dotenv:
   - ${HOME}/.zshrc
   - ${HOME}/.zshenv
 
-env:
-  PYENV_ROOT: "${XDG_DATA_HOME}/pyenv"
-
-
 includes:
   # Build taskfiles
   scripts:
     internal: true
     taskfile: "./scripts/scripts.yaml"
 
-#  mcv:
-#    internal: true
-#    taskfile: "./src/mcv.yaml"
+  #  mcv:
+  #    internal: true
+  #    taskfile: "./src/mcv.yaml"
 
   # Ops taskfiles
   ansible:
@@ -56,14 +52,14 @@ tasks:
     cmds:
       - task: scripts:deploy
 
-#  init:
-#    desc: Initialize all the projects
-#    run: once
-#    summary: |
-#      This task initializes all the projects locally
-#    cmds:
-#      - npx nx run-many --target=init --parallel --all --verbose
-#    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+  #  init:
+  #    desc: Initialize all the projects
+  #    run: once
+  #    summary: |
+  #      This task initializes all the projects locally
+  #    cmds:
+  #      - npx nx run-many --target=init --parallel --all --verbose
+  #    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   lint:
     desc: Lint all the projects
@@ -72,7 +68,7 @@ tasks:
     summary: |
       This task lints all the projects locally
     cmds:
-      - npx nx run-many --target=lint --parallel --all --verbose
+      - npx nx run-many --target=lint --parallel --all --verbose --fix
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   install:
@@ -80,25 +76,24 @@ tasks:
     run: once
     deps:
       - task: build
-      - task: install:tools
     summary: |
       This task installs all npm/poetry packages
     cmds:
       - cmd: npx nx run-many --target=install --parallel --all
       - cmd: npx nx run-many --target=install-bin --parallel --all
 
-#      - |
-#        cp ./sea-config.json ./dist/apps/home-ops/sea-config.json
-#        source ${XDG_DATA_HOME}/nvm/nvm.sh; nvm use --lts
-#        cd ./dist/apps/home-ops && node --experimental-sea-config sea-config.json
-#        cp $(command -v node) home-ops
-#
-#        if [[ {{OS}} == "darwin" ]]; then
-#          codesign --remove-signature home-ops
-#          npx postject home-ops NODE_SEA_BLOB sea-prep.blob --macho-segment-name NODE_SEA --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8
-#        else
-#          npx postject home-ops NODE_SEA_BLOB sea-prep.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8
-#        fi
+    #      - |
+    #        cp ./sea-config.json ./dist/apps/home-ops/sea-config.json
+    #        source ${XDG_DATA_HOME}/nvm/nvm.sh; nvm use --lts
+    #        cd ./dist/apps/home-ops && node --experimental-sea-config sea-config.json
+    #        cp $(command -v node) home-ops
+    #
+    #        if [[ {{OS}} == "darwin" ]]; then
+    #          codesign --remove-signature home-ops
+    #          npx postject home-ops NODE_SEA_BLOB sea-prep.blob --macho-segment-name NODE_SEA --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8
+    #        else
+    #          npx postject home-ops NODE_SEA_BLOB sea-prep.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8
+    #        fi
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   build:
@@ -109,7 +104,7 @@ tasks:
     summary: |
       This task builds all the projects locally
     cmds:
-        - npx nx run-many --target=build --parallel --all
+      - npx nx run-many --target=build --parallel --all
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   test:
@@ -150,52 +145,68 @@ tasks:
   sync:
     desc: Sync all the projects
     run: once
+    preconditions:
+      - test $(command -v trapper-keeper)
     summary: |
       This task runs all synchronization tasks
     cmds:
       - task: chez:sync
-      - task: install:asdf:sync
       - task: unison:sync
+      - cmd: trapper-keeper pack --sync
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
-#
-#  mcv:pack:
-#    desc: Pack all the projects
-#    summary: |
-#      This task packs all the projects locally into a single node executable which can then be
-#      transferred to a new system for unpacking.  To permit cross platform compatibility, the
-#      useSnapshots and useCodeCache options are disabled.
-#
-#      https://nodejs.org/api/single-executable-applications.html
-#      https://github.com/nodejs/node/blob/main/doc/api/single-executable-applications.md#generating-single-executable-preparation-blobs
-#    deps:
-#      - task: validate:internal:xdg
-#      - task: validate:internal:scripts
-#      - task: install:npm
-#      - task: install:python
-#      - task: install:brew
-#    cmds:
-#      - task: install
-#      - task: sync
-#      # Sensitive files and directories are packed here
-#      - |
-#        trapper-keeper pack
-#    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
-#    # TODO: Push secret to shared secure location
-#
-#  mcv:unpack:
-#    desc: Deploy all the system and home directory projects
-#    summary: |
-#      This task verifies, configures, and deploys projects locally much like a [Mobile Construction Vehicle](https://cnc.fandom.com/wiki/Mobile_construction_vehicle)
-#    deps:
-#      - task: install:npm
-#      - task: install:python
-#      - task: install:brew
-#      - task: validate:internal:xdg
-#      - task: validate:internal:scripts
-#    cmds:
-#      - task: chez:sync
-#      - task: deploy:local
-#      # TODO: Pull secret from shared secure location
+  #
+  #  mcv:pack:
+  #    desc: Pack all the projects
+  #    summary: |
+  #      This task packs all the projects locally into a single node executable which can then be
+  #      transferred to a new system for unpacking.  To permit cross platform compatibility, the
+  #      useSnapshots and useCodeCache options are disabled.
+  #
+  #      https://nodejs.org/api/single-executable-applications.html
+  #      https://github.com/nodejs/node/blob/main/doc/api/single-executable-applications.md#generating-single-executable-preparation-blobs
+  #    deps:
+  #      - task: validate:internal:xdg
+  #      - task: validate:internal:scripts
+  #      - task: install:npm
+  #      - task: install:python
+  #      - task: install:brew
+  #    cmds:
+  #      - task: install
+  #      - task: sync
+  #      # Sensitive files and directories are packed here
+  #      - |
+  #        trapper-keeper pack
+  #    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+  #    # TODO: Push secret to shared secure location
+  #
+  #  mcv:unpack:
+  #    desc: Deploy all the system and home directory projects
+  #    summary: |
+  #      This task verifies, configures, and deploys projects locally much like a [Mobile Construction Vehicle](https://cnc.fandom.com/wiki/Mobile_construction_vehicle)
+  #    deps:
+  #      - task: install:npm
+  #      - task: install:python
+  #      - task: install:brew
+  #      - task: validate:internal:xdg
+  #      - task: validate:internal:scripts
+  #    cmds:
+  #      - task: chez:sync
+  #      - task: deploy:local
+  #      # TODO: Pull secret from shared secure location
+
+  angularapp:create:
+    desc: Create a new Angular application
+    summary: |
+      This task creates a new Angular application, skipping test and framework defaults for flexibility
+    cmds:
+      - >-
+        npx nx generate @nx/angular:application --directory apps/{{.PROJ_NAME}} --bundler esbuild
+        --standalone false --e2eTestRunner playwright --unitTestRunner jest --style less
+        --name {{.PROJ_NAME}} --ssr false --verbose
+    vars:
+      PROJ_NAME:
+        sh: "echo $(gum input --placeholder 'Project Name')"
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   nodeapp:create:
     desc: Create a new NodeJS application
@@ -206,11 +217,11 @@ tasks:
         npx nx generate @nx/node:application --directory apps/{{.PROJ_NAME}} --bundler esbuild --framework none
         --name {{.PROJ_NAME}} --docker true --e2eTestRunner none --js false --unitTestRunner none
         --projectNameAndRootFormat as-provided --verbose
-#      - test -f ./apps/{{.PROJ_NAME}}/eslint.config.js && rm ./apps/{{.PROJ_NAME}}/eslint.config.js
-#      - mv ./apps/{{.PROJ_NAME}}/main.ts ./apps/{{.PROJ_NAME}}/main.mts
-#      - ln -sf ./config/apps/tsconfig.json ./apps/{{.PROJ_NAME}}/tsconfig.json
-#      - ln -sf ./config/apps/tsconfig.app.json ./apps/{{.PROJ_NAME}}/tsconfig.app.json
-#      - ln -sf ./config/apps/tsconfig.spec.json ./apps/{{.PROJ_NAME}}/tsconfig.spec.json
+    #      - test -f ./apps/{{.PROJ_NAME}}/eslint.config.js && rm ./apps/{{.PROJ_NAME}}/eslint.config.js
+    #      - mv ./apps/{{.PROJ_NAME}}/main.ts ./apps/{{.PROJ_NAME}}/main.mts
+    #      - ln -sf ./config/apps/tsconfig.json ./apps/{{.PROJ_NAME}}/tsconfig.json
+    #      - ln -sf ./config/apps/tsconfig.app.json ./apps/{{.PROJ_NAME}}/tsconfig.app.json
+    #      - ln -sf ./config/apps/tsconfig.spec.json ./apps/{{.PROJ_NAME}}/tsconfig.spec.json
     vars:
       PROJ_NAME:
         sh: "echo $(gum input --placeholder 'Project Name')"
@@ -245,6 +256,7 @@ tasks:
         sh: "echo $(gum input --placeholder 'Project Name')"
       MODULE_NAME:
         sh: "echo $(gum input --placeholder 'Module Name: Usually the same as the project name with an underscore')"
+
   pylib:create:
     desc: Create a new Python library
     summary: |

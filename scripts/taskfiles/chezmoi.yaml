@@ -14,14 +14,7 @@ tasks:
     interactive: true
     run: once
     cmds:
-      - "chezmoi init"
-
-  add:
-    desc: "Add new file to chezmoi"
-    interactive: true
-    run: once
-    cmds:
-      -
+      - "chezmoi init --source ${XDG_DATA_HOME}/automation/home-ops/scripts/dotfiles"
 
   apply:
     desc: "Apply changes"
@@ -35,12 +28,7 @@ tasks:
     interactive: true
     preconditions:
       - sh: "command -v chezmoi"
-      - sh: "command -v rsync"
     cmds:
-      - >-
-        rsync -avzu --compress-choice="zstd" --delete --info=progress2 --no-whole-file
-        --backup --backup-dir="${XDG_CACHE_HOME}/chezmoi" --suffix=".bak" --delete --exclude=".git"
-        -h "${XDG_DATA_HOME}/automation/home-ops/scripts/dotfiles/" "${XDG_DATA_HOME}/chezmoi"
       - task: init
       - task: apply
 

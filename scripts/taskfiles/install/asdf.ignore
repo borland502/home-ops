@@ -5,38 +5,7 @@ version: 3
 
 vars:
   ASDF_PLUGINS:
-    - nodejs
-    - python
-    - age
-    - age-plugin-yubikey
-    - bat
-    - caddy
-    - chezmoi
-    - dasel
-    - direnv
-    - eza
-    - fd
-    - fzf
-    - git
-    - has
-    - java
-    - graalvm
-    - jbang
-    - jq
-    - github-cli
-    - gum
-    - pandoc
-    - pipx
-    - redis
-    - restic
-    - ripgrep
-    - ruby
-    - spring-boot
-    - sqlite
-    - starship
-    - task
-#    - unison
-    - vim
+    sh: echo $(chezmoi data | jq -rce '.asdf.versions | keys[]')
 
   # some tools cannot be installed via asdf on ARM, but are still useful for
   # x86 machines and linux
@@ -45,7 +14,7 @@ vars:
 
   # remove incompatible plugins from full plugin list
   ARM_COMPATIBLE_PLUGINS:
-    sh: echo {{range $plugin := .ASDF_PLUGINS}}{{if not (has $plugin $.ARM_INCOMPATIBLE_PLUGINS)}}{{$plugin}} {{end}}{{end}}
+    sh: echo {{range $plugin := (list .ASDF_PLUGINS) }}{{if not (has $plugin $.ARM_INCOMPATIBLE_PLUGINS)}}{{$plugin}} {{end}}{{end}}
 
   NODE_LTS_PREFIX: "{{.NODE_VERSION}}"
 
@@ -55,7 +24,10 @@ tasks:
   install:
     desc: Installs asdf itself, node, and python as fundamental tools
     silent: true
-    interactive: true
+    ignore_error: true
+    run: once
+    status:
+      - test ! command -v asdf
     cmds:
       - cmd: |
           # https://notes.billmill.org/computer_usage/asdf/make_asdf_follow_the_XDG_spec.html
@@ -69,7 +41,6 @@ tasks:
               export ASDF_DATA_DIR="$XDG_DATA_HOME/asdf"
 
               . "$ASDF_DIR/asdf.sh"
-              . "$ASDF_DIR/completions/asdf.bash"
 
               # https://asdf-vm.com/manage/configuration.html#asdfrc
               export ASDF_CONFIG_FILE="$XDG_CONFIG_HOME/asdfrc"
@@ -82,39 +53,55 @@ tasks:
 
               export ASDF_JAVA_DEFAULT_PACKAGES_FILE="$XDG_CONFIG_HOME/default-java-packages"
           fi
-        platforms: [linux]
-      - cmd: |
-          brew install asdf
-          if [[ -d ${HOME}/.asdf ]]; then
-              . "$(brew --prefix asdf)/libexec/asdf.sh"
-              . "${HOME}/.asdf/completions/_asdf"
-
-              export ASDF_DIR="$XDG_DATA_HOME/asdf"
-              export ASDF_DATA_DIR="$XDG_DATA_HOME/asdf"
-              export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdfrc"
-              # https://github.com/asdf-vm/asdf-nodejs#default-npm-packages
-              export ASDF_NPM_DEFAULT_PACKAGES_FILE="$XDG_CONFIG_HOME/default-npm-packages"
-              # https://github.com/asdf-community/asdf-python#default-python-packages
-              export ASDF_PYTHON_DEFAULT_PACKAGES_FILE="$XDG_CONFIG_HOME/default-python-packages"
-              export ASDF_JAVA_DEFAULT_PACKAGES_FILE="$XDG_CONFIG_HOME/default-java-packages"
-          fi
-        platforms: [darwin]
       - cmd: asdf plugin add nodejs
       - cmd: asdf plugin add python
       - cmd: asdf install nodejs latest:{{.NODE_LTS_PREFIX}}
       - cmd: asdf install python latest:{{.PYTHON_LTS_PREFIX}}
       - cmd: asdf global nodejs latest:{{.NODE_LTS_PREFIX}}
       - cmd: asdf global python latest:{{.PYTHON_LTS_PREFIX}}
-    dir: "${HOME}"
 
   plugins:install:
     desc: Installs all asdf plugins
-    silent: true
+    silent: false
+    run: once
+    status:
+      - |
+        for plugin in $(asdf plugin list | awk '{print $1}'); do
+          if ! [[ $(chezmoi data | jq -rce '.asdf.versions."'"$plugin"'"') ]]; then
+            return 1
+          fi
+        done
     cmds:
+      - cmd: |
+          # https://notes.billmill.org/computer_usage/asdf/make_asdf_follow_the_XDG_spec.html
+          git clone https://github.com/asdf-vm/asdf.git $XDG_DATA_HOME/asdf --branch v0.15.0
+          if [[ -d $XDG_DATA_HOME/asdf ]]; then
+              # I really wish asdf supported XDG_CONFIG:
+              # https://github.com/asdf-vm/asdf/issues/687
+              #
+              # so let's set a bunch of variables that let us pretend it does
+              export ASDF_DIR="$XDG_DATA_HOME/asdf"
+              export ASDF_DATA_DIR="$XDG_DATA_HOME/asdf"
+
+              . "$ASDF_DIR/asdf.sh"
+
+              # https://asdf-vm.com/manage/configuration.html#asdfrc
+              export ASDF_CONFIG_FILE="$XDG_CONFIG_HOME/asdfrc"
+
+              # https://github.com/asdf-vm/asdf-nodejs#default-npm-packages
+              export ASDF_NPM_DEFAULT_PACKAGES_FILE="$XDG_CONFIG_HOME/default-npm-packages"
+
+              # https://github.com/asdf-community/asdf-python#default-python-packages
+              export ASDF_PYTHON_DEFAULT_PACKAGES_FILE="$XDG_CONFIG_HOME/default-python-packages"
+
+              export ASDF_JAVA_DEFAULT_PACKAGES_FILE="$XDG_CONFIG_HOME/default-java-packages"
+          fi
       - platforms: [amd64]
         for:
           var: ASDF_PLUGINS
           as: PLUGIN
+        status:
+          - test $(chezmoi data | jq -rce '.asdf.versions.{{.PLUGIN}}') != null
         cmd: asdf plugin add {{.PLUGIN}}
 
       - platforms: [arm64]
@@ -122,14 +109,16 @@ tasks:
           var: ARM_COMPATIBLE_PLUGINS
           as: PLUGIN
           split: ' '
-        cmd: asdf plugin add {{.PLUGIN}}
+        cmd: asdf plugin-add {{.PLUGIN}}
 
   plugins:update:
+    run: once
     desc: Updates all asdf plugins
     cmd: asdf plugin-update --all
 
   update:
     desc: Updates asdf itself
+    run: once
     cmds:
       - cmd: |
           {{ if eq .OS "linux" }}
@@ -140,26 +129,25 @@ tasks:
         platforms: [amd64]
 
       - platforms: [arm64]
-        for:
-          var: ARM_COMPATIBLE_PLUGINS
-          as: PLUGIN
-          split: ' '
-        task: tool:install
-        vars: { PLUGIN: '{{.PLUGIN}}' }
+        cmd: |
+          {{ if eq .OS "linux" }}
+            apt update && apt upgrade asdf -y
+          {{ else if eq .OS "darwin" }}
+            brew upgrade asdf
+          {{ end }}
 
   sync:
     desc: Updates asdf plugins, asdf itself and installs packages for this project
     silent: true
+    run: once
     cmds:
-      - task: plugins:install
       - task: plugins:update
       - task: update
-      - asdf install
 
   tool:install:
     internal: true
     status:
-      - asdf plugin list | grep -q "{{.PLUGIN}}" || exit 1
+      - test asdf where {{.PLUGIN}}
     requires:
       vars: [PLUGIN]
     silent: true
@@ -168,17 +156,25 @@ tasks:
         version='latest:{{.NODE_LTS_PREFIX}}'
       {{else if eq .PLUGIN "python"}}
         version='latest:{{.PYTHON_LTS_PREFIX}}'
+      {{else if eq .PLUGIN "java"}}
+        version="$(chezmoi data | jq -rce '.asdf.versions.java')"
       {{else}}
         version='latest'
       {{end}}
       echo
-      asdf install {{.PLUGIN}} "$version"
-      echo -n "Setting {{.PLUGIN}} $version as global.."
-      asdf global {{.PLUGIN}} "$version"
-      echo "DONE"
+      retVal=$(asdf install {{.PLUGIN}} "$version")
+
+      if [[ $retVal -ne 0 ]] || [[ $retVal == "No compatible versions available"* ]]; then
+        echo $retVal
+      else
+        echo -n "Setting {{.PLUGIN}} $version as global.."
+        asdf global {{.PLUGIN}} "$version"
+        echo "DONE"
+      fi
 
   tools:install:
     desc: Installs/updates all asdf based tools
+    run: once
     cmds:
       # install nodejs latest as many things depend on it in the following steps
       - platforms: [amd64]

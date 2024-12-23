@@ -24,6 +24,13 @@ ij_wrap_on_typing = false
 
 # Code files
 
+# Python files
+[*.py]
+indent_size = 4
+tab_width = 4
+ij_continuation_indent_size = 8
+
+
 ###############################
 # C# Coding Conventions       #
 ###############################

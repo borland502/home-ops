@@ -97,7 +97,39 @@
         "{workspaceRoot}/.stylelintrc(.(json|yml|yaml|js))?"
       ],
       "cache": true
+    },
+    "@angular-devkit/build-angular:application": {
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ]
+    },
+    "@nx/eslint:lint": {
+      "cache": true,
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json",
+        "{workspaceRoot}/.eslintignore",
+        "{workspaceRoot}/eslint.config.js"
+      ]
+    },
+    "e2e-ci--**/*": {
+      "dependsOn": [
+        "^build"
+      ]
     }
   },
-  "nxCloudId": "675b9c67cb1a90b656ab5586"
+  "nxCloudId": "675b9c67cb1a90b656ab5586",
+  "generators": {
+    "@nx/angular:application": {
+      "e2eTestRunner": "playwright",
+      "linter": "eslint",
+      "style": "less",
+      "unitTestRunner": "jest"
+    }
+  }
 }

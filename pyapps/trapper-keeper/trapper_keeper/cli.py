@@ -113,11 +113,14 @@ class TrapperKeeper:
             fp_key=Path(self.settings.get("key")),
         )
 
-    def pack(self):
+    def pack(self, sync: bool = False):
         """Pack the Trapper Keeper.
 
         This method creates a temporary directory, generates necessary keys and tokens,
         creates a KeePass database, and packs the directory into a compressed file.
+
+        Args:
+            sync (bool): Sync the packed file back to the bootstrap database. Defaults to False.
         """
         # Create a random folder in the system temp folder
         temp_dir = tempfile.mkdtemp()
@@ -161,10 +164,44 @@ class TrapperKeeper:
             fp_key=Path(tgt_settings.get("key")),
         )
         print(f"Trapper Keeper packed to {pack_dir / 'trapper_keeper.zst'}")
+
+        if sync:
+            print("Syncing back to bootstrap db")
+            self._sync_to_bootstrap(
+                fp_kp_db=Path(tgt_settings.get("db")),
+                fp_token=Path(tgt_settings.get("token")),
+                fp_key=Path(tgt_settings.get("key")),
+            )
         # Move the packed file to the XDG_CACHE_HOME trapper_keeper folder
         # file.move_file(
         #     pack_dir / "trapper_keeper.zst", Path(self.settings.get("cache"))
         # )
+
+
+    def _sync_to_bootstrap(self, fp_kp_db: Path, fp_token: Path, fp_key: Path):
+      """Sync refreshes the source bootstrap database.  This operation is useful only after running pack.
+
+      Args:
+          fp_kp_db (Path): The path to the Keepass database file.
+          fp_token (Path): The path to the token file.
+          fp_key (Path): The path to the key file.
+      """
+      with (
+          get_store(
+              DbTypes.KP,
+              fp_kp_db=self.fp_kp_db,
+              fp_token=self.fp_token,
+              fp_key=self.fp_key,
+          ) as src_store,
+          get_store(
+              DbTypes.KP,
+              fp_kp_db=Path(self.settings.get("bootstrap_db")),
+              fp_token=Path(self.settings.get("bootstrap_token")),
+              fp_key=None,
+          ) as tgt_store,
+      ):
+          tgt_store.copy_bootstrap_entries(src_store, invert=True)
+
 
     @staticmethod
     def passphrase(length: int = 7, fp_token: Path | None = None):
@@ -248,14 +285,6 @@ class TrapperKeeper:
         self.settings = TkSettings.get_instance(
             "trapper_keeper", xdg_config=True, auto_create=True
         )
-
-    def add_export_entry(self, attachment_name: str, export_file: Path):
-        """Add an export entry.
-
-        Args:
-            attachment_name (str): The name of the attachment.
-            export_file (Path): The file path to save the exported attachment.
-        """
 
     def export_bootstrap_kpdb(self, tmp_dir: Path) -> Path:
         """Export the bootstrap KeePass database.

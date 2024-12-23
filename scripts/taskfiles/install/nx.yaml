@@ -6,10 +6,6 @@ includes:
     internal: true
     taskfile: "../validate.yaml"
 
-  asdf:
-    internal: true
-    taskfile: "./asdf.yaml"
-
 tasks:
 
 #  install-plugins:
@@ -33,11 +29,8 @@ tasks:
         - NODE_VERSION
     deps:
       - task: validate:internal:xdg
-      - task: asdf:install
-      - task: asdf:tools:install
     cmds:
       # repeated here in case local node version is different
-      - asdf install
       - npm install
       - npm install -g nx
 #      - task: install-plugins

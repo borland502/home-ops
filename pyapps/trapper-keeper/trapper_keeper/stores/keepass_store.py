@@ -69,7 +69,7 @@ def _create_kp_db_bootstrap_entries(kp_db: PyKeePass) -> None:
     store_env_vars(entry, kp_db)
 
 
-def store_attachments(entry, kp_db, src_files):
+def store_attachments(entry, kp_db, src_files: iter[Path]):
     """Store attachments in the Keepass database.
 
     Args:
@@ -77,7 +77,7 @@ def store_attachments(entry, kp_db, src_files):
         kp_db (PyKeePass): The Keepass database instance.
         src_files (Iterable[Path]): The source files to be attached.
     """
-    for idx, src_file in enumerate(next(src_files)):
+    for idx, src_file in enumerate(src_files):
         data: bytes | None = get_file_bytes(src_file)
         if data:
             kp_db.add_binary(data=get_file_bytes(src_file), compressed=False)
@@ -248,11 +248,12 @@ class KeepassStore(PyKeePass):
                 force_creation=True,
             )
 
-    def copy_bootstrap_entries(self, src: KeepassStore):
+    def copy_bootstrap_entries(self, src: KeepassStore, invert: bool = False):
         """Copy additional entries from the source database bootstrap group.
 
         Args:
             src (KeepassStore): The source Keepass store.
+            invert (bool, optional): Invert the copy. Defaults to False.
         """
         tgt_group: Group = self.get_bootstrap_group()
         src_group: Group = src.get_bootstrap_group()

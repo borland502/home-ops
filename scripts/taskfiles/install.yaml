@@ -7,10 +7,6 @@ env:
 
 
 includes:
-  asdf:
-    internal: true
-    taskfile: "./install/asdf.yaml"
-
   nx:
     taskfile: "./install/nx.yaml"
 
@@ -40,29 +36,10 @@ tasks:
 
   tools:
     desc: Install all the necessary tools
-    summary: |
-      Installs all the core tools that asdf can manage
-        - bat
-        - direnv
-        - fd
-        - fzf
-        - github-cli
-        - nodejs
-        - python
-        - ripgrep
-        - ruby
     run: once
     deps:
       - task: brew
-      - task: asdf:install
     cmds:
-      - task: asdf:plugins:install
-      - task: asdf:tools:install
       - task: nx:install
 
-    sync:
-      desc: Synchronize asdf packages
-      summary: |
-        Updates asdf packages
-      cmds:
-        - task: asdf:sync
+

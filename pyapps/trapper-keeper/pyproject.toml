@@ -43,6 +43,7 @@ group = { }
   sqlalchemy = "^2.0.36"
   sqlite-utils = "^3.37"
   xkcdpass = "^1.19.9"
+  pygments = "^2.18.0"
 
     [tool.poetry.dependencies.utils]
     develop = true

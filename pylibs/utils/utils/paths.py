@@ -67,6 +67,7 @@ SKIP_DIRS = [
     "trapper_keeper",
     "typings",
     "venv",
+    "automation",
 ]
 
 
@@ -111,12 +112,18 @@ class SkipPaths:
         for path in paths:
             if path is None or not path.exists():
                 continue
-            yield SkipPaths.filter_dirs(path, exclude_dirs, exclude_files)
+
+            if path.is_file():
+                yield path
+            else:
+                yield from SkipPaths.filter_dirs(path, exclude_dirs, exclude_files)
+
 
 
 def export_paths() -> chain[str]:
     """Generate a chain of paths to be exported."""
-    return chain(AnsiblePaths, SecretsPaths, HomeOpsPaths)
+    ansible_files = [str(path) for path in AnsiblePaths if Path(path.value).is_file()]
+    return chain(ansible_files, SecretsPaths)
 
 
 class BasePaths(StrEnum):
@@ -269,3 +276,4 @@ class AnsiblePaths(StrEnum):
     DYNAMIC_SQLITE = f"{IHOME}/sqlite.yaml"
     DBS_SQLITE = f"{XdgPaths.XDG_STATE_HOME}/sqlite/dasbootstrap.db"
     INVENTORY_ALL = f"{IHOME}/inventory/"
+
