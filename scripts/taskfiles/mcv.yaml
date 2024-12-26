@@ -63,5 +63,5 @@ tasks:
     cmds:
       - task: install
       - task: chez:sync
-      - task: deploy:local
+      - task: deploy:sync
       # TODO: Pull secret from shared secure location

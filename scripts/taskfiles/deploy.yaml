@@ -3,7 +3,7 @@ version: "3"
 
 includes:
     validate:
-        taskfile: "./taskfiles/validate.yaml"
+        taskfile: "./validate.yaml"
 
 vars:
   HOMEOPS_DIR: "${XDG_DATA_HOME}/automation/home-ops"
@@ -38,8 +38,7 @@ tasks:
         mkdir -p "${XDG_BIN_HOME}"
       - |
         # Confirm that NODE_CONFIG_DIR is set and not empty
-        echo ${NODE_CONFIG_DIR}
-        if [ -n "${NODE_CONFIG_DIR+x}" ]; then
+        if [ -z "${NODE_CONFIG_DIR+x}" ]; then
           echo "NODE_CONFIG_DIR is not set. Please set it to the directory where the configuration files are stored."
           exit 2
         fi
@@ -175,7 +174,7 @@ tasks:
           done
         done
 
-  deploy:
+  sync:
     silent: true
     deps:
       - task: validate:internal:xdg

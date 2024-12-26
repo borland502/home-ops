@@ -15,13 +15,14 @@ tasks:
     run: once
     cmds:
       - "chezmoi init --source ${XDG_DATA_HOME}/automation/home-ops/scripts/dotfiles"
+      - "chezmoi data --source ${XDG_DATA_HOME}/automation/home-ops/scripts/dotfiles"
 
   apply:
     desc: "Apply changes"
     interactive: true
     run: once
     cmds:
-      - chezmoi apply
+      - chezmoi apply --source ${XDG_DATA_HOME}/automation/home-ops/scripts/dotfiles
 
   sync:
     desc: "Synchronize development dir with working chezmoi dir"

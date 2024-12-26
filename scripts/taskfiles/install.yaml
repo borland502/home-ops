@@ -1,19 +1,14 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
-env:
-  PYTHON_VERSION: "3.12"
-  NODE_VERSION: "22"
-
-
 includes:
-  nx:
-    taskfile: "./install/nx.yaml"
 
   validate:
     internal: true
     taskfile: "${XDG_CONFIG_HOME}/taskfiles/validate.yaml"
 
+env:
+  NODE_CONFIG_DIR: "${XDG_CONFIG_HOME}/home-ops"
 
 tasks:
   brew:
@@ -34,12 +29,79 @@ tasks:
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         fi
 
+  git:
+    desc: Ensure that git is installed
+    run: once
+    silent: true
+    internal: true
+    deps:
+      - task: brew
+    status:
+      - test $(command -v git)
+    cmds:
+      - brew install git
+
+  node:
+    desc: Ensure that node is installed
+    run: once
+    silent: true
+    internal: true
+    deps:
+      - task: brew
+    status:
+      - test $(command -v node)
+    cmds:
+      # Duplicates the nvm install command, but brew will sneak it in sooner or later for other tools
+      # and this suffices for the system node
+      - brew install node
+
+  python:
+    desc: Ensure that python is installed
+    run: once
+    silent: true
+    internal: true
+    deps:
+      - task: brew
+    status:
+      - test $(command -v python)
+    cmds:
+      - brew install python
+
+  pyenv:
+    desc: Ensure that pyenv is installed
+    run: once
+    silent: true
+    internal: true
+    deps:
+      - task: brew
+    status:
+      - test $(command -v pyenv)
+    cmds:
+      - brew install pyenv
+
+  nvm:
+    desc: Ensure that nvm is installed
+    run: once
+    silent: true
+    internal: true
+    deps:
+      - task: brew
+    status:
+      - test ${NVM_DIR+x}
+    cmds:
+      - brew install nvm
+
   tools:
     desc: Install all the necessary tools
     run: once
     deps:
       - task: brew
+      - task: git
+      - task: node
+      - task: python
+      - task: pyenv
+      - task: nvm
     cmds:
-      - task: nx:install
+      - echo "All tools are installed"
 
 

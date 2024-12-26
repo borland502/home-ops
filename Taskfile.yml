@@ -7,16 +7,10 @@ dotenv:
   - ${HOME}/.zshenv
 
 includes:
-  # Build taskfiles
-  scripts:
+
+  deploy:
     internal: true
-    taskfile: "./scripts/scripts.yaml"
-
-  #  mcv:
-  #    internal: true
-  #    taskfile: "./src/mcv.yaml"
-
-  # Ops taskfiles
+    taskfile: "./scripts/taskfiles/deploy.yaml"
   ansible:
     internal: true
     taskfile: "./scripts/taskfiles/ansible.yaml"
@@ -47,10 +41,10 @@ tasks:
     cmds:
       - npx nx show projects --affected
 
-  deploy:local:
-    desc: Deploy the applications locally
-    cmds:
-      - task: scripts:deploy
+#  deploy:local:
+#    desc: Deploy the applications locally
+#    cmds:
+#      - task: scripts:deploy
 
   #  init:
   #    desc: Initialize all the projects
@@ -65,6 +59,8 @@ tasks:
     desc: Lint all the projects
     interactive: true
     run: once
+    deps:
+      - task: install:node
     summary: |
       This task lints all the projects locally
     cmds:
@@ -130,29 +126,31 @@ tasks:
           CLI_ARGS: "create-lxc"
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
-  update:
-    desc: Update all the project libraries
-    run: once
-    summary: |
-      This task updates all the projects locally
-    cmds:
-      - npx nx migrate latest
-      - npx nx migrate @nxlv/python:latest
-      - npx npm-check-updates -u
-      - echo "Run 'npm install' to update the packages"
-    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+#  update:
+#    desc: Update all the project libraries
+#    run: once
+#    summary: |
+#      This task updates all the projects locally
+#    cmds:
+#      - npx nx migrate latest
+#      - npx nx migrate @nxlv/python:latest
+#      - npx npm-check-updates -u
+#      - echo "Run 'npm install' to update the packages"
+#    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   sync:
     desc: Sync all the projects
     run: once
     preconditions:
       - test $(command -v trapper-keeper)
+    deps:
+      - task: install:tools
     summary: |
       This task runs all synchronization tasks
     cmds:
       - task: chez:sync
       - task: unison:sync
-      - cmd: trapper-keeper pack --sync
+      - task: deploy:sync
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
   #
   #  mcv:pack:
