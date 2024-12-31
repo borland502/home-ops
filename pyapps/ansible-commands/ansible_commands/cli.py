@@ -5,6 +5,8 @@ from typer import Option
 from utils.paths import SecretsPaths
 from utils.ssh import HostKeysUtils
 
+from .ansible_commands import Actions
+
 app = typer.Typer()
 
 

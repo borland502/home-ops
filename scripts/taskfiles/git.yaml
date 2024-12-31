@@ -2,54 +2,40 @@
 version: "3"
 
 tasks:
+  internal:stash:home-ops:
+    desc: Stash the changes in the local repository
+    internal: false
+    silent: false
+    cmds:
+      - git stash --all
+    dir: ${XDG_DATA_HOME}/automation/home-ops
+
   internal:fetch:home-ops:
     desc: Fetch the latest changes from the remote repository
-    internal: true
-    silent: true
+    internal: false
+    silent: false
     cmds:
       - git fetch --all
     dir: ${XDG_DATA_HOME}/automation/home-ops
 
   internal:pull:home-ops:
     desc: Pull the latest changes from the remote repository
-    internal: true
-    silent: true
+    deps:
+      - task: internal:stash:home-ops
+      - task: internal:fetch:home-ops
+    internal: false
+    silent: false
     cmds:
-      - git sync -s
+      - git pull
+      - git stash pop
     dir: ${XDG_DATA_HOME}/automation/home-ops
 
-  internal:pull:dotfiles:
-    desc: Pull the latest changes from the remote repository
-    internal: true
-    silent: true
-    cmds:
-      - git sync -s
-    dir: ${XDG_DATA_HOME}/automation/home-ops/scripts/dotfiles
-
-  internal:pull:devcontainer:
-    desc: Pull the latest changes from the remote repository
-    internal: true
-    silent: true
-    cmds:
-      - git sync -s
-    dir: ${XDG_DATA_HOME}/automation/home-ops/scripts/devcontainer-features
-
-  internal:pull:ansible:collection:
-    desc: Pull the latest changes from the remote repository
-    internal: true
-    silent: true
-    cmds:
-      - git sync -s
-    dir: ${XDG_DATA_HOME}/automation/home-ops/scripts/ansible/collections
-
-  pull:
-    desc: Pull the latest changes from the remote repository
-    internal: true
-    silent: true
+  sync:
+    desc: Sync the local and remote repositories
     deps:
-      - task: internal:fetch:home-ops
-      - task: internal:pull:dotfiles
-      - task: internal:pull:devcontainer
-      - task: internal:pull:ansible:collection
-    cmds:
       - task: internal:pull:home-ops
+    run: once
+    silent: false
+    cmds:
+      - git status
+    dir: ${XDG_DATA_HOME}/automation/home-ops

@@ -7,12 +7,10 @@ dotenv:
   - ${HOME}/.zshenv
 
 includes:
-
   deploy:
     internal: true
     taskfile: "./scripts/taskfiles/deploy.yaml"
   ansible:
-    internal: true
     taskfile: "./scripts/taskfiles/ansible.yaml"
   chez:
     internal: true
@@ -25,12 +23,11 @@ includes:
     taskfile: "./scripts/taskfiles/validate.yaml"
   install:
     internal: true
-    taskfile: "./scripts/taskfiles/install.yaml"
+    taskfile: "./scripts/taskfiles/install/install.yaml"
   git:
     internal: true
     taskfile: "./scripts/taskfiles/git.yaml"
   unison:
-    internal: true
     taskfile: "./scripts/taskfiles/unison.yaml"
 
 tasks:
@@ -41,10 +38,10 @@ tasks:
     cmds:
       - npx nx show projects --affected
 
-#  deploy:local:
-#    desc: Deploy the applications locally
-#    cmds:
-#      - task: scripts:deploy
+  #  deploy:local:
+  #    desc: Deploy the applications locally
+  #    cmds:
+  #      - task: scripts:deploy
 
   #  init:
   #    desc: Initialize all the projects
@@ -72,6 +69,7 @@ tasks:
     run: once
     deps:
       - task: build
+      - task: install:pipx
     summary: |
       This task installs all npm/poetry packages
     cmds:
@@ -126,17 +124,17 @@ tasks:
           CLI_ARGS: "create-lxc"
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
-#  update:
-#    desc: Update all the project libraries
-#    run: once
-#    summary: |
-#      This task updates all the projects locally
-#    cmds:
-#      - npx nx migrate latest
-#      - npx nx migrate @nxlv/python:latest
-#      - npx npm-check-updates -u
-#      - echo "Run 'npm install' to update the packages"
-#    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+  #  update:
+  #    desc: Update all the project libraries
+  #    run: once
+  #    summary: |
+  #      This task updates all the projects locally
+  #    cmds:
+  #      - npx nx migrate latest
+  #      - npx nx migrate @nxlv/python:latest
+  #      - npx npm-check-updates -u
+  #      - echo "Run 'npm install' to update the packages"
+  #    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   sync:
     desc: Sync all the projects
@@ -148,8 +146,9 @@ tasks:
     summary: |
       This task runs all synchronization tasks
     cmds:
+      - task: git:sync
       - task: chez:sync
-      - task: unison:sync
+      # - task: unison:sync
       - task: deploy:sync
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
   #

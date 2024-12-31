@@ -122,8 +122,7 @@ class SkipPaths:
 
 def export_paths() -> chain[str]:
     """Generate a chain of paths to be exported."""
-    ansible_files = [str(path) for path in AnsiblePaths if Path(path.value).is_file()]
-    return chain(ansible_files, SecretsPaths)
+    return chain(SecretsPaths)
 
 
 class BasePaths(StrEnum):

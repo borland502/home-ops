@@ -20,29 +20,26 @@ tasks:
   proxy:
     desc: "Bi-directional sync with Unison for caddy/crowdsec/fenrus"
     preconditions:
-      - sh: test -f "${HOME}/.unison/proxy-config.prf"
-        msg: "Unison profile not found"
-      - sh: test -f "${HOME}/.unison/caddy.prf"
-        msg: "Unison profile not found"
-      - sh: test -f "${HOME}/.unison/fenrus.prf"
-        msg: "Unison profile not found"
+      - sh: test -f "${XDG_DATA_HOME}/unison/caddy.prf"
+        msg: "Caddy Unison profile not found"
+      - sh: test -f "${XDG_DATA_HOME}/unison/fenrus.prf"
+        msg: "Fenrus Unison profile not found"
     cmds:
-      - unison proxy-config
-      - unison caddy
-      - unison fenrus
+      - unison -ignorearchives caddy
+      - unison -ignorearchives fenrus
 
   sync:
     desc: "Sync all unison profiles"
-    preconditions:
-      - sh: test -f "${HOME}/.unison/default.prf"
-        msg: "Unison profile not found"
-
+    deps:
+      - proxy
+      - watchyourlan
+    cmd: echo "Synced all unison profiles"
 
   watchyourlan:
     desc: "Watch your LAN bi-directional sync with Unison"
     preconditions:
-      - sh: test -f "${HOME}/.unison/watchyourlan.prf"
-        msg: "Unison profile not found"
+      - sh: test -f "${XDG_DATA_HOME}/unison/watchyourlan.prf"
+        msg: "Watchyourlan Unison profile not found"
     cmds:
-      - unison watchyourlan
+      - unison -ignorearchives watchyourlan
 

@@ -2,9 +2,9 @@ version: "3"
 
 includes:
   validate:
-    taskfile: "./taskfiles/validate.yaml"
+    taskfile: "./scripts/taskfiles/validate.yaml"
   install:
-    taskfile: "./taskfiles/install.yaml"
+    taskfile: "./scripts/taskfiles/install.yaml"
 
 tasks:
     bandit:

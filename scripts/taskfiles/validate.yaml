@@ -8,15 +8,15 @@ version: "3"
 tasks:
   debug:
     desc: Print the environment variables
-    internal: true
+    internal: false
     cmds:
       - printenv
 
   internal:xdg:
     desc: Ensure the XDG directories are set
     run: once
-    internal: true
-    silent: true
+    internal: false
+    silent: false
     cmds:
       - source ${HOME}/.env
       - |
@@ -71,8 +71,8 @@ tasks:
   internal:scripts:
     desc: Ensure the scripts bin & lib directories are set
     run: once
-    internal: true
-    silent: true
+    internal: false
+    silent: false
     cmds:
       - |
         # Confirm that the scripts directory is set and not empty
@@ -95,8 +95,8 @@ tasks:
 #      - The ssh private key should have 600 permissions
 #      - The keepassxc database should have 600 permissions
 #    run: once
-#    internal: true
-#    silent: true
+#    internal: false
+#    silent: false
 #    cmds:
 #      - |
 #        # Confirm that the permissions are set correctly for the sensitive files

@@ -73,3 +73,6 @@ src/assets/*
 config.toml
 
 .angular
+home-ops.iml
+
+

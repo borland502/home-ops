@@ -110,7 +110,7 @@ class Actions:
                 "-m",
                 "import_role",
                 "-a",
-                "name=cielito.proxmox.create_lxc",
+                "name=maxhoesel.proxmox.lxc_container",
                 "-e",
                 self.app_path,
                 *VARS,

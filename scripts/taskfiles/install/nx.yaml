@@ -6,6 +6,10 @@ includes:
     internal: true
     taskfile: "../validate.yaml"
 
+  install:
+    internal: true
+    taskfile: "./install.yaml"
+
 tasks:
 
 #  install-plugins:
@@ -29,6 +33,7 @@ tasks:
         - NODE_VERSION
     deps:
       - task: validate:internal:xdg
+      - task: install:nvm
     cmds:
       # repeated here in case local node version is different
       - npm install

@@ -29,7 +29,7 @@
       }
     },
     "install-bin": {
-      "executor": "nx:run-commands",
+      "executor": "@nxlv/python:run-commands",
       "options": {
         "command": "pipx install . --force",
         "cwd": "pyapps/ansible-commands"
