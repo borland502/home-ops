@@ -56,6 +56,8 @@ coverage
 **/coverage
 __pycache__
 
+**/*egg-info/*
+
 # Don't check in code available in the git submodule
 .devcontainer/*
 !.devcontainer/devcontainer.json
