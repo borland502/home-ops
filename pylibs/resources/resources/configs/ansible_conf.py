@@ -6,7 +6,7 @@ This module defines the configuration self for Trapper Keeper.
 from simple_toml_settings import TOMLSettings
 
 from resources.configs.baseconf import BaseConfig
-from utils.paths import XdgPaths
+from homeops_utils.paths import XdgPaths
 
 
 class AnsibleCommandSettings(BaseConfig):

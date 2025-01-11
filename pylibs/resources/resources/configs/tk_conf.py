@@ -10,7 +10,7 @@ from uuid import UUID
 
 from simple_toml_settings import TOMLSettings
 
-from utils.paths import (
+from homeops_utils.paths import (
     SecretsPaths,
     export_paths,
 )

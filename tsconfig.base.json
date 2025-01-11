@@ -28,11 +28,14 @@
       "@technohouser/shared": [
         "libs/shared/src/index.mts"
       ],
-      "@technohouser/watchyourlan-api-lib": [
-        "libs/watchyourlan-api/src/index.mts"
+      "@technohouser/scripts": [
+        "scripts/zx/main.mts"
       ]
     }
   },
+  "files": [
+    "config/prod.toml"
+  ],
   "exclude": [
     "node_modules",
     "tmp",

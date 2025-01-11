@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-from utils.paths import AnsiblePaths
+from homeops_utils.paths import AnsiblePaths
 
 
 # def find_yaml_files_in_dir(path: str) -> list[str]:

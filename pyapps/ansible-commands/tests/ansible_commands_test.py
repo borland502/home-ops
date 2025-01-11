@@ -3,7 +3,7 @@
 import unittest
 from pathlib import Path
 
-from utils.paths import AnsiblePaths
+from homeops_utils.paths import AnsiblePaths
 
 from ansible_commands.ansible_commands import INVENTORY, VARS
 

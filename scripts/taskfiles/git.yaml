@@ -19,6 +19,7 @@ tasks:
     dir: ${XDG_DATA_HOME}/automation/home-ops
 
   internal:pull:home-ops:
+    run: once
     desc: Pull the latest changes from the remote repository
     deps:
       - task: internal:stash:home-ops

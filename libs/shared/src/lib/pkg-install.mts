@@ -6,8 +6,6 @@ import {getAllData} from "systeminformation";
 import {$, fs, ProcessOutput, question, tmpfile, which} from "zx";
 import {initShell, isNil} from "../index.mjs";
 
-await initShell($);
-
 const DISTRO = {
   arch: "arch",
   pengwin: "pengwin",

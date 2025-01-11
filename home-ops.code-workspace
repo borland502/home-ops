@@ -22,6 +22,10 @@
 	"settings": {
 		"cSpell.words": [
 			"smul"
+		],
+		"python.analysis.extraPaths": [
+			"pylibs",
+			"bases"
 		]
 	}
 }

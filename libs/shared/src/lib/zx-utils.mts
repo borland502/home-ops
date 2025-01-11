@@ -2,6 +2,8 @@ import * as logger from "./log.mjs";
 import { isString } from "radash";
 import * as zx from "zx";
 import config from "config";
+import * as process from "node:process";
+import {exit} from "node:process";
 
 const whichOptions = {
   path: "/bin:/usr/bin:/usr/local/bin",
@@ -29,7 +31,7 @@ export async function initShell($$: zx.Shell & zx.Options) {
 
 export * from "zx";
 
-export async function detectShell(): Promise<string | boolean> {
+export async function detectShell(): Promise<string | true> {
   const shells = await Promise.all([
     zx.which("zsh", whichOptions),
     zx.which("bash", whichOptions),
@@ -44,7 +46,7 @@ export async function detectShell(): Promise<string | boolean> {
     }
   }
 
-  return false;
+  exit(2)
 }
 
 /**

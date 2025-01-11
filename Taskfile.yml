@@ -8,7 +8,6 @@ dotenv:
 
 includes:
   deploy:
-    internal: true
     taskfile: "./scripts/taskfiles/deploy.yaml"
   ansible:
     taskfile: "./scripts/taskfiles/ansible.yaml"
@@ -148,8 +147,10 @@ tasks:
     cmds:
       - task: git:sync
       - task: chez:sync
-      # - task: unison:sync
       - task: deploy:sync
+      - task: install:sync
+      - task: ansible:sync
+      - task: unison:sync
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
   #
   #  mcv:pack:
@@ -245,7 +246,7 @@ tasks:
     cmds:
       - >-
         npx nx generate @nxlv/python:poetry-project {{.PROJ_NAME}} --projectType application --packageName {{.PROJ_NAME}}
-        --directory pyapps/{{.PROJ_NAME}} --moduleName {{.MODULE_NAME}}  --pyprojectPythonDependency '>=3.12'
+        --directory pyapps/{{.PROJ_NAME}} --moduleName {{.MODULE_NAME}}  --pyprojectPythonDependency '>=3.11,<4.0'
         --linter ruff --projectNameAndRootFormat as-provided
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
     vars:
@@ -261,7 +262,7 @@ tasks:
     cmds:
       - >-
         npx nx generate @nxlv/python:poetry-project {{.PROJ_NAME}} --projectType library --packageName {{.PROJ_NAME}}
-        --directory pylibs/{{.PROJ_NAME}} --moduleName {{.MODULE_NAME}}  --pyprojectPythonDependency '>=3.12'
+        --directory pylibs/{{.PROJ_NAME}} --moduleName {{.MODULE_NAME}}  --pyprojectPythonDependency '>=3.11,<4.0'
         --linter ruff --projectNameAndRootFormat as-provided
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
     vars:
