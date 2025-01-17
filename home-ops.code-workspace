@@ -26,6 +26,7 @@
 		"python.analysis.extraPaths": [
 			"pylibs",
 			"bases"
-		]
+		],
+		"java.compile.nullAnalysis.mode": "automatic"
 	}
 }

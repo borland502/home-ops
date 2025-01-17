@@ -1,0 +1,34 @@
+{
+  "catalogs": {},
+  "aliases": {},
+  "templates": {
+    "exec": {
+      "file-refs": {
+        "{basename}Runner.java": "templates/ExecRunner.java.qute"
+      },
+      "description": "A template for a script using ProcessBuilder to execute a command",
+      "properties": {
+        "basename": {
+          "description": "The base name of the script",
+          "default": "Echo"
+        },
+        "tag": {
+          "description": "The tag to use variants of the same command",
+          "default": "echoHello"
+        },
+        "command": {
+          "description": "The command to execute",
+          "default": "echo"
+        },
+        "commandArgs": {
+          "description": "The arguments to pass to the command",
+          "default": "\"Hello, World!\""
+        },
+        "workingDir": {
+          "description": "The working directory to execute the command in",
+          "default": "System.getProperty(\"user.dir\")"
+        }
+      }
+    }
+  }
+}

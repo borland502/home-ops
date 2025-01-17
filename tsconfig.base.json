@@ -10,6 +10,8 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "emitDeclarationOnly": true,
+    "declarationDir": "dist",
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "noFallthroughCasesInSwitch": true,
@@ -27,9 +29,6 @@
     "paths": {
       "@technohouser/shared": [
         "libs/shared/src/index.mts"
-      ],
-      "@technohouser/scripts": [
-        "scripts/zx/main.mts"
       ]
     }
   },

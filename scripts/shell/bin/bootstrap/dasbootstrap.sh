@@ -154,6 +154,38 @@ if ! [[ -d ${HO_HOME} ]]; then
     exit 2
   )
   git clone --single-branch main "${GH_PROJ}"
+  mkdir -p "${HO_HOME}"
+  mv "${GH_ROOT}" "${HO_HOME}"
 else
-  git pull --autostash --force "${DBS_SCROOT}"
+  git pull --autostash --force "${HO_HOME}"
 fi
+
+cd ${HO_HOME} || (
+  echo "Could not cd into ${HO_HOME}"
+  exit 2
+)
+
+# Wrapper may be too out of date or existing home-ops may be too out of date
+if ! [[ -d ${HO_HOME}/scripts/shell/bin/jbang ]]; then
+  curl -Ls https://sh.jbang.dev | bash -s - app setup
+  chmod +x ${HO_HOME}/scripts/shell/bin/jbang
+  cd ${HO_HOME}/scripts/shell/bin || (
+    echo "Could not cd into ${HO_HOME}/scripts/shell/bin"
+    exit 2
+  )
+
+  jbang wrapper install
+
+  cd ${HO_HOME} || (
+    echo "Could not cd into ${HO_HOME}"
+    exit 2
+  )
+
+else
+  ${HO_HOME}/scripts/shell/bin/jbang jbang update
+fi
+
+${HO_HOME}/scripts/shell/bin/jbang jdk install 21
+
+echo "Bootstrap complete. Please run the following command to continue:"
+echo "sudo su - <New User>"

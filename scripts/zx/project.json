@@ -31,11 +31,11 @@
         "platform": "node",
         "outputPath": "dist",
         "format": [
-          "cjs"
+          "esm"
         ],
         "bundle": true,
         "thirdParty": true,
-        "main": "scripts/zx/main.mts",
+        "main": "scripts/zx/main.mjs",
         "tsConfig": "scripts/zx/tsconfig.app.json",
         "assets": [
           "scripts/zx/assets"
@@ -44,7 +44,7 @@
         "esbuildOptions": {
           "sourcemap": true,
           "outExtension": {
-            ".js": ".cjs"
+            ".js": ".mjs"
           }
         },
         "configurations": {
@@ -54,7 +54,7 @@
             "esbuildOptions": {
               "sourcemap": false,
               "outExtension": {
-                ".js": ".cjs"
+                ".js": ".mjs"
               }
             }
           }

@@ -170,21 +170,21 @@ tasks:
     cmds:
       - cmd: |
           # Compile all TypeScript files in the HOMEOPS_DIR/scripts/zx directory to CJS files
-          for file in $(find "{{.HOMEOPS_DIR}}/scripts/zx" -name "*.mts"); do
-            npx tsc --outDir "{{.HOMEOPS_DIR}}/scripts/dist" --module commonjs --target es2020 "$file"
+          for file in $(find "scripts/zx" -name "*.mts"); do
+            npx esbuild --bundle --platform=node --tsconfig=tsconfig.base.json --format=cjs $file
           done
       - cmd: >-
-          npx tsx --experimental-sea-config "{{.HOMEOPS_DIR}}/scripts/zx/sea-config.json"
-          > "{{.HOMEOPS_DIR}}/dist/sea-prep.blob"
-      - cmd: cp $(command -v node) "{{.HOMEOPS_DIR}}/scripts/dist/home-ops"
+          npx tsx --experimental-sea-config "scripts/zx/sea-config.json"
+          > "dist/sea-prep.blob"
+      - cmd: cp $(command -v node) "dist/home-ops"
       - cmd: |
           if [[ $(uname) == "Darwin" ]]; then
-            codesign --remove-signature "{{.HOMEOPS_DIR}}/scripts/dist/home-ops"
-            npx postject "{{.HOMEOPS_DIR}}/scripts/dist/home-ops" NODE_SEA_BLOB \
-            "{{.HOMEOPS_DIR}}/scripts/dist/sea-prep.blob" --macho-segment-name NODE_SEA \
+            codesign --remove-signature "dist/home-ops"
+            npx postject "dist/home-ops" NODE_SEA_BLOB \
+            "dist/sea-prep.blob" --macho-segment-name NODE_SEA \
             --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
           else
-            npx postject "{{.HOMEOPS_DIR}}/scripts/dist/home-ops" NODE_SEA_BLOB "{{.HOMEOPS_DIR}}/scripts/dist/sea-prep.blob" --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8
+            npx postject "scripts/dist/home-ops" NODE_SEA_BLOB "scripts/dist/sea-prep.blob" --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8
           fi
 
   #  internal:deploy:zx:

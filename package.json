@@ -25,6 +25,7 @@
     "@nx/web": "20.3.1",
     "@nx/workspace": "20.3.1",
     "@nxlv/python": "20.0.1",
+    "@nxrocks/nx-spring-boot": "^10.2.6",
     "@playwright/test": "^1.49.1",
     "@qiwi/deep-proxy": "^3.0.0",
     "@types/config": "^3.3.5",
@@ -45,9 +46,6 @@
     "nx-stylelint": "^18.0.0",
     "tsx": "^4.19.2"
   },
-  "files": [
-    "config/prod.toml"
-  ],
   "dependencies": {
     "config": "^3.3.12",
     "radash": "^12.1.0",

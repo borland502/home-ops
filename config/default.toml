@@ -1,39 +1,25 @@
 [colors]
-  base0 = "#131313"
-  base1 = "#191919"
-  base2 = "#222222"
-  base3 = "#363537"
-  base4 = "#525053"
-  base5 = "#69676c"
-  base6 = "#8b888f"
-  base7 = "#bab6c0"
-  base8 = "#f7f1ff"
-  base8x0c = "#2b2b2b"
-  blue = "#5ad4e6"
-  green = "#7bd88f"
-  orange = "#fd9353"
-  purple = "#948ae3"
-  red = "#fc618d"
-  yellow = "#fcd566"
-
-[express]
-  apiBase = "/api"
-  assetsFolder = "assets"
-  engine = "pug"
-  host = "localhost"
-  port = 3000
-  views = "views"
-
-[express.headers]
-  origin = "*"
+    base0 = "#131313"
+    base1 = "#191919"
+    base2 = "#222222"
+    base3 = "#363537"
+    base4 = "#525053"
+    base5 = "#69676c"
+    base6 = "#8b888f"
+    base7 = "#bab6c0"
+    base8 = "#f7f1ff"
+    base8x0c = "#2b2b2b"
+    blue = "#5ad4e6"
+    green = "#7bd88f"
+    orange = "#fd9353"
+    purple = "#948ae3"
+    red = "#fc618d"
+    yellow = "#fcd566"
 
 [ghcli]
-  org = "technohouser"
-  limit = "500"
-  rootdir = "."
-
-[nx]
-  bundler = "esbuild"
+    limit = "500"
+    org = "technohouser"
+    rootdir = "."
 
 [os]
 
@@ -43,26 +29,16 @@
 
 [os.windows]
 
-[watchyourlan.api]
-  apiBase = "/api"
-  host = "localhost"
-  port = 3001
-
 [watchyourlan.db]
-  dbFileName = "/watchyourlan/db.sqlite"
-  dialect = "sqlite"
+    dbFileName = "/watchyourlan/db.sqlite"
+    dialect = "sqlite"
 
 [zx]
-  verbose = true
-  nothrow = true
-  shell = "zsh"
-  pkgManager = "npm"
-  installGlobals = [
-    "tsx",
-    "ts-node",
-    "typescript",
-    "nx"
-  ]
+    installGlobals = ["tsx", "ts-node", "typescript", "nx"]
+    nothrow = true
+    pkgManager = "npm"
+    shell = "zsh"
+    verbose = true
 
 [zx.minimist.opts]
-  stopEarly = true
+    stopEarly = true
