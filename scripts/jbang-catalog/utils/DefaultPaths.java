@@ -31,8 +31,8 @@ public class DefaultPaths {
   }
 
   public enum HomeOpsPaths {
-    HOME_OPS_CONFIG_PATH(Path.of(System.getProperty("user.home"), ".home_ops", "config")),
-    HOME_OPS_DATA_PATH(Path.of(System.getProperty("user.home"), ".home_ops", "data"));
+    HOME_OPS_CONFIG_PATH(Path.of(System.getenv("XDG_CONFIG_HOME"), "home-ops")),
+    HOME_OPS_DATA_PATH(Path.of(System.getenv("XDG_DATA_HOME"), "automation", "home-ops")),;
 
     private final Path path;
 

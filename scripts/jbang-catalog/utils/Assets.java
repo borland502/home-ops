@@ -27,12 +27,21 @@ public class Assets {
   public enum Config {
     HOME_OPS;
 
-    private FileConfig config;
+    private FileConfig tomlConfig;
+    private FileConfig jsonConfig;
     private ConfigSpec spec;
 
     Config() {
-      config = FileConfig
-          .builder(Paths.get(getenv("XDG_CONFIG_HOME"), "home-ops", "config.toml"))
+      tomlConfig = FileConfig
+          .builder(Paths.get(getenv("XDG_CONFIG_HOME"), "home-ops", "default.toml"))
+          .autoreload()
+          .onFileNotFound(FileNotFoundAction.CREATE_EMPTY)
+          .preserveInsertionOrder()
+          .sync()
+          .build();
+
+      jsonConfig = FileConfig
+          .builder(Paths.get(getenv("XDG_CONFIG_HOME"), "home-ops", "inventory.json"))
           .autoreload()
           .onFileNotFound(FileNotFoundAction.CREATE_EMPTY)
           .preserveInsertionOrder()
@@ -40,32 +49,32 @@ public class Assets {
           .build();
     }
 
-    public FileConfig getConfig() {
-      config.set("colors.base0", "#131313");
-      config.set("colors.base1", "#191919");
-      config.set("colors.base2", "#222222");
-      config.set("colors.base3", "#363537");
-      config.set("colors.base4", "#525053");
-      config.set("colors.base5", "#69676c");
-      config.set("colors.base6", "#8b888f");
-      config.set("colors.base7", "#bab6c0");
-      config.set("colors.base8", "#f7f1ff");
-      config.set("colors.base8x0c", "#2b2b2b");
-      config.set("colors.blue", "#5ad4e6");
-      config.set("colors.green", "#7bd88f");
-      config.set("colors.orange", "#fd9353");
-      config.set("colors.purple", "#948ae3");
-      config.set("colors.red", "#fc618d");
-      config.set("colors.yellow", "#fcd566");
+    public FileConfig getTomlConfig() {
+      tomlConfig.set("colors.base0", "#131313");
+      tomlConfig.set("colors.base1", "#191919");
+      tomlConfig.set("colors.base2", "#222222");
+      tomlConfig.set("colors.base3", "#363537");
+      tomlConfig.set("colors.base4", "#525053");
+      tomlConfig.set("colors.base5", "#69676c");
+      tomlConfig.set("colors.base6", "#8b888f");
+      tomlConfig.set("colors.base7", "#bab6c0");
+      tomlConfig.set("colors.base8", "#f7f1ff");
+      tomlConfig.set("colors.base8x0c", "#2b2b2b");
+      tomlConfig.set("colors.blue", "#5ad4e6");
+      tomlConfig.set("colors.green", "#7bd88f");
+      tomlConfig.set("colors.orange", "#fd9353");
+      tomlConfig.set("colors.purple", "#948ae3");
+      tomlConfig.set("colors.red", "#fc618d");
+      tomlConfig.set("colors.yellow", "#fcd566");
 
-      config.set("zx.installGlobals", ImmutableList.of("tsx", "ts-node", "typescript", "nx"));
-      config.set("zx.nothrow", true);
-      config.set("zx.pkgManager", "npm");
-      config.set("zx.shell", "zsh");
-      config.set("zx.verbose", true);
-      config.set("zx.minimist.opts.stopEarly", true);
+      tomlConfig.set("zx.installGlobals", ImmutableList.of("tsx", "ts-node", "typescript", "nx"));
+      tomlConfig.set("zx.nothrow", true);
+      tomlConfig.set("zx.pkgManager", "npm");
+      tomlConfig.set("zx.shell", "zsh");
+      tomlConfig.set("zx.verbose", true);
+      tomlConfig.set("zx.minimist.opts.stopEarly", true);
 
-      return config;
+      return tomlConfig;
     }
   }
 

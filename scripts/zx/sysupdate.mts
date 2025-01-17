@@ -14,17 +14,17 @@ async function main() {
 
     await initShell($);
 
-    async function installAptPackages() {
-        const aptPackages = await $`chezmoi data --format json | jq -rce '.apt.packages[]'`.lines()
-            .catch((reason: unknown) => {
-                error(`Error: ${reason}`);
-                return [] as string[];
-            });
+    // async function installAptPackages() {
+    //     const aptPackages = await $`chezmoi data --format json | jq -rce '.apt.packages[]'`.lines()
+    //         .catch((reason: unknown) => {
+    //             error(`Error: ${reason}`);
+    //             return [] as string[];
+    //         });
 
-        for (const pkg of aptPackages) {
-            await $`sudo apt install -y ${pkg}`;
-        }
-    }
+    //     for (const pkg of aptPackages) {
+    //         await $`sudo apt install -y ${pkg}`;
+    //     }
+    // }
 
     async function installPipxPackages() {
         const pipxPackages = await $`chezmoi data --format json | jq -rce '.pipx.packages[]'`.lines()
@@ -94,13 +94,13 @@ async function main() {
         }
     }
 
-    await which("apt").then(async () => {
-        await installAptPackages();
+    // await which("apt").then(async () => {
+    //     await installAptPackages();
 
-        await $`sudo apt update && sudo apt dist-upgrade -y`.catch((reason: unknown) => {
-            error(`Error: ${reason}`);
-        });
-    });
+    //     await $`sudo apt update && sudo apt dist-upgrade -y`.catch((reason: unknown) => {
+    //         error(`Error: ${reason}`);
+    //     });
+    // });
 
     await $`brew update`.then(() => {
         $`brew upgrade`;

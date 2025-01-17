@@ -3,6 +3,8 @@
 //DEPS org.projectlombok:lombok:1.18.36
 //DEPS ch.qos.logback:logback-classic:1.5.16
 //DEPS com.electronwill.night-config:toml:3.8.1
+//DEPS com.electronwill.night-config:core:3.8.1
+//DEPS com.electronwill.night-config:json:3.8.1
 //DEPS com.google.guava:guava:30.1-jre
 //DEPS org.eclipse.jgit:org.eclipse.jgit:7.1.0.202411261347-r
 //DEPS info.picocli:picocli:4.6.3
@@ -21,6 +23,7 @@ import java.util.concurrent.Callable;
 import org.eclipse.jgit.api.Git;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
+import com.electronwill.nightconfig.json.JsonFormat;
 
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
@@ -28,6 +31,7 @@ import picocli.CommandLine.Command;
 import utils.Assets;
 import utils.DefaultPaths;
 import utils.DefaultPaths.HomeOpsPaths;
+import utils.Exec;
 
 /**
  *
@@ -36,7 +40,7 @@ import utils.DefaultPaths.HomeOpsPaths;
 @Command(name = "BootstrapRunner", mixinStandardHelpOptions = true, version = "BootstrapRunner 0.1", description = "BootstrapRunner made with jbang")
 class BootstrapRunner implements Callable<Integer> {
 
-  private static FileConfig config = Assets.Config.HOME_OPS.getConfig();
+  private static FileConfig config = Assets.Config.HOME_OPS.getTomlConfig();
 
   static {
     // TODO: Factor out backup actions
@@ -82,6 +86,45 @@ class BootstrapRunner implements Callable<Integer> {
       return 0;
     }
 
+    // TODO: Abstract out toml loading
+    // Sync with default files from default config
+    FileConfig defaultConfig = FileConfig
+        .of(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().resolve("config/default.toml").toFile());
+    defaultConfig.load();
+    config.addAll(defaultConfig.unmodifiable());
+
+    // Chezmoi files are canonical sources of truth so replace any values that
+    // match
+    FileConfig envConfig = FileConfig
+        .of(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().resolve("scripts/dotfiles/.chezmoidata/env.toml").toFile());
+    envConfig.load();
+    config.putAll(envConfig.unmodifiable());
+
+    FileConfig inventoryConfig = FileConfig
+        .of(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().resolve("scripts/dotfiles/.chezmoidata/inventory.toml").toFile());
+    inventoryConfig.load();
+    config.putAll(inventoryConfig.unmodifiable());
+
+    FileConfig packagesConfig = FileConfig
+        .of(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().resolve("scripts/dotfiles/.chezmoidata/packages.toml").toFile());
+    packagesConfig.load();
+    config.putAll(packagesConfig.unmodifiable());
+
+    // Write system information to inventory.json using systeminformation npm library
+    Exec.buildProcess("npx", "systeminformation").inheritIO()
+        .directory(HomeOpsPaths.HOME_OPS_CONFIG_PATH.getPath().toFile())
+        .redirectOutput(HomeOpsPaths.HOME_OPS_CONFIG_PATH.getPath().resolve("inventory.json").toFile()).start()
+        .waitFor();
+
+    // JSON to TOML conversion
+
+    // FileConfig systemInfoConfig = FileConfig
+    // .builder(HomeOpsPaths.HOME_OPS_CONFIG_PATH.getPath().resolve("inventory.json"),
+    // JsonFormat.fancyInstance())
+    // .build();
+    // systemInfoConfig.load();
+    // config.putAll(systemInfoConfig.unmodifiable());
+
     // Sync with chezmoi TOML files in the dotfiles directory
 
     // // Check if pyenv is installed and install if not
@@ -108,6 +151,8 @@ class BootstrapRunner implements Callable<Integer> {
     // } else {
     // log.info("chezmoi is already installed.");
     // }
+
+    config.save();
 
     return 1;
   }
