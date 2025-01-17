@@ -92,15 +92,10 @@ function create_sudo_user() {
 }
 
 ensurePackageInstalled build-essential
-ensurePackageInstalled "linux-headers-$(uname -r)"
 ensurePackageInstalled git
 ensurePackageInstalled curl
 ensurePackageInstalled rsync
-ensurePackageInstalled unison
-ensurePackageInstalled gh
-ensurePackageInstalled python3-full
 ensurePackageInstalled npm
-ensurePackageInstalled pipx
 
 if [[ $USER == "root" ]]; then
   read -rp "Enter the username to create or default to ansible: " _user
@@ -113,79 +108,20 @@ if [[ $USER == "root" ]]; then
   create_sudo_user "${_user}"
 fi
 
-# Essential constants
-# XDG Spec
-set -o allexport
-XDG_CONFIG_HOME="${HOME}/.config"
-# shellcheck disable=SC2034
-XDG_CACHE_HOME="${HOME}/.cache"
-XDG_DATA_HOME="${HOME}/.local/share"
-# shellcheck disable=SC2034
-XDG_STATE_HOME="${HOME}/.local/state"
-# XDG Spec adjacent
-XDG_BIN_HOME="${HOME}/.local/bin"
-XDG_LIB_HOME="${HOME}/.local/lib"
+# Install jbang and export home location
+curl -Ls https://sh.jbang.dev | bash -s - app setup
+export PATH="$HOME/.jbang/bin:$PATH"
+export JBANG_HOME="$HOME/.jbang"
 
-# Home Ops Home
-HO_HOME="${XDG_DATA_HOME}/automation/home-ops"
+# copy the exports into ~/.zshrc
+echo "export PATH=\"$HOME/.jbang/bin:\$PATH\"" >>"$HOME/.zshrc"
+echo "export JBANG_HOME=\"$HOME/.jbang\"" >>"$HOME/.zshrc"
+jbang jdk install 21
+jbang jdk default 21
+jbang catalog add BootstrapRunner@borland502/home-ops/scripts/jbang-catalog
 
-# shellcheck disable=SC2034
-HOMEBREW_NO_INSTALL_CLEANUP=true
-# shellcheck disable=SC2034
-HOMEBREW_NO_ANALYTICS=1
-CAN_USE_SUDO=1
-# shellcheck disable=SC2034
-HAS_ALLOW_UNSAFE=y
-
-# Program versions
-PYTHON=3.12
-set +o allexport
-
-mkdir -p "${XDG_CONFIG_HOME}"
-mkdir -p "${XDG_CACHE_HOME}"
-mkdir -p "${XDG_DATA_HOME}"
-mkdir -p "${XDG_STATE_HOME}"
-mkdir -p "${XDG_BIN_HOME}"
-mkdir -p "${XDG_LIB_HOME}"
-
-if ! [[ -d ${HO_HOME} ]]; then
-  cd "${HO_ROOT}" || (
-    echo "Could not cd into ${HO_ROOT}"
-    exit 2
-  )
-  git clone --single-branch main "${GH_PROJ}"
-  mkdir -p "${HO_HOME}"
-  mv "${GH_ROOT}" "${HO_HOME}"
-else
-  git pull --autostash --force "${HO_HOME}"
-fi
-
-cd ${HO_HOME} || (
-  echo "Could not cd into ${HO_HOME}"
-  exit 2
-)
-
-# Wrapper may be too out of date or existing home-ops may be too out of date
-if ! [[ -d ${HO_HOME}/scripts/shell/bin/jbang ]]; then
-  curl -Ls https://sh.jbang.dev | bash -s - app setup
-  chmod +x ${HO_HOME}/scripts/shell/bin/jbang
-  cd ${HO_HOME}/scripts/shell/bin || (
-    echo "Could not cd into ${HO_HOME}/scripts/shell/bin"
-    exit 2
-  )
-
-  jbang wrapper install
-
-  cd ${HO_HOME} || (
-    echo "Could not cd into ${HO_HOME}"
-    exit 2
-  )
-
-else
-  ${HO_HOME}/scripts/shell/bin/jbang jbang update
-fi
-
-${HO_HOME}/scripts/shell/bin/jbang jdk install 21
+# Handoff to jbang bootstrap script
+jbang home-ops/scripts/jbang-catalog
 
 echo "Bootstrap complete. Please run the following command to continue:"
 echo "sudo su - <New User>"

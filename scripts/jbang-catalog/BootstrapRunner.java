@@ -39,6 +39,7 @@ class BootstrapRunner implements Callable<Integer> {
   private static FileConfig config = Assets.Config.HOME_OPS.getConfig();
 
   static {
+    // TODO: Factor out backup actions
     try (FileConfig backupConfig = FileConfig.of(createTempFile("homeOps", ".toml", new FileAttribute<?>[0]))) {
       config.load();
       backupConfig.putAll(config.unmodifiable());
@@ -81,7 +82,32 @@ class BootstrapRunner implements Callable<Integer> {
       return 0;
     }
 
-    // Sync with optional TOML files
+    // Sync with chezmoi TOML files in the dotfiles directory
+
+    // // Check if pyenv is installed and install if not
+    // if (!isCommandAvailable("pyenv")) {
+    // log.info("pyenv is not installed. Installing pyenv...");
+    // Exec.runCommand("curl https://pyenv.run | bash");
+    // } else {
+    // log.info("pyenv is already installed.");
+    // }
+
+    // // Check if nvm is installed and install if not
+    // if (!isCommandAvailable("nvm")) {
+    // log.info("nvm is not installed. Installing nvm...");
+    // Exec.runCommand("curl -o-
+    // https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash");
+    // } else {
+    // log.info("nvm is already installed.");
+    // }
+
+    // // Check if chezmoi is installed and install if not
+    // if (!isCommandAvailable("chezmoi")) {
+    // log.info("chezmoi is not installed. Installing chezmoi...");
+    // Exec.runCommand("sh -c \"$(curl -fsLS get.chezmoi.io)\"");
+    // } else {
+    // log.info("chezmoi is already installed.");
+    // }
 
     return 1;
   }

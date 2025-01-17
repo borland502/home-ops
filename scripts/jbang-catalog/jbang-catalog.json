@@ -1,6 +1,12 @@
 {
   "catalogs": {},
-  "aliases": {},
+  "aliases": {
+    "dasbootstrap": {
+      "description": "A script to install home-ops and dotfiles from this project",
+      "script-ref": "https://github.com/borland502/home-ops/blob/feature/jbang-scripts/scripts/jbang-catalog/BootstrapRunner.java",
+      "debug": "true"
+    }
+  },
   "templates": {
     "exec": {
       "file-refs": {
