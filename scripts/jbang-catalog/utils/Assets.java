@@ -1,22 +1,14 @@
 package utils;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
-import com.electronwill.nightconfig.core.ConfigFormat;
-import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.core.file.FileNotFoundAction;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.graph.ImmutableNetwork;
 
 import lombok.extern.slf4j.Slf4j;
 
-import static java.lang.System.getenv;
-import static java.nio.file.Files.createFile;
+import static java.lang.System.getProperty;
 
 /**
  * Assets -- a resource loading utility class
@@ -28,20 +20,10 @@ public class Assets {
     HOME_OPS;
 
     private FileConfig tomlConfig;
-    private FileConfig jsonConfig;
-    private ConfigSpec spec;
 
     Config() {
       tomlConfig = FileConfig
-          .builder(Paths.get(getenv("XDG_CONFIG_HOME"), "home-ops", "default.toml"))
-          .autoreload()
-          .onFileNotFound(FileNotFoundAction.CREATE_EMPTY)
-          .preserveInsertionOrder()
-          .sync()
-          .build();
-
-      jsonConfig = FileConfig
-          .builder(Paths.get(getenv("XDG_CONFIG_HOME"), "home-ops", "inventory.json"))
+          .builder(Paths.get(getProperty("user.home"), ".config", "home-ops", "default.toml"))
           .autoreload()
           .onFileNotFound(FileNotFoundAction.CREATE_EMPTY)
           .preserveInsertionOrder()

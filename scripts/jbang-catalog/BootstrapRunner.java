@@ -3,8 +3,6 @@
 //DEPS org.projectlombok:lombok:1.18.36
 //DEPS ch.qos.logback:logback-classic:1.5.16
 //DEPS com.electronwill.night-config:toml:3.8.1
-//DEPS com.electronwill.night-config:core:3.8.1
-//DEPS com.electronwill.night-config:json:3.8.1
 //DEPS com.google.guava:guava:30.1-jre
 //DEPS org.eclipse.jgit:org.eclipse.jgit:7.1.0.202411261347-r
 //DEPS info.picocli:picocli:4.6.3
@@ -23,7 +21,6 @@ import java.util.concurrent.Callable;
 import org.eclipse.jgit.api.Git;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
-import com.electronwill.nightconfig.json.JsonFormat;
 
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
@@ -110,7 +107,8 @@ class BootstrapRunner implements Callable<Integer> {
     packagesConfig.load();
     config.putAll(packagesConfig.unmodifiable());
 
-    // Write system information to inventory.json using systeminformation npm library
+    // Write system information to inventory.json using systeminformation npm
+    // library
     Exec.buildProcess("npx", "systeminformation").inheritIO()
         .directory(HomeOpsPaths.HOME_OPS_CONFIG_PATH.getPath().toFile())
         .redirectOutput(HomeOpsPaths.HOME_OPS_CONFIG_PATH.getPath().resolve("inventory.json").toFile()).start()
