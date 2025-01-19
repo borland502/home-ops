@@ -12,7 +12,6 @@ includes:
   ansible:
     taskfile: "./scripts/taskfiles/ansible.yaml"
   chez:
-    internal: true
     taskfile: "./scripts/taskfiles/chezmoi.yaml"
   kp:
     internal: true

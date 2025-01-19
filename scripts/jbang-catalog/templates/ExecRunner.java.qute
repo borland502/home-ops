@@ -4,11 +4,11 @@
 //DEPS ch.qos.logback:logback-classic:1.5.16
 //DEPS com.electronwill.night-config:toml:3.8.1
 //DEPS com.google.guava:guava:30.1-jre
+//DEPS org.eclipse.jgit:org.eclipse.jgit:7.1.0.202411261347-r
 //DEPS info.picocli:picocli:4.6.3
-//DEPS dev.dirs:directories:26
 //SOURCES utils/Exec.java
 //SOURCES utils/Assets.java
-//SOURCES utils/EnvVar.java
+//SOURCES utils/DefaultPaths.java
 //JAVAC_OPTIONS -proc:full
 
 import static utils.Assets.Config.HOME_OPS;

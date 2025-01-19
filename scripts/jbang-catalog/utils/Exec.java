@@ -1,7 +1,10 @@
 package utils;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -16,14 +19,12 @@ public class Exec {
 
     List<String> statement = Lists.asList(command, args);
     // By default output to whatever the invoking process is output
-    return new ProcessBuilder(statement).redirectOutput(ProcessBuilder.Redirect.INHERIT);
+    return new ProcessBuilder(statement);
   }
 
-  // public static ProcessBuilder addEnvVars(ProcessBuilder pb, EnvVar... envVars)
-  // {
-  // pb.environment()
-  // .putAll(Arrays.stream(envVars).collect(Collectors.toMap(envVar ->
-  // envVar.key().toString(), EnvVar::value)));
+  // public static ProcessBuilder addEnvVars(ProcessBuilder pb, Map<String,
+  // String> envVars) {
+  // pb.environment().putAll(envVars);
   // return pb;
   // }
 
@@ -58,26 +59,5 @@ public class Exec {
     pb.redirectInput(input.toFile());
     return pb;
   }
-
-  public static ProcessBuilder from(String command, String... args) {
-    return buildProcess(command, args);
-  }
-
-  public static ProcessBuilder from(String command, String[] args, Path workingDir) {
-    return setWorkingDir(from(command, args), workingDir);
-  }
-
-  // public static ProcessBuilder from(String command, String[] args, Path
-  // workingDir, EnvVar... envVars) {
-  // return addEnvVars(setWorkingDir(from(command, args), workingDir), envVars);
-  // }
-
-  // public static ProcessBuilder from(String command, String[] args, Path
-  // workingDir, Path output, Path error, Path input,
-  // EnvVar... envVars) {
-  // return redirectInput(redirectError(
-  // redirectOutput(addEnvVars(setWorkingDir(from(command, args), workingDir),
-  // envVars), output), error), input);
-  // }
 
 }

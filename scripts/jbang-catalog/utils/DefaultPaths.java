@@ -31,8 +31,8 @@ public class DefaultPaths {
   }
 
   public enum HomeOpsPaths {
-    HOME_OPS_CONFIG_PATH(Path.of(System.getenv("XDG_CONFIG_HOME"), "home-ops")),
-    HOME_OPS_DATA_PATH(Path.of(System.getenv("XDG_DATA_HOME"), "automation", "home-ops")),;
+    HOME_OPS_CONFIG_PATH(Path.of(System.getProperty("user.home"), ".config", "home-ops")),
+    HOME_OPS_DATA_PATH(Path.of(System.getProperty("user.home"), ".local", "share", "automation", "home-ops")),;
 
     private final Path path;
 
@@ -53,12 +53,11 @@ public class DefaultPaths {
     return success;
   }
 
-  private static boolean ensurePath(Path path) {
+  public static boolean ensurePath(Path path) {
     try {
       if (!path.toFile().exists()) {
         return path.toFile().mkdirs();
       }
-      log.warn("Path exists: " + path);
       return true;
     } catch (Exception e) {
       log.error("Failed to create path: " + path, e);

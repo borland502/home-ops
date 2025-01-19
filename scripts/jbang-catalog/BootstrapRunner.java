@@ -11,24 +11,32 @@
 //SOURCES utils/DefaultPaths.java
 //JAVAC_OPTIONS -proc:full
 
-import static java.nio.file.Files.createTempFile;
-
-import java.io.File;
 import java.io.IOException;
+import java.lang.ProcessBuilder.Redirect;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.eclipse.jgit.api.Git;
-
+import com.electronwill.nightconfig.core.concurrent.SynchronizedConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
+import com.google.common.collect.Lists;
 
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import utils.Assets;
-import utils.DefaultPaths;
 import utils.DefaultPaths.HomeOpsPaths;
 import utils.Exec;
+
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 
 /**
  *
@@ -37,16 +45,15 @@ import utils.Exec;
 @Command(name = "BootstrapRunner", mixinStandardHelpOptions = true, version = "BootstrapRunner 0.1", description = "BootstrapRunner made with jbang")
 class BootstrapRunner implements Callable<Integer> {
 
-  private static FileConfig config = Assets.Config.HOME_OPS.getTomlConfig();
+  private static FileConfig config;
 
   static {
-    // TODO: Factor out backup actions
-    try (FileConfig backupConfig = FileConfig.of(createTempFile("homeOps", ".toml", new FileAttribute<?>[0]))) {
+    try {
+      config = Assets.Config.HOME_OPS.getTomlConfig();
       config.load();
-      backupConfig.putAll(config.unmodifiable());
-      backupConfig.save();
-    } catch (IOException e) {
-      log.error("Error loading configuration", e);
+    } catch (IOException | InterruptedException e) {
+      log.error("Error initializing configuration", e);
+      System.exit(2);
     }
   }
 
@@ -57,102 +64,194 @@ class BootstrapRunner implements Callable<Integer> {
 
   @Override
   public Integer call() throws Exception {
+    List<ProcessBuilder> processBuilders = Lists.newArrayList();
+    processBuilders.add(loadEnvVariables());
+    processBuilders.add(installBrew());
+    processBuilders.add(syncHostInfo());
+    processBuilders.add(installSystemPackages());
+    processBuilders.add(installBrewPackages());
+    processBuilders.add(installKeePassXC());
+    processBuilders.add(installChezmoi());
+    boolean allProcessesExitedSuccessfully = processBuilders
+        .stream().mapToInt(process -> {
+          try {
+            return process.start().waitFor();
+          } catch (InterruptedException | IOException e) {
+            log.error("Error waiting for process to exit", e);
+            return 2;
+          }
+        }).allMatch(exitValue -> exitValue == 0);
 
-    // Ensure default paths exist
-    if (DefaultPaths.ensurePaths()) {
-      log.info("Default paths were created or exist");
+    if (!allProcessesExitedSuccessfully) {
+      log.error("One or more processes exited with a non-zero exit code");
+      return 2;
     }
 
-    // Validate if homeOps config exists and is a directory
-    File homeOpsDataFile = HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().toFile();
-    homeOpsDataFile.mkdirs();
-    if (homeOpsDataFile.isDirectory()) {
-      log.info("HomeOps data path exists");
-    } else {
-      log.warn("HomeOps data path does not exist -- checking out project from git");
-      // Clone project from git
+    log.info("All processes exited successfully");
+
+    return 0;
+  }
+
+  private ProcessBuilder loadEnvVariables() {
+    SynchronizedConfig envVars = config.get("bootstrap.constants");
+
+    envVars.entrySet().forEach(e -> {
+      String key = e.getKey();
+      String value = e.getValue().toString();
+      Path envPath = Path.of(System.getProperty("user.home"), ".env");
+      String entry = key + "=" + "\"" + value + "\"" + System.lineSeparator();
       try {
-        Git.cloneRepository()
-            .setURI("https://github.com/borland502/home-ops.git")
-            .setDirectory(homeOpsDataFile)
-            .call();
-        log.info("Project successfully cloned from git");
-      } catch (Exception e) {
-        log.error("Error cloning project from git", e);
+        Files.writeString(envPath, entry, CREATE, APPEND);
+      } catch (IOException e1) {
+        log.error("Error writing to env file", e1);
       }
-      return 0;
+      System.setProperty(key, value);
+    });
+
+    return Exec.buildProcess("bash", new String[] { "-c", "env" })
+        .redirectOutput(Redirect.INHERIT)
+        .redirectError(Redirect.INHERIT);
+  }
+
+  private ProcessBuilder installKeePassXC() {
+    String osName = System.getProperty("os.name").toLowerCase();
+    if (osName.contains("mac")) {
+      try {
+        Path tempDir = Files.createTempDirectory("keepassxc");
+        Path dmgPath = tempDir.resolve("KeePassXC.dmg");
+        Path digestPath = tempDir.resolve("KeePassXC.dmg.DIGEST");
+
+        // Download DMG and digest files
+        HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS).build();
+        client.send(HttpRequest.newBuilder()
+            .uri(URI.create(
+                "https://github.com/keepassxreboot/keepassxc/releases/download/2.7.9/KeePassXC-2.7.9-arm64.dmg"))
+            .GET().build(), BodyHandlers.ofFile(dmgPath));
+        client.send(HttpRequest.newBuilder()
+            .uri(URI.create(
+                "https://github.com/keepassxreboot/keepassxc/releases/download/2.7.9/KeePassXC-2.7.9-arm64.dmg.DIGEST"))
+            .GET().build(), BodyHandlers.ofFile(digestPath));
+
+        // Verify SHA-256 hash
+        String command = String.format("cd %s && shasum -a 256 -c %s && " +
+            "hdiutil attach %s && " +
+            "sudo cp -R /Volumes/KeePassXC/KeePassXC.app /Applications/ && " +
+            "hdiutil detach /Volumes/KeePassXC",
+            tempDir, digestPath.getFileName(), dmgPath.getFileName());
+
+        return Exec.buildProcess("bash", "-c", command)
+            .redirectOutput(Redirect.INHERIT)
+            .redirectError(Redirect.INHERIT);
+      } catch (IOException | InterruptedException e) {
+        log.error("Error installing KeePassXC on MacOS", e);
+        return new ProcessBuilder().inheritIO();
+      }
+    } else {
+      return Exec.buildProcess(
+          "bash",
+          "-c",
+          "DISTRO=$(jq -r .os.distro ~/.config/home-ops/host.json); " +
+              "if [[ \"$DISTRO\" == *\"Debian\"* ]]; then " +
+              "sudo apt-get -y update && sudo apt-get -y install keepassxc; " +
+              "else " +
+              "echo \"Unsupported distro: $DISTRO\"; " +
+              "fi")
+          .redirectOutput(Redirect.INHERIT)
+          .redirectError(Redirect.INHERIT);
     }
+  }
 
-    // TODO: Abstract out toml loading
-    // Sync with default files from default config
-    FileConfig defaultConfig = FileConfig
-        .of(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().resolve("config/default.toml").toFile());
-    defaultConfig.load();
-    config.addAll(defaultConfig.unmodifiable());
+  private ProcessBuilder installChezmoi() {
+    try {
+      String xdgDataHome = System.getenv("XDG_DATA_HOME");
+      if (xdgDataHome == null) {
+        xdgDataHome = System.getProperty("user.home") + "/.local/share";
+      }
+      Path dotfilesPath = Path.of(xdgDataHome, "automation", "home-ops", "scripts", "dotfiles");
+      Files.createDirectories(dotfilesPath);
 
-    // Chezmoi files are canonical sources of truth so replace any values that
-    // match
-    FileConfig envConfig = FileConfig
-        .of(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().resolve("scripts/dotfiles/.chezmoidata/env.toml").toFile());
-    envConfig.load();
-    config.putAll(envConfig.unmodifiable());
+      String command = String.format("touch %s/.env && chezmoi init --source %s && chezmoi apply --source %s",
+          System.getProperty("user.home"),
+          dotfilesPath,
+          dotfilesPath);
 
-    FileConfig inventoryConfig = FileConfig
-        .of(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().resolve("scripts/dotfiles/.chezmoidata/inventory.toml").toFile());
-    inventoryConfig.load();
-    config.putAll(inventoryConfig.unmodifiable());
+      return Exec.buildProcess("bash", "-c", command)
+          .redirectOutput(Redirect.INHERIT)
+          .redirectError(Redirect.INHERIT);
+    } catch (IOException e) {
+      log.error("Error creating directories for chezmoi", e);
+      return new ProcessBuilder().inheritIO();
+    }
+  }
 
-    FileConfig packagesConfig = FileConfig
-        .of(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().resolve("scripts/dotfiles/.chezmoidata/packages.toml").toFile());
-    packagesConfig.load();
-    config.putAll(packagesConfig.unmodifiable());
+  private ProcessBuilder installSystemPackages() {
+    List<String> aptPackages = config.get("apt.packages");
+    return Exec.buildProcess(
+        "bash",
+        "-c",
+        "DISTRO=$(jq -r .os.distro ~/.config/home-ops/host.json); if [[ \"$DISTRO\" == *\"Debian\"* ]]; then sudo apt-get -y update && sudo apt-get -y install "
+            + String.join(" ", aptPackages) + "; else echo \"Unsupported distro: $DISTRO\"; fi")
+        .redirectOutput(Redirect.INHERIT).redirectError(Redirect.INHERIT);
+  }
 
+  private ProcessBuilder installBrewPackages() {
+    // Install Homebrew packages
+    try {
+      Path zshrcPath = Path.of(System.getProperty("user.home"), "/.zshrc");
+      String osName = System.getProperty("os.name").toLowerCase();
+      String brewPath = osName.contains("mac") ? "/opt/homebrew/bin/brew" : "/home/linuxbrew/.linuxbrew/bin/brew";
+
+      Files.writeString(zshrcPath,
+          "\neval \"$(" + brewPath + " shellenv)\"\n",
+          APPEND, CREATE);
+
+      List<String> brewPackages = config.get("brew.packages");
+      List<String> arguments = new java.util.ArrayList<>();
+      arguments.add("-c");
+      arguments.add(
+          "source " + zshrcPath + " && brew update && brew upgrade && brew install " + String.join(" ", brewPackages));
+
+      return Exec.buildProcess("bash", arguments.toArray(new String[0]))
+          .redirectOutput(Redirect.INHERIT)
+          .redirectError(Redirect.INHERIT);
+    } catch (IOException | ClassCastException e) {
+      log.error("Error installing brew packages", e);
+      return new ProcessBuilder().inheritIO();
+    }
+  }
+
+  private ProcessBuilder installBrew() {
+    // Install Homebrew
+    try {
+      Path tempFile = Files.createTempFile("brew", ".sh", new FileAttribute<?>[0]);
+      HttpRequest request = HttpRequest.newBuilder()
+          .uri(URI.create("https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"))
+          .GET()
+          .build();
+      HttpClient client = HttpClient.newBuilder()
+          .followRedirects(HttpClient.Redirect.ALWAYS)
+          .build();
+      client.send(request, BodyHandlers.ofFile(tempFile));
+
+      Files.setPosixFilePermissions(tempFile, PosixFilePermissions.fromString("rwxr-xr-x"));
+      return Exec.buildProcess("bash", "-c", tempFile.toAbsolutePath().toString())
+          .redirectOutput(Redirect.INHERIT)
+          .redirectError(Redirect.INHERIT);
+    } catch (IOException | InterruptedException e) {
+      log.error("Error during Homebrew installation", e);
+      return new ProcessBuilder().inheritIO(); // Return an empty ProcessBuilder on error
+    }
+  }
+
+  private ProcessBuilder syncHostInfo() {
     // Write system information to inventory.json using systeminformation npm
     // library
-    Exec.buildProcess("npx", "systeminformation").inheritIO()
+    ProcessBuilder processBuilder = Exec.buildProcess("npx", "systeminformation")
         .directory(HomeOpsPaths.HOME_OPS_CONFIG_PATH.getPath().toFile())
-        .redirectOutput(HomeOpsPaths.HOME_OPS_CONFIG_PATH.getPath().resolve("inventory.json").toFile()).start()
-        .waitFor();
+        .redirectOutput(HomeOpsPaths.HOME_OPS_CONFIG_PATH.getPath().resolve("host.json").toFile());
 
-    // JSON to TOML conversion
+    return processBuilder;
 
-    // FileConfig systemInfoConfig = FileConfig
-    // .builder(HomeOpsPaths.HOME_OPS_CONFIG_PATH.getPath().resolve("inventory.json"),
-    // JsonFormat.fancyInstance())
-    // .build();
-    // systemInfoConfig.load();
-    // config.putAll(systemInfoConfig.unmodifiable());
-
-    // Sync with chezmoi TOML files in the dotfiles directory
-
-    // // Check if pyenv is installed and install if not
-    // if (!isCommandAvailable("pyenv")) {
-    // log.info("pyenv is not installed. Installing pyenv...");
-    // Exec.runCommand("curl https://pyenv.run | bash");
-    // } else {
-    // log.info("pyenv is already installed.");
-    // }
-
-    // // Check if nvm is installed and install if not
-    // if (!isCommandAvailable("nvm")) {
-    // log.info("nvm is not installed. Installing nvm...");
-    // Exec.runCommand("curl -o-
-    // https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash");
-    // } else {
-    // log.info("nvm is already installed.");
-    // }
-
-    // // Check if chezmoi is installed and install if not
-    // if (!isCommandAvailable("chezmoi")) {
-    // log.info("chezmoi is not installed. Installing chezmoi...");
-    // Exec.runCommand("sh -c \"$(curl -fsLS get.chezmoi.io)\"");
-    // } else {
-    // log.info("chezmoi is already installed.");
-    // }
-
-    config.save();
-
-    return 1;
   }
 
 }

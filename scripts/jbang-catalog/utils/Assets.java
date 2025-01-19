@@ -1,14 +1,25 @@
 package utils;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.List;
+import java.util.Map;
 
+import org.eclipse.jgit.api.Git;
+
+import com.electronwill.nightconfig.core.concurrent.SynchronizedConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.core.file.FileNotFoundAction;
-import com.google.common.collect.ImmutableList;
 
 import lombok.extern.slf4j.Slf4j;
+import utils.DefaultPaths.HomeOpsPaths;
 
 import static java.lang.System.getProperty;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Assets -- a resource loading utility class
@@ -22,8 +33,15 @@ public class Assets {
     private FileConfig tomlConfig;
 
     Config() {
+      if (DefaultPaths.ensurePaths()) {
+        log.info("Default paths were created or exist");
+      }
+
+      Path configPath = Paths.get(getProperty("user.home"), ".config", "home-ops", "default.toml");
+      DefaultPaths.ensurePath(configPath.getParent());
+
       tomlConfig = FileConfig
-          .builder(Paths.get(getProperty("user.home"), ".config", "home-ops", "default.toml"))
+          .builder(configPath)
           .autoreload()
           .onFileNotFound(FileNotFoundAction.CREATE_EMPTY)
           .preserveInsertionOrder()
@@ -31,32 +49,94 @@ public class Assets {
           .build();
     }
 
-    public FileConfig getTomlConfig() {
-      tomlConfig.set("colors.base0", "#131313");
-      tomlConfig.set("colors.base1", "#191919");
-      tomlConfig.set("colors.base2", "#222222");
-      tomlConfig.set("colors.base3", "#363537");
-      tomlConfig.set("colors.base4", "#525053");
-      tomlConfig.set("colors.base5", "#69676c");
-      tomlConfig.set("colors.base6", "#8b888f");
-      tomlConfig.set("colors.base7", "#bab6c0");
-      tomlConfig.set("colors.base8", "#f7f1ff");
-      tomlConfig.set("colors.base8x0c", "#2b2b2b");
-      tomlConfig.set("colors.blue", "#5ad4e6");
-      tomlConfig.set("colors.green", "#7bd88f");
-      tomlConfig.set("colors.orange", "#fd9353");
-      tomlConfig.set("colors.purple", "#948ae3");
-      tomlConfig.set("colors.red", "#fc618d");
-      tomlConfig.set("colors.yellow", "#fcd566");
+    public FileConfig getTomlConfig() throws InterruptedException, IOException {
+      syncConfig();
 
-      tomlConfig.set("zx.installGlobals", ImmutableList.of("tsx", "ts-node", "typescript", "nx"));
-      tomlConfig.set("zx.nothrow", true);
-      tomlConfig.set("zx.pkgManager", "npm");
-      tomlConfig.set("zx.shell", "zsh");
-      tomlConfig.set("zx.verbose", true);
-      tomlConfig.set("zx.minimist.opts.stopEarly", true);
+      // TOML [[]] list of tables object conversion
+      List<SynchronizedConfig> envVars = tomlConfig.get("env.vars");
 
+      // TODO: Abstract out toml loading and perhaps create a pull request to author
+      // There should be one flat map of all env vars
+      SynchronizedConfig envVarsConfig = envVars.getFirst();
+      envVarsConfig.entrySet().stream().flatMap(e -> {
+        String key = e.getKey();
+        String value = e.getValue().toString();
+        return Map.of(key, value).entrySet().stream();
+      }).forEach(e -> {
+        String key = e.getKey();
+        String value = e.getValue();
+        Path envPath = Paths.get(System.getProperty("user.home"), ".env");
+        String entry = key + "=" + "\"" + value + "\"" + System.lineSeparator();
+        try {
+          Files.writeString(envPath, entry, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (IOException e1) {
+          log.error("Error writing to env file", e1);
+        }
+        System.setProperty(key, value);
+      });
+
+      checkoutHomeOps();
       return tomlConfig;
+    }
+
+    private void checkoutHomeOps() {
+      DefaultPaths.ensurePath(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().getParent());
+      File homeOpsDataFile = HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().toFile();
+      if (homeOpsDataFile.isDirectory()) {
+        log.info("HomeOps data path exists");
+      } else {
+        log.warn("HomeOps data path does not exist -- checking out project from git");
+        // Clone project from git
+        try {
+          Git.cloneRepository()
+              .setURI("https://github.com/borland502/home-ops.git")
+              .setDirectory(homeOpsDataFile)
+              .setCloneSubmodules(true)
+              .call();
+          log.info("Project successfully cloned from git");
+        } catch (Exception e) {
+          log.error("Error cloning project from git", e);
+        }
+      }
+    }
+
+    private void syncConfig() throws InterruptedException, IOException {
+
+      // Sync bootstrap configurations from bootstrap.toml
+      FileConfig bootstrapConfig = FileConfig
+          .of(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().resolve("scripts/dotfiles/.chezmoidata/bootstrap.toml")
+              .toFile());
+      bootstrapConfig.load();
+      tomlConfig.putAll(bootstrapConfig.unmodifiable());
+
+      // Sync with default files from default config but do not overwrite existing
+      // values
+      FileConfig defaultConfig = FileConfig
+          .of(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().resolve("config/default.toml").toFile());
+      defaultConfig.load();
+      tomlConfig.addAll(defaultConfig.unmodifiable());
+
+      // Chezmoi files are canonical sources of truth so replace any values that
+      // match
+      FileConfig envConfig = FileConfig
+          .of(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().resolve("scripts/dotfiles/.chezmoidata/env.toml").toFile());
+      envConfig.load();
+      tomlConfig.putAll(envConfig.unmodifiable());
+
+      FileConfig inventoryConfig = FileConfig
+          .of(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().resolve("scripts/dotfiles/.chezmoidata/inventory.toml")
+              .toFile());
+      inventoryConfig.load();
+      tomlConfig.putAll(inventoryConfig.unmodifiable());
+
+      FileConfig packagesConfig = FileConfig
+          .of(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().resolve("scripts/dotfiles/.chezmoidata/packages.toml")
+              .toFile());
+      packagesConfig.load();
+      tomlConfig.putAll(packagesConfig.unmodifiable());
+
+      // persist changes
+      tomlConfig.save();
     }
   }
 
