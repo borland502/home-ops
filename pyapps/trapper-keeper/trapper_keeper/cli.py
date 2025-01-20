@@ -8,9 +8,9 @@ import tempfile
 from pathlib import Path
 
 import fire
+from homeops_utils import file
+from homeops_utils.file import pathify
 from resources.configs.tk_conf import TgtSettings, TkSettings
-from utils import file
-from utils.file import pathify
 
 from .keegen import gen_passphrase, gen_utf8
 from .stores.keepass_store import view_kp_db

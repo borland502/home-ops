@@ -40,6 +40,18 @@ tasks:
     cmds:
       - brew install git
 
+  java:
+    desc: Ensure that java is installed
+    run: once
+    silent: true
+    internal: true
+    deps:
+      - task: sdkman
+    status:
+      - test $(command -v java)
+    cmds:
+      - brew install java
+
   node:
     desc: Ensure that node is installed
     run: once
@@ -90,6 +102,20 @@ tasks:
     cmds:
       - brew install pyenv
 
+  sdkman:
+    desc: Ensure that sdkman is installed
+    run: once
+    silent: true
+    internal: true
+    deps:
+      - task: brew
+    status:
+      - test $(command -v sdk)
+    cmds:
+      - export SDKMAN_DIR="{{.SDKMAN_DIR}}" && curl -s "https://get.sdkman.io" | bash
+    vars:
+      SDKMAN_DIR: "${XDG_DATA_HOME}/sdkman"
+
   nvm:
     desc: Ensure that nvm is installed
     run: once
@@ -115,7 +141,7 @@ tasks:
       - cmd: brew install --cask keepassxc
         platforms:
           - "darwin"
-      - cmd: source ../../shell/lib/install_doctor_functions.sh; ensurePackageInstalled
+      - cmd: source ../../shell/lib/install_doctor_functions.sh; ensurePackageInstalled keepassxc
         platforms:
           - "linux"
 
@@ -129,7 +155,17 @@ tasks:
       - task: python
       - task: pyenv
       - task: nvm
+      - task: sdkman
+      - task: java
     cmds:
       - task: keepassxc
 
-
+  sync:
+    desc: update all userspace tools and install any missing tools
+    deps:
+      - task: tools
+      - task: validate:internal:xdg
+      - task: validate:internal:scripts
+    cmds:
+      - brew update && brew upgrade
+      - echo "Synced all tools"

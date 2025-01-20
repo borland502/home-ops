@@ -8,12 +8,12 @@ from contextlib import AbstractContextManager
 from pathlib import Path
 from uuid import UUID
 
+from homeops_utils.file import get_file_bytes, pathify
+from homeops_utils.paths import SkipPaths
 from pykeepass import PyKeePass, create_database
 from pykeepass.entry import Entry
 from pykeepass.group import Group
 from resources.configs.tk_conf import TkSettings
-from utils.file import get_file_bytes, pathify
-from utils.paths import SkipPaths
 
 from trapper_keeper.keegen import gen_passphrase, gen_utf8
 

@@ -1,8 +1,0 @@
-{
-  "name": "@home-ops/watchyourlan-api",
-  "version": "0.0.1",
-  "scripts": {
-    "lint": "gts lint",
-    "fix": "gts fix"
-  }
-}

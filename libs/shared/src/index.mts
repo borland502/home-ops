@@ -4,4 +4,3 @@ export * from "./lib/common/XdgPaths.mjs";
 export * from "./lib/log.mjs";
 export * from "./lib/zx-utils.mjs"
 export * from "./lib/pkg-install.mjs";
-export * from "./lib/confirm_install.mjs";

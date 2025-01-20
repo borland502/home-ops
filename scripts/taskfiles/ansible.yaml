@@ -17,29 +17,34 @@ tasks:
   ping:
     desc: Ping all the hosts
     cmds:
-      - ansible all -i {{.ANSIBLE_INV_HOME}} -m 'ping'
+      - poetry run ansible all -i {{.ANSIBLE_INV_HOME}} -m 'ping'
 
   fingerprint:
       desc: Get the SSH fingerprint for each host
       cmds:
-        - ansible all -i {{.ANSIBLE_INV_HOME}} --one-line -m 'command' -a 'ssh-keygen -lf /etc/ssh/ssh_host_rsa_key.pub'
+        - poetry run ansible all -i {{.ANSIBLE_INV_HOME}} --one-line -m 'command' -a 'ssh-keygen -lf /etc/ssh/ssh_host_rsa_key.pub'
+
+  sync:
+    desc: Update ansible and synchronize the ansible inventory
+    deps:
+      - task: ping
+      - task: update-roles
+      - task: update-collections
+    cmds:
+
 
   update-collections:
       internal: true
-      deps:
-        - task: update-external-srcs
       desc: Update the available ansible collections using ~/.ansible/collections/requirements.yml
       cmds:
           - |
-              {{.DBS_VENV_PYTHON}} {{.DBS_MODULE_DASBOOTSTRAP}} update-collections 2>/dev/null
+              ansible-commands update-collections 2>/dev/null
   update-roles:
-      deps:
-        - task: update-external-srcs
       internal: true
       desc: Update the available ansible roles using ~/.ansible/roles/requirements.yml
       cmds:
          - |
-             {{.DBS_VENV_PYTHON}} {{.DBS_MODULE_DASBOOTSTRAP}} update-roles 2>/dev/null
+             ansible-commands update-roles 2>/dev/null
 
 #  update:containers:
 #      deps:

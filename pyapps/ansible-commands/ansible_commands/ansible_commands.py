@@ -7,8 +7,8 @@ It includes functionalities to create, destroy, bootstrap, configure user access
 import os
 
 import ansible_runner
+from homeops_utils.paths import AnsiblePaths
 from resources.ansible import find_playbook
-from utils.paths import AnsiblePaths
 
 # Inventory and variable definitions for Ansible commands
 INVENTORY: list[str] = ["-i", str(AnsiblePaths.IHOME + "/hosts.yaml")]

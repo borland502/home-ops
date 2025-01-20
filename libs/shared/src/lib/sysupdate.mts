@@ -9,8 +9,8 @@ import {
     installByBrew, hasCommand
 } from "@technohouser/shared";
 
-const sysinfo = await getSystemData()
-
+async function main() {
+  const sysinfo = await getSystemData();
 await initShell($);
 
 async function installAptPackages() {
@@ -93,97 +93,99 @@ async function installBrew(brewPackages: Promise<string[]>, brewCasks?: Promise<
   }
 }
 
+await main().then(async () => {
 await which("apt").then(async () => {
-    await installAptPackages()
+    await installAptPackages();
 
     await $`sudo apt update && sudo apt dist-upgrade -y`.catch((reason: unknown) => {
-        error(`Error: ${reason}`)
-    })
-})
+      error(`Error: ${reason}`);
+    });
+  });
 
 await $`brew update`.then(() => {
-  $`brew upgrade`
+    $`brew upgrade`;
 }).then(() => {
-  $`brew doctor`
+    $`brew doctor`;
 }).then(() => {
-  $`brew missing`
+    $`brew missing`;
 }).then(() => {
-  const brewPackages = $`chezmoi data --format json | jq -rce '.brew.packages[]'`.lines()
+    const brewPackages = $`chezmoi data --format json | jq -rce '.brew.packages[]'`.lines();
 
-  let brewCasks: Promise<string[]> | undefined
+    let brewCasks: Promise<string[]> | undefined;
   if (sysinfo.os.distro === "macOS") {
-    brewCasks = $`chezmoi data --format json | jq -rce '.brew.casks[]'`.lines()
+      brewCasks = $`chezmoi data --format json | jq -rce '.brew.casks[]'`.lines();
   }
 
   installBrew(brewPackages, brewCasks).then(() => {
-    info("All brew packages installed")
-  })
+      info("All brew packages installed");
+    });
 
 }).catch((reason: unknown) => {
-  error(`Error: ${reason}`)
+    error(`Error: ${reason}`);
 }).finally(() => {
-  $`brew cleanup -s`
-})
+    $`brew cleanup -s`;
+  });
 
 await which("npm").then((hasNPM) => {
   if (hasNPM === null || !hasNPM) {
-    $`brew install npm`
+      $`brew install npm`;
   }
 
   $`npm update -g`.then(() => {
-    $`npm install -g npm`
+      $`npm install -g npm`;
   }).then(() => {
 
     installNpmPackages().then(() => {
-      info("All npm packages installed")
-    })
+        info("All npm packages installed");
+      });
 
   }).catch((reason: unknown) => {
-    error(`Error: ${reason}`)
-  })
+      error(`Error: ${reason}`);
+    });
 
-})
+  });
 
 await which("pipx").then((hasPipx) => {
   if (hasPipx === null || !hasPipx) {
-    $`brew install pipx`
+      $`brew install pipx`;
   }
 
   $`pipx upgrade-all`.then(() => {
     installPipxPackages().then(() => {
-      info("All pipx packages installed")
-    })
+        info("All pipx packages installed");
+      });
 
   }).catch((reason: unknown) => {
-    error(`Error: ${reason}`)
-  })
-})
+      error(`Error: ${reason}`);
+    });
+  });
 
 await which("tldr").then((hasTLDR) => {
   if (hasTLDR === null || !hasTLDR) {
-    $`brew install tldr`
+      $`brew install tldr`;
   }
 
   $`tldr --update`.catch((reason: unknown) => {
-    error(`Error: ${reason}`)
-  })
-})
+      error(`Error: ${reason}`);
+    });
+  });
 
 await which("softwareupdate").then((hasSoftwareUpdate) => {
   if (hasSoftwareUpdate !== null && sysinfo.os.distro === "macOS") {
     $`softwareupdate --install --all --force`.catch((reason: unknown) => {
-      error(`Error: ${reason}`)
-    })
+        error(`Error: ${reason}`);
+      });
   }
-})
+  });
 
 await which("flatpak").then((hasFlatpak: string | null) => {
   if (hasFlatpak === null || hasFlatpak === "") {
         // TODO: Use generic package manager
-      $`apt install flatpak`
+      $`apt install flatpak`;
   }
 
   $`flatpak update -y`.catch((reason: unknown) => {
-    error(`Error: ${reason}`)
-  })
-})
+      error(`Error: ${reason}`);
+    });
+  });
+})};

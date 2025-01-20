@@ -1,5 +1,7 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
+.blob
+
 # compiled output
 dist
 tmp
@@ -40,6 +42,7 @@ testem.log
 .DS_Store
 Thumbs.db
 
+.nx
 .nx/cache
 .nx/workspace-data
 
@@ -52,6 +55,8 @@ test-results
 coverage
 **/coverage
 __pycache__
+
+**/*egg-info/*
 
 # Don't check in code available in the git submodule
 .devcontainer/*
@@ -74,5 +79,4 @@ config.toml
 
 .angular
 home-ops.iml
-
-
+.idea

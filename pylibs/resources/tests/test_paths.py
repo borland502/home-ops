@@ -13,7 +13,7 @@ from xdg_base_dirs import (
     xdg_data_dirs,
 )
 
-from utils.paths import BasePaths, XdgPaths, HomeOpsPaths, AnsiblePaths
+from homeops_utils.paths import BasePaths, XdgPaths, HomeOpsPaths, AnsiblePaths
 
 
 class TestPaths(unittest.TestCase):

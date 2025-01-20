@@ -28,23 +28,9 @@ While I do hope useful elements can be mined for similar projects, if only by co
 * [utils](./libs/shared/utils/README.md)
 * [zx-utils](./libs/shared/zx-utils/README.md)
 
-### Project
-
-* [watchyourlan-api](./libs/watchyourlan-api/README.md)
-
 ## Run tasks
 
-### Build all projects
 
-```shell
-npm run build:all
-```
-
-### Lint all projects
-
-```shell
-npm run lint:all
-```
 
 ## Frameworks Used
 

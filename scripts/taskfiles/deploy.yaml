@@ -2,8 +2,14 @@
 version: "3"
 
 includes:
-    validate:
-        taskfile: "./validate.yaml"
+  validate:
+    taskfile: "./validate.yaml"
+  install:
+    taskfile: "./install/install.yaml"
+
+env:
+  NODE_PATH: "${XDG_DATA_HOME}/automation/home-ops/node_modules"
+
 
 vars:
   HOMEOPS_DIR: "${XDG_DATA_HOME}/automation/home-ops"
@@ -11,9 +17,9 @@ vars:
 
 tasks:
 
-#  help:
-#    desc: Scripts available in this project
-#    cmd:
+  #  help:
+  #    desc: Scripts available in this project
+  #    cmd:
 
   internal:init:
     internal: true
@@ -43,29 +49,34 @@ tasks:
           exit 2
         fi
 
-  internal:copy:config:
-    internal: true
-    silent: true
-    desc: Copy the configuration files to the NODE_CONFIG_DIR
-    cmds:
-      - |
-        # Define the source directories and the target directory
-        source_dir="{{.HOMEOPS_DIR}}/config"
-        target_dir="${XDG_CONFIG_HOME}/home-ops"
-
-        # Create the target directory if it doesn't exist
-        mkdir -p "$target_dir"
-
-        # Copy the configuration files to the target directory
-        ln -sf "$source_dir"/*.toml "$target_dir"
-    sources:
-      - "{{.HOMEOPS_DIR}}/config/*"
-    generates:
-      - "{{.XDG_CONFIG_HOME}}/home-ops"
+#  internal:copy:config:
+#    internal: true
+#    silent: true
+#    desc: Copy the configuration files to the NODE_CONFIG_DIR
+#    cmds:
+#      - |
+#        # Define the source directories and the target directory
+#        source_dir="{{.HOMEOPS_DIR}}/config"
+#        target_dir="${XDG_CONFIG_HOME}/home-ops"
+#
+#        # Create the target directory if it doesn't exist
+#        mkdir -p "$target_dir"
+#
+#        # Copy the configuration files to the target directory
+#        ln -sf "$source_dir"/*.toml "$target_dir"
+#    sources:
+#      - "{{.HOMEOPS_DIR}}/config/*"
+#    generates:
+#      - "{{.XDG_CONFIG_HOME}}/home-ops"
 
   internal:deploy:ansible:
     silent: true
     internal: true
+    preconditions:
+      - sh: test -d "${HOME}/.ansible"
+        msg: "The ansible directory does not exist. Please create it."
+      - sh: test $(task install:pyenv)
+        msg: "pyenv is not installed and could not be installed. Please install it."
     desc: Deploy the ansible playbooks, roles, etc to the ~/.ansible directory
     cmds:
       - |
@@ -86,25 +97,30 @@ tasks:
           done
         done
 
-#  internal:deploy:taskfiles:
-#    silent: true
-#    internal: true
-#    desc: Deploy the taskfiles to the ~/.config/taskfiles directory
-#    cmds:
-#      - |
-#        # Define the source directories and the target directory
-#        source_dir="{{.HOMEOPS_DIR}}/scripts/taskfiles"
-#        target_dir="${XDG_DATA_HOME}/automation/home-ops/scripts/taskfiles"
-#
-#        # Create the target directory if it doesn't exist
-#        mkdir -p "$target_dir"
-#
-#        # Copy the taskfiles to the target directory
-#        ln -sf "$source_dir"/*.yaml "$target_dir"
-#    sources:
-#      - "{{.HOMEOPS_DIR}}/scripts/taskfiles/*"
-#    generates:
-#      - "{{.XDG_CONFIG_HOME}}/taskfiles"
+  #  internal:deploy:taskfiles:
+  #    silent: true
+  #    internal: true
+  #    desc: Deploy the taskfiles to the ~/.config/taskfiles directory
+  #    cmds:
+  #      - |
+  #        # Define the source directories and the target directory
+  #        source_dir="{{.HOMEOPS_DIR}}/scripts/taskfiles"
+  #        target_dir="${XDG_DATA_HOME}/automation/home-ops/scripts/taskfiles"
+  #
+  #        # Create the target directory if it doesn't exist
+  #        mkdir -p "$target_dir"
+  #
+  #        # Copy the taskfiles to the target directory
+  #        ln -sf "$source_dir"/*.yaml "$target_dir"
+  #    sources:
+  #      - "{{.HOMEOPS_DIR}}/scripts/taskfiles/*"
+  #    generates:
+  #      - "{{.XDG_CONFIG_HOME}}/taskfiles"
+
+#  internal:deploy:jbang:
+#    silent: false
+#    internal: false
+#    desc: Deploy the JBang scripts to the ~/.local/bin directory
 
   internal:deploy:shell:
     desc: Deploy the shell scripts to the ~/.local/{bin,lib} directory
@@ -146,6 +162,36 @@ tasks:
           done
         done
 
+#  internal:deploy:zx:
+#    desc: Deploy the ZX scripts to the ~/.local/bin directory as SEA scripts
+#    summary: |
+#      # SEA scripts
+#
+#      > Deploy the ZX scripts to the ~/.local/bin directory
+#
+#      ## Links
+#      - [SEA](https://nodejs.org/api/single-executable-applications.html)
+#      - [ZX](https://google.github.io/zx/getting-started)
+#    cmds:
+#      - cmd: |
+#          # Compile all TypeScript files in the HOMEOPS_DIR/scripts/zx directory to CJS files
+#          for file in $(find "scripts/zx" -name "*.mts"); do
+#            npx esbuild --bundle --platform=node --tsconfig=tsconfig.base.json --format=cjs $file
+#          done
+#      - cmd: >-
+#          npx tsx --experimental-sea-config "scripts/zx/sea-config.json"
+#          > "dist/sea-prep.blob"
+#      - cmd: cp $(command -v node) "dist/home-ops"
+#      - cmd: |
+#          if [[ $(uname) == "Darwin" ]]; then
+#            codesign --remove-signature "dist/home-ops"
+#            npx postject "dist/home-ops" NODE_SEA_BLOB \
+#            "dist/sea-prep.blob" --macho-segment-name NODE_SEA \
+#            --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
+#          else
+#            npx postject "scripts/dist/home-ops" NODE_SEA_BLOB "scripts/dist/sea-prep.blob" --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8
+#          fi
+
   internal:deploy:zx:
     silent: true
     internal: true
@@ -183,5 +229,5 @@ tasks:
     desc: Deploy the scripts to the ~/.local/bin directory
     cmds:
       - task: internal:deploy:zx
-#      - task: internal:deploy:taskfiles
+      #      - task: internal:deploy:taskfiles
       - task: internal:deploy:shell
