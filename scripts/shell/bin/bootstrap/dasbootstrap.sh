@@ -124,7 +124,7 @@ echo "export JBANG_HOME=\"$HOME/.jbang\"" >>"$HOME/.zshrc"
 "${HOME}/.local/share/automation/home-ops/scripts/jbang-catalog/jbang" jdk default 21
 
 # Handoff to jbang bootstrap script
-"${HOME}/.local/share/automation/home-ops/scripts/jbang-catalog/jbang" --verbose dasbootstrap@https://github.com/borland502/home-ops/blob/feature/jbang-scripts/scripts/jbang-catalog
+"${HOME}/.local/share/automation/home-ops/scripts/jbang-catalog/jbang" --verbose dasbootstrap@https://github.com/borland502/home-ops/blob/scripts/jbang-catalog
 
 echo "Bootstrap complete. Please run the following command to continue:"
 echo "sudo su - <New User>"
