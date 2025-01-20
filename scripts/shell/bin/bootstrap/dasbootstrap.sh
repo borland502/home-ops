@@ -115,16 +115,16 @@ export PATH="$HOME/.jbang/bin:$PATH"
 export JBANG_HOME="$HOME/.jbang"
 
 mkdir -p "${HOME}/.local/share/automation"
-git clone https://github.com/borland502/home-ops.git "${HOME}/.local/share/automation"
+git clone --recurse-submodules https://github.com/borland502/home-ops.git "${HOME}/.local/share/automation/home-ops"
 
 # copy the exports into ~/.zshrc
 echo "export PATH=\"$HOME/.jbang/bin:\$PATH\"" >>"$HOME/.zshrc"
 echo "export JBANG_HOME=\"$HOME/.jbang\"" >>"$HOME/.zshrc"
-jbang jdk install 21
-jbang jdk default 21
+"${HOME}/.local/share/automation/home-ops/scripts/jbang-catalog/jbang" jdk install 21
+"${HOME}/.local/share/automation/home-ops/scripts/jbang-catalog/jbang" jdk default 21
 
 # Handoff to jbang bootstrap script
-jbang --verbose dasbootstrap@https://github.com/borland502/home-ops/blob/feature/jbang-scripts/scripts/jbang-catalog
+"${HOME}/.local/share/automation/home-ops/scripts/jbang-catalog/jbang" --verbose dasbootstrap@https://github.com/borland502/home-ops/blob/feature/jbang-scripts/scripts/jbang-catalog
 
 echo "Bootstrap complete. Please run the following command to continue:"
 echo "sudo su - <New User>"
