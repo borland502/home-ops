@@ -96,6 +96,7 @@ ensurePackageInstalled git
 ensurePackageInstalled curl
 ensurePackageInstalled rsync
 ensurePackageInstalled npm
+ensurePackageInstalled gcc
 
 if [[ $USER == "root" ]]; then
   read -rp "Enter the username to create or default to ansible: " _user
@@ -113,15 +114,17 @@ curl -Ls https://sh.jbang.dev | bash -s - app setup
 export PATH="$HOME/.jbang/bin:$PATH"
 export JBANG_HOME="$HOME/.jbang"
 
+mkdir -p "${HOME}/.local/share/automation"
+git clone https://github.com/borland502/home-ops.git "${HOME}/.local/share/automation"
+
 # copy the exports into ~/.zshrc
 echo "export PATH=\"$HOME/.jbang/bin:\$PATH\"" >>"$HOME/.zshrc"
 echo "export JBANG_HOME=\"$HOME/.jbang\"" >>"$HOME/.zshrc"
 jbang jdk install 21
 jbang jdk default 21
-jbang catalog add BootstrapRunner@borland502/home-ops/scripts/jbang-catalog
 
 # Handoff to jbang bootstrap script
-jbang home-ops/scripts/jbang-catalog
+jbang --verbose dasbootstrap@https://github.com/borland502/home-ops/blob/feature/jbang-scripts/scripts/jbang-catalog
 
 echo "Bootstrap complete. Please run the following command to continue:"
 echo "sudo su - <New User>"

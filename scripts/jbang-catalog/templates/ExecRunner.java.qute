@@ -13,27 +13,32 @@
 
 import static utils.Assets.Config.HOME_OPS;
 
-import java.nio.file.Path;
-import java.util.List;
+import java.io.IOException;
 import java.util.concurrent.Callable;
-import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.file.FileConfig;
-import com.google.common.collect.Lists;
 
+import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+
 import utils.Exec;
 
 /**
  *
  */
+@Slf4j
 @Command(name = "{basename}Runner", mixinStandardHelpOptions = true, version = "{basename}Runner 0.1", description = "{basename}Runner made with jbang")
 class {basename}Runner implements Callable<Integer> {
 
-  private static final FileConfig config;
+  private static FileConfig config;
+
   static {
-    config = HOME_OPS.getConfig();
-    config.load();
+    try {
+      config = HOME_OPS.getTomlConfig();
+      config.load();
+    } catch (IOException | InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public static void main(String... args) {
@@ -43,30 +48,11 @@ class {basename}Runner implements Callable<Integer> {
 
   @Override
   public Integer call() throws Exception {
-    String tablePath = "commands.{basename}Runner.{tag}";
-    String cmdPath = tablePath + ".cmd";
-    String argsPath = tablePath + ".args";
-    String workingDirPath = tablePath + ".workingDir";
+    log.info("Hello, World!");
+    log.info("red:" + config.get("colors.red").toString());
+    config.entrySet().forEach(e -> log.info(e.getKey() + " : " + e.getValue()));
 
-    ConfigSpec spec = new ConfigSpec();
-    spec.define(cmdPath, "{command}");
-    spec.define(argsPath, Lists.newArrayList({commandArgs}));
-    spec.define(workingDirPath, {workingDir});
-
-    if (!spec.isCorrect(config)) {
-      spec.correct(config);
-    }
-
-    String command = config.get(cmdPath);
-    List<String> args = config.get(argsPath);
-    String workingDir = config.get(workingDirPath);
-
-    if (config != null) {
-      config.save();
-      config.close();
-    }
-
-    return Exec.from(command, args.toArray(new String[0]), Path.of(workingDir)).start().waitFor();
+    return Exec.buildProcess("ls", "-lha").inheritIO().start().waitFor();
   }
 
 }
