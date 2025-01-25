@@ -1,4 +1,4 @@
-# Note: You can use any Debian/Ubuntu based image you want. 
+# Note: You can use any Debian/Ubuntu based image you want.
 FROM --platform=linux/amd64 mcr.microsoft.com/devcontainers/base:bookworm
 
 ENV USERNAME=vscode
@@ -33,7 +33,9 @@ RUN sudo apt-get update && export DEBIAN_FRONTEND=noninteractive && sudo apt-get
   zsh \
   && sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/* \
   && /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
-  && echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/${USERNAME}/.profile \
+  && ([ -d "/home/linuxbrew/.linuxbrew" ] && echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/${USERNAME}/.profile \
+  || [ -d "$HOME/.linuxbrew" ] && echo 'eval "$($HOME/.linuxbrew/bin/brew shellenv)"' >> /home/${USERNAME}/.profile \
+  || [ -d "/opt/homebrew" ] && echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /home/${USERNAME}/.profile) \
   && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" \
   && brew install gcc chezmoi curl
 

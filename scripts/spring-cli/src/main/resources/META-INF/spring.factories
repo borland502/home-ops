@@ -1,0 +1,3 @@
+org.springframework.boot.env.PropertySourceLoader=\
+  com.technohouser.config.properties.json.JsonPropertySourceLoader, \
+  com.technohouser.config.properties.toml.TomlPropertySourceLoader

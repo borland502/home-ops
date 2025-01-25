@@ -29,8 +29,8 @@
 
 [os.windows]
 
-[watchyourlan.db]
-    dbFileName = "/watchyourlan/db.sqlite"
+[db.watchyourlan]
+    dbFileName = "watchyourlan/db.sqlite"
     dialect = "sqlite"
 
 [zx]

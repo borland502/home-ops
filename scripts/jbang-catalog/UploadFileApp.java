@@ -56,7 +56,7 @@ public class UploadFileApp {
   }
 
   public static void main(String[] args) throws IOException {
-    HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+    HttpServer server = HttpServer.create(new InetSocketAddress(7080), 0);
 
     server.createContext("/", exchange -> {
       if ("GET".equals(exchange.getRequestMethod())) {

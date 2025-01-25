@@ -23,6 +23,7 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import com.electronwill.nightconfig.core.concurrent.SynchronizedConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
@@ -65,17 +66,22 @@ class BootstrapRunner implements Callable<Integer> {
   @Override
   public Integer call() throws Exception {
     List<ProcessBuilder> processBuilders = Lists.newArrayList();
-    processBuilders.add(loadEnvVariables());
     processBuilders.add(installBrew());
     processBuilders.add(syncHostInfo());
     processBuilders.add(installSystemPackages());
     processBuilders.add(installBrewPackages());
-    processBuilders.add(installKeePassXC());
-    processBuilders.add(installChezmoi());
-    boolean allProcessesExitedSuccessfully = processBuilders
+    processBuilders.add(uploadKeepassDb());
+    processBuilders.add(configureChezmoi());
+    boolean allProcessesExitedSuccessfully = processBuilders.reversed()
         .stream().mapToInt(process -> {
           try {
-            return process.start().waitFor();
+            Process p = process.start();
+            if (!p.waitFor(1, TimeUnit.MINUTES)) {
+              p.destroyForcibly();
+              log.error("Process timed out after 1 minute");
+              return 2;
+            }
+            return p.exitValue();
           } catch (InterruptedException | IOException e) {
             log.error("Error waiting for process to exit", e);
             return 2;
@@ -92,76 +98,21 @@ class BootstrapRunner implements Callable<Integer> {
     return 0;
   }
 
-  private ProcessBuilder loadEnvVariables() {
-    SynchronizedConfig envVars = config.get("bootstrap.constants");
-
-    envVars.entrySet().forEach(e -> {
-      String key = e.getKey();
-      String value = e.getValue().toString();
-      Path envPath = Path.of(System.getProperty("user.home"), ".env");
-      String entry = key + "=" + "\"" + value + "\"" + System.lineSeparator();
-      try {
-        Files.writeString(envPath, entry, CREATE, APPEND);
-      } catch (IOException e1) {
-        log.error("Error writing to env file", e1);
-      }
-      System.setProperty(key, value);
-    });
-
-    return Exec.buildProcess("bash", new String[] { "-c", "env" })
+  private ProcessBuilder uploadKeepassDb() {
+    log.info("Please upload your KeePass database and token using the file upload utility...");
+    ProcessBuilder uploader = Exec.buildProcess("jbang", "UploadFileApp.java")
         .redirectOutput(Redirect.INHERIT)
         .redirectError(Redirect.INHERIT);
+
+    log.info(
+        "The upload servlet for keepass db / keepass token is listening on the target server, port 7080.  CTRL+C to exit");
+
+    return uploader;
   }
 
-  private ProcessBuilder installKeePassXC() {
-    String osName = System.getProperty("os.name").toLowerCase();
-    if (osName.contains("mac")) {
-      try {
-        Path tempDir = Files.createTempDirectory("keepassxc");
-        Path dmgPath = tempDir.resolve("KeePassXC.dmg");
-        Path digestPath = tempDir.resolve("KeePassXC.dmg.DIGEST");
-
-        // Download DMG and digest files
-        HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS).build();
-        client.send(HttpRequest.newBuilder()
-            .uri(URI.create(
-                "https://github.com/keepassxreboot/keepassxc/releases/download/2.7.9/KeePassXC-2.7.9-arm64.dmg"))
-            .GET().build(), BodyHandlers.ofFile(dmgPath));
-        client.send(HttpRequest.newBuilder()
-            .uri(URI.create(
-                "https://github.com/keepassxreboot/keepassxc/releases/download/2.7.9/KeePassXC-2.7.9-arm64.dmg.DIGEST"))
-            .GET().build(), BodyHandlers.ofFile(digestPath));
-
-        // Verify SHA-256 hash
-        String command = String.format("cd %s && shasum -a 256 -c %s && " +
-            "hdiutil attach %s && " +
-            "sudo cp -R /Volumes/KeePassXC/KeePassXC.app /Applications/ && " +
-            "hdiutil detach /Volumes/KeePassXC",
-            tempDir, digestPath.getFileName(), dmgPath.getFileName());
-
-        return Exec.buildProcess("bash", "-c", command)
-            .redirectOutput(Redirect.INHERIT)
-            .redirectError(Redirect.INHERIT);
-      } catch (IOException | InterruptedException e) {
-        log.error("Error installing KeePassXC on MacOS", e);
-        return new ProcessBuilder().inheritIO();
-      }
-    } else {
-      return Exec.buildProcess(
-          "bash",
-          "-c",
-          "DISTRO=$(jq -r .os.distro ~/.config/home-ops/host.json); " +
-              "if [[ \"$DISTRO\" == *\"Debian\"* ]]; then " +
-              "sudo apt-get -y update && sudo apt-get -y install keepassxc; " +
-              "else " +
-              "echo \"Unsupported distro: $DISTRO\"; " +
-              "fi")
-          .redirectOutput(Redirect.INHERIT)
-          .redirectError(Redirect.INHERIT);
-    }
-  }
-
-  private ProcessBuilder installChezmoi() {
+  // TODO: Need to have transferred the keepass db and token to the host prior to
+  // this stage
+  private ProcessBuilder configureChezmoi() {
     try {
       String xdgDataHome = System.getenv("XDG_DATA_HOME");
       if (xdgDataHome == null) {
@@ -199,7 +150,21 @@ class BootstrapRunner implements Callable<Integer> {
     try {
       Path zshrcPath = Path.of(System.getProperty("user.home"), "/.zshrc");
       String osName = System.getProperty("os.name").toLowerCase();
-      String brewPath = osName.contains("mac") ? "/opt/homebrew/bin/brew" : "/home/linuxbrew/.linuxbrew/bin/brew";
+      String brewPath;
+      if (osName.contains("mac")) {
+        brewPath = "/opt/homebrew/bin/brew";
+      } else {
+        Path homeLinuxbrew = Path.of("/home/linuxbrew/.linuxbrew/bin/brew");
+        Path userHomeLinuxbrew = Path.of(System.getProperty("user.home"), ".linuxbrew/bin/brew");
+
+        if (Files.exists(homeLinuxbrew)) {
+          brewPath = homeLinuxbrew.toString();
+        } else if (Files.exists(userHomeLinuxbrew)) {
+          brewPath = userHomeLinuxbrew.toString();
+        } else {
+          throw new IOException("Could not find Homebrew installation");
+        }
+      }
 
       Files.writeString(zshrcPath,
           "\neval \"$(" + brewPath + " shellenv)\"\n",
@@ -246,7 +211,7 @@ class BootstrapRunner implements Callable<Integer> {
   private ProcessBuilder syncHostInfo() {
     // Write system information to inventory.json using systeminformation npm
     // library
-    ProcessBuilder processBuilder = Exec.buildProcess("npx", "systeminformation")
+    ProcessBuilder processBuilder = Exec.buildProcess("sudo", "npx", "systeminformation")
         .directory(HomeOpsPaths.HOME_OPS_CONFIG_PATH.getPath().toFile())
         .redirectOutput(HomeOpsPaths.HOME_OPS_CONFIG_PATH.getPath().resolve("host.json").toFile());
 

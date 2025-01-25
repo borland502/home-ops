@@ -20,6 +20,7 @@ import static java.lang.System.getProperty;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ProcessBuilder.Redirect;
 
 /**
  * Assets -- a resource loading utility class
@@ -75,8 +76,30 @@ public class Assets {
         System.setProperty(key, value);
       });
 
+      loadEnvVariables().start().waitFor();
       checkoutHomeOps();
       return tomlConfig;
+    }
+
+    private ProcessBuilder loadEnvVariables() {
+      SynchronizedConfig envVars = tomlConfig.get("bootstrap.constants");
+
+      envVars.entrySet().forEach(e -> {
+        String key = e.getKey();
+        String value = e.getValue().toString();
+        Path envPath = Path.of(System.getProperty("user.home"), ".env");
+        String entry = key + "=" + "\"" + value + "\"" + System.lineSeparator();
+        try {
+          Files.writeString(envPath, entry, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (IOException e1) {
+          log.error("Error writing to env file", e1);
+        }
+        System.setProperty(key, value);
+      });
+
+      return Exec.buildProcess("bash", new String[] { "-c", "env" })
+          .redirectOutput(Redirect.INHERIT)
+          .redirectError(Redirect.INHERIT);
     }
 
     private void checkoutHomeOps() {

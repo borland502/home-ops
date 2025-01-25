@@ -5,6 +5,35 @@
       "description": "A script to install home-ops and dotfiles from this project",
       "script-ref": "https://raw.githubusercontent.com/borland502/home-ops/scripts/jbang-catalog/BootstrapRunner.java",
       "java": "21"
+    },
+    "spring-greeting": {
+        "description": "A simple Spring Boot application w/SqliteDb that returns a greeting",
+        "script-ref": "https://raw.githubusercontent.com/borland502/home-ops/scripts/jbang-catalog/apps/GreetingCli.java",
+        "java": "17",
+      "dependencies": [
+        "org.springframework.boot:spring-boot-dependencies:3.4.1@pom",
+        "org.springframework.boot:spring-boot-starter:3.4.1",
+        "org.springframework.boot:spring-boot-starter-validation:3.4.1",
+        "org.springframework.boot:spring-boot-actuator:3.4.1",
+        "org.springframework.boot:spring-boot-starter-data-jpa:3.4.1",
+        "org.springframework.boot:spring-boot-starter-data-redis:3.4.1",
+        "org.springframework.boot:spring-boot-configuration-processor:3.4.1",
+        "org.springframework.boot:spring-boot-autoconfigure:3.4.1",
+        "org.hibernate.orm:hibernate-community-dialects:6.6.5.Final",
+        "info.picocli:picocli-spring-boot-starter:4.7.6",
+        "org.xerial:sqlite-jdbc:3.46.1.3"
+      ],
+      "sources": [
+        "services/GreetingService.java",
+        "commands/GreetingCommand.java"
+      ],
+      "files": [
+        "application.yaml=resources/spring-greeting.yaml"
+      ],
+      "main": "apps.GreetingCli",
+      "arguments": [
+        "Bob"
+      ]
     }
   },
   "templates": {

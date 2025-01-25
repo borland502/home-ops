@@ -14,7 +14,6 @@ includes:
   chez:
     taskfile: "./scripts/taskfiles/chezmoi.yaml"
   kp:
-    internal: true
     taskfile: "./scripts/taskfiles/keepassxc.yaml"
   validate:
     internal: true
@@ -86,12 +85,12 @@ tasks:
     #        else
     #          npx postject home-ops NODE_SEA_BLOB sea-prep.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8
     #        fi
-    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
+    # dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
 
   build:
     run: once
-    deps:
-      - task: lint
+    # deps:
+    #   - task: lint
     desc: Build all the projects
     summary: |
       This task builds all the projects locally
@@ -147,35 +146,37 @@ tasks:
       - task: git:sync
       - task: chez:sync
       - task: deploy:sync
-      - task: install:sync
+      # - task: install:sync
       - task: ansible:sync
       - task: unison:sync
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
-  #
-  #  mcv:pack:
-  #    desc: Pack all the projects
-  #    summary: |
-  #      This task packs all the projects locally into a single node executable which can then be
-  #      transferred to a new system for unpacking.  To permit cross platform compatibility, the
-  #      useSnapshots and useCodeCache options are disabled.
-  #
-  #      https://nodejs.org/api/single-executable-applications.html
-  #      https://github.com/nodejs/node/blob/main/doc/api/single-executable-applications.md#generating-single-executable-preparation-blobs
-  #    deps:
-  #      - task: validate:internal:xdg
-  #      - task: validate:internal:scripts
-  #      - task: install:npm
-  #      - task: install:python
-  #      - task: install:brew
-  #    cmds:
-  #      - task: install
-  #      - task: sync
-  #      # Sensitive files and directories are packed here
-  #      - |
-  #        trapper-keeper pack
-  #    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
-  #    # TODO: Push secret to shared secure location
-  #
+
+  # TODO: Do not build again if the executable exists in the proper location unless explicitly requested
+  mcv:pack:
+    desc: Pack all the projects
+    summary: |
+      This task packs all the projects locally into a single node executable which can then be
+      transferred to a new system for unpacking.  To permit cross platform compatibility, the
+      useSnapshots and useCodeCache options are disabled.
+
+      https://nodejs.org/api/single-executable-applications.html
+      https://github.com/nodejs/node/blob/main/doc/api/single-executable-applications.md#generating-single-executable-preparation-blobs
+    deps:
+      - task: validate:internal:xdg
+      - task: validate:internal:scripts
+      - task: install:node
+      - task: install:python
+      - task: install:brew
+    cmds:
+      - task: install
+      - task: sync
+      # Sensitive files and directories are packed here
+      - |
+        trapper-keeper pack
+    dir:
+      "{{.XDG_DATA_HOME}}/automation/home-ops"
+      # TODO: Push secret to shared secure location
+
   #  mcv:unpack:
   #    desc: Deploy all the system and home directory projects
   #    summary: |
