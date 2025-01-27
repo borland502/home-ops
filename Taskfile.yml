@@ -146,7 +146,6 @@ tasks:
       - task: git:sync
       - task: chez:sync
       - task: deploy:sync
-      # - task: install:sync
       - task: ansible:sync
       - task: unison:sync
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
@@ -181,6 +180,19 @@ tasks:
       # Create tarball
       - cmd: >-
           tar -czf /tmp/mcv.tar.gz -C /tmp/mcv/dist/mcv.run /tmp/mcv/dist/mcv.tar.gz
+
+  mcv:unpack:
+    desc: Unpack all the projects
+    silent: true
+    summary: |
+      This task unpacks all the projects locally from a script with a jar attachment
+    cmds:
+      # Unpack the tarball
+      - cmd: >-
+          tar -xzf /tmp/mcv.tar.gz -C /tmp/mcv/dist
+      # Run the script
+      - cmd: >-
+          /tmp/mcv/dist/mcv.run
 
   angularapp:create:
     desc: Create a new Angular application
