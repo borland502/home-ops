@@ -85,3 +85,15 @@ config.toml
 .angular
 home-ops.iml
 .idea
+
+# Files that should not be in this project and certainly not checked in
+*.kdbx
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+*.cer
+*.crt
+*.csr
+*.pub

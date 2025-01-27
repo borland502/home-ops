@@ -153,6 +153,7 @@ tasks:
 
   mcv:pack:
     desc: Pack all the projects
+    silent: true
     summary: |
       This task packs all the projects locally into a script with a jar attachment to install everything on the target system
     deps:
@@ -166,18 +167,20 @@ tasks:
       # Clean build artifacts and temporary directories in the automation data directory
       - cmd: |
           find {{.XDG_DATA_HOME}}/automation \
-          -type d \( -name "node_modules" -o -name "dist" -o -name "target" -o -name "__pycache__" -o -name "*.egg-info" \) \
+          -type d \( -name "node_modules" -o -name "dist" -o -name "target" -o -name "__pycache__" -o -name "*.egg-info" -o -name ".venv" \) \
           -exec rm -rf {} +
       # Create archive
       - cmd: >-
-          tar -czf /tmp/mcv/dist/mcv.tar.gz -C {{.XDG_CONFIG_HOME}} {{.XDG_DATA_HOME}}/trapper_keeper {{.XDG_DATA_HOME}}/unison {{.XDG_DATA_HOME}}/automation {{.ANSIBLE_HOME}}
-      # Create final executable
+          tar -czf /tmp/mcv/dist/mcv.tar.gz -C {{.XDG_CONFIG_HOME}} {{.XDG_DATA_HOME}}/trapper_keeper {{.XDG_DATA_HOME}}/unison {{.ANSIBLE_HOME}}
+      # Create executable
       - cmd: >-
           cat {{.XDG_DATA_HOME}}/automation/home-ops/scripts/shell/bin/dasbootstrap.sh
           {{.XDG_DATA_HOME}}/automation/home-ops/scripts/shell/bin/user_install.sh
-          $(find {{.XDG_DATA_HOME}}/automation/home-ops/scripts/spring-cli/build/libs -name "home-ops.jar")
-          /tmp/mcv/dist/mcv.tar.gz > /tmp/mcv/dist/mcv.run &&
+          {{.XDG_DATA_HOME}}/automation/home-ops/scripts/spring-cli/build/libs/home-ops.jar > /tmp/mcv/dist/mcv.run &&
           chmod +x /tmp/mcv/dist/mcv.run
+      # Create tarball
+      - cmd: >-
+          tar -czf /tmp/mcv.tar.gz -C /tmp/mcv/dist/mcv.run /tmp/mcv/dist/mcv.tar.gz
 
   angularapp:create:
     desc: Create a new Angular application
