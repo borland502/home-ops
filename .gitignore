@@ -45,7 +45,7 @@ Thumbs.db
 # Java
 *.class
 *.jar
-*.hprof
+**/*.hprof
 
 .nx
 .nx/cache
@@ -97,3 +97,5 @@ home-ops.iml
 *.crt
 *.csr
 *.pub
+
+
