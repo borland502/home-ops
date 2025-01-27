@@ -19,7 +19,7 @@ public class JsonPropertySourceLoader extends YamlPropertySourceLoader {
 
   @Override
   public String[] getFileExtensions() {
-    return new String[]{"json"};
+    return new String[] { "json" };
   }
 
 }

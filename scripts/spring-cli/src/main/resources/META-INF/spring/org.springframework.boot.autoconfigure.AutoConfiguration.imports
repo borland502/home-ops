@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
+org.springframework.boot.autoconfigure.data.rest.RepositoryRestMvcAutoConfiguration
+org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration

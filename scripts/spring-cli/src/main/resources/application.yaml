@@ -1,9 +1,18 @@
+assets:
+  host.path: ${XDG_CONFIG_HOME}/home-ops/host.json
 spring:
   toml:
     enabled: true
   shell:
+    theme:
+      name: "monokai-filter-spectrum"
     interactive:
       enabled: true
+    command:
+      stacktrace:
+        enabled: false
+      script:
+        enabled: false
   cache:
     type: redis
     redis:
@@ -12,26 +21,38 @@ spring:
       time-to-live: 3600000
   config:
     import:
-      - "file://${XDG_CONFIG_HOME}/home-ops/host.json"
+      - "file://${assets.host.path}"
       - "file://${XDG_CONFIG_HOME}/home-ops/default.toml"
   data:
     jpa:
-      database-platform: org.hibernate.dialect.SQLiteDialect
-      hibernate:
-        ddl-auto: create
-        show-sql: true
+      repositories:
+        enabled: true
+        bootstrap-mode: lazy
 
-  datasource:
-    driver-class-name: "org.sqlite.JDBC"
-    url: "jdbc:sqlite:${XDG_DATA_HOME}/home-ops/db.sqlite"
   main:
     banner-mode: off
+  jpa:
+    hibernate:
+      ddl-auto: update
+    generate-ddl: true
+    show-sql: true
+    open-in-view: false
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:${XDG_DATA_HOME}/home-ops/db.sqlite
+    username: ""
+    password: ""
+
 management:
   endpoints:
     web:
       exposure:
         include: "*"
       base-path: /actuator
-
+#db:
+#  property-sources:
+#    - table: "hosts"
+#  property-refresh-interval: 5s
 
 

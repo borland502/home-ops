@@ -18,7 +18,7 @@ public class Env {
     this.environment = environment;
   }
 
-  @ShellMethod(value = "Print all environment properties", key = "printenvs")
+  @ShellMethod(value = "Print all environment properties", key = "printenv")
   public void printEnvironmentProperties() {
     MutablePropertySources propertySources = ((ConfigurableEnvironment) environment).getPropertySources();
     for (PropertySource<?> propertySource : propertySources) {
