@@ -1,9 +1,10 @@
-package com.technohouser.commands.dasbootstrap;
+package com.technohouser.commands.install;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.Callable;
+import com.technohouser.service.ExecService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -12,32 +13,38 @@ import org.springframework.shell.standard.ShellMethod;
 @ShellComponent
 public class ChezmoiInstall implements Callable<String> {
 
+  private final ExecService execService;
+
+  public ChezmoiInstall(ExecService execService) {
+    this.execService = execService;
+  }
+
   private ProcessBuilder chezmoiCheck() {
-    return new ProcessBuilder("chezmoi", "--version").redirectOutput(
+    return execService.exec("chezmoi", "--version").redirectOutput(
         ProcessBuilder.Redirect.INHERIT).redirectError(ProcessBuilder.Redirect.INHERIT);
   }
 
   private ProcessBuilder chezmoiInstall() {
-    return new ProcessBuilder("bash", "-c", "curl -sfL https://git.io/chezmoi | sh").redirectOutput(
+    return execService.exec("bash", "-c", "curl -sfL https://git.io/chezmoi | sh").redirectOutput(
         ProcessBuilder.Redirect.INHERIT).redirectError(ProcessBuilder.Redirect.INHERIT);
   }
 
   private ProcessBuilder chezmoiInit() {
-    return new ProcessBuilder("chezmoi", "init").redirectOutput(ProcessBuilder.Redirect.INHERIT)
+    return execService.exec("chezmoi", "init").redirectOutput(ProcessBuilder.Redirect.INHERIT)
         .redirectError(ProcessBuilder.Redirect.INHERIT);
   }
 
   private ProcessBuilder chezmoiApply() {
-    return new ProcessBuilder("chezmoi", "apply").redirectOutput(ProcessBuilder.Redirect.INHERIT)
+    return execService.exec("chezmoi", "apply").redirectOutput(ProcessBuilder.Redirect.INHERIT)
         .redirectError(ProcessBuilder.Redirect.INHERIT);
   }
 
   private ProcessBuilder cloneRepository(Path dotfilesPath) {
     if (Files.exists(dotfilesPath)) {
       log.info("Repository already exists at {}", dotfilesPath);
-      return new ProcessBuilder("echo", "Repository already exists at " + dotfilesPath);
+      return execService.exec("echo", "Repository already exists at " + dotfilesPath);
     }
-    return new ProcessBuilder("bash", "-c",
+    return execService.exec("bash", "-c",
         String.format("git clone --recurse-submodules https://github.com/borland502/home-ops %s",
             dotfilesPath)).redirectOutput(ProcessBuilder.Redirect.INHERIT)
         .redirectError(ProcessBuilder.Redirect.INHERIT);

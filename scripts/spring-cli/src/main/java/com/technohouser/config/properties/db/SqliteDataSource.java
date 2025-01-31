@@ -16,21 +16,12 @@ import org.sqlite.SQLiteDataSource;
 public class SqliteDataSource {
 
   @Value("${spring.datasource.url}")
-  private URI dbUrl;
-
-  @Value("${spring.datasource.username}")
-  private String dbUsername;
-
-  @Value("${spring.datasource.password}")
-  private String dbPassword;
-
-  @Value("${spring.datasource.driver-class-name}")
-  private String dbDriverClassName;
+  private String url;
 
   @Bean
-  public DataSource dataSource(DatabaseProperties databaseProperties) {
+  public DataSource dataSource() {
     SQLiteDataSource dataSource = new SQLiteDataSource();
-    dataSource.setUrl("jdbc:sqlite:homeops.db");
+    dataSource.setUrl(url);
     return dataSource;
   }
 

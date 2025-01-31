@@ -1,4 +1,4 @@
-package utils;
+package com.technohouser.utils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -57,7 +57,7 @@ public class DefaultPaths {
       }
       return true;
     } catch (Exception e) {
-      log.error("Failed to create path: " + path, e);
+      log.error("Failed to create path: {}", path, e);
       return false;
     }
   }

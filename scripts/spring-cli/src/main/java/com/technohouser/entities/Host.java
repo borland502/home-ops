@@ -25,7 +25,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Host {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")

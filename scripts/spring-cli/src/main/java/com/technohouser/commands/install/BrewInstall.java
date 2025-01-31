@@ -1,4 +1,4 @@
-package com.technohouser.commands.dasbootstrap;
+package com.technohouser.commands.install;
 
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 import java.util.concurrent.Callable;
+import com.technohouser.service.ExecService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.shell.context.InteractionMode;
 import org.springframework.shell.standard.ShellComponent;
@@ -26,10 +27,13 @@ public class BrewInstall implements Callable<String> {
 
   private final HostProperties hostProperties;
   private final BrewProperties brewProperties;
+  private final ExecService execService;
 
-  public BrewInstall(HostProperties hostProperties, BrewProperties brewProperties) {
+  public BrewInstall(HostProperties hostProperties, BrewProperties brewProperties,
+      ExecService execService) {
     this.hostProperties = hostProperties;
     this.brewProperties = brewProperties;
+    this.execService = execService;
   }
 
   private ProcessBuilder installBrew() {
@@ -45,7 +49,7 @@ public class BrewInstall implements Callable<String> {
       }
 
       Files.setPosixFilePermissions(tempFile, PosixFilePermissions.fromString("rwxr-xr-x"));
-      return utils.Exec.buildProcess("bash", "-c", tempFile.toAbsolutePath().toString())
+      return execService.exec("bash", "-c", tempFile.toAbsolutePath().toString())
           .redirectOutput(Redirect.INHERIT).redirectError(Redirect.INHERIT);
     } catch (IOException | InterruptedException e) {
       log.error("Error during Homebrew installation", e);
@@ -83,7 +87,7 @@ public class BrewInstall implements Callable<String> {
           "source " + zshrcPath + " && brew update && brew upgrade && brew install " + String.join(
               " ", brewPackages));
 
-      return utils.Exec.buildProcess("bash", arguments.toArray(new String[0]))
+      return execService.exec("bash", arguments.toArray(new String[0]))
           .redirectOutput(Redirect.INHERIT).redirectError(Redirect.INHERIT);
     } catch (IOException | ClassCastException e) {
       log.error("Error installing brew packages", e);
@@ -96,7 +100,7 @@ public class BrewInstall implements Callable<String> {
   @Override
   public String call() throws Exception {
     try {
-      ProcessBuilder checkBrew = utils.Exec.buildProcess("brew", "--version");
+      ProcessBuilder checkBrew = execService.exec("brew", "--version");
       if (checkBrew.start().waitFor() != 0) {
         if (installBrew().start().waitFor() != 0) {
           throw new Exception("Failed to install Homebrew");

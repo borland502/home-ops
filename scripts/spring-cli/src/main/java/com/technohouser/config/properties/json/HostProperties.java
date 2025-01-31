@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Configuration
-@ConfigurationProperties
+@ConfigurationProperties(prefix = "host")
 public class HostProperties {
 
   private String version;
@@ -36,7 +36,6 @@ public class HostProperties {
 
   @Data
   @NoArgsConstructor
-  @ConfigurationProperties(prefix = "system")
   public static class SystemInfo {
     private String manufacturer;
     private String model;
@@ -50,7 +49,6 @@ public class HostProperties {
 
   @Data
   @NoArgsConstructor
-  @ConfigurationProperties(prefix = "bios")
   public static class BiosInfo {
     private String vendor;
     private String version;
@@ -60,7 +58,6 @@ public class HostProperties {
 
   @Data
   @NoArgsConstructor
-  @ConfigurationProperties(prefix = "baseboard")
   public static class BaseboardInfo {
     private String manufacturer;
     private String model;
@@ -73,7 +70,6 @@ public class HostProperties {
 
   @Data
   @NoArgsConstructor
-  @ConfigurationProperties(prefix = "chassis")
   public static class ChassisInfo {
     private String manufacturer;
     private String model;
@@ -86,7 +82,6 @@ public class HostProperties {
 
   @Data
   @NoArgsConstructor
-  @ConfigurationProperties(prefix = "os")
   public static class OsInfo {
     private String platform;
     private String distro;
@@ -106,7 +101,6 @@ public class HostProperties {
 
   @Data
   @NoArgsConstructor
-  @ConfigurationProperties(prefix = "system")
   public static class UuidInfo {
     private String os;
     private String hardware;
@@ -115,7 +109,6 @@ public class HostProperties {
 
   @Data
   @NoArgsConstructor
-  @ConfigurationProperties(prefix = "versions")
   public static class VersionsInfo {
     private String kernel;
     private String apache;
@@ -140,7 +133,6 @@ public class HostProperties {
 
   @Data
   @NoArgsConstructor
-  @ConfigurationProperties(prefix = "cpu")
   public static class CpuInfo {
     private String manufacturer;
     private String brand;
@@ -166,7 +158,6 @@ public class HostProperties {
 
     @Data
     @NoArgsConstructor
-    @ConfigurationProperties(prefix = "cpu.cache")
     public static class CpuCache {
       private Integer l1d;
       private Integer l1i;
@@ -177,14 +168,12 @@ public class HostProperties {
 
   @Data
   @NoArgsConstructor
-  @ConfigurationProperties(prefix = "graphics")
   public static class GraphicsInfo {
     private List<Controller> controllers;
     private List<Display> displays;
 
     @Data
     @NoArgsConstructor
-    @ConfigurationProperties(prefix = "graphics.controller")
     public static class Controller {
       private String vendor;
       private String model;
@@ -200,7 +189,6 @@ public class HostProperties {
 
     @Data
     @NoArgsConstructor
-    @ConfigurationProperties(prefix = "graphics.display")
     public static class Display {
       private String vendor;
       private String vendorId;
@@ -226,7 +214,6 @@ public class HostProperties {
 
   @Data
   @NoArgsConstructor
-  @ConfigurationProperties(prefix = "net")
   public static class NetInfo {
     private String iface;
     private String ifaceName;
@@ -252,7 +239,6 @@ public class HostProperties {
 
   @Data
   @NoArgsConstructor
-  @ConfigurationProperties(prefix = "memLayout")
   public static class MemLayoutInfo {
     private Long size;
     private String bank;
@@ -270,7 +256,6 @@ public class HostProperties {
 
   @Data
   @NoArgsConstructor
-  @ConfigurationProperties(prefix = "diskLayout")
   public static class DiskLayoutInfo {
     private String device;
     private String type;
@@ -293,7 +278,6 @@ public class HostProperties {
 
   @Data
   @NoArgsConstructor
-  @ConfigurationProperties(prefix = "time")
   public static class TimeInfo {
     private Long current;
     private Integer uptime;

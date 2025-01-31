@@ -1,6 +1,7 @@
-package com.technohouser.commands.dasbootstrap;
+package com.technohouser.commands.install;
 
 import com.technohouser.config.properties.toml.AptProperties;
+import com.technohouser.service.ExecService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.shell.context.InteractionMode;
 import org.springframework.shell.standard.ShellComponent;
@@ -13,9 +14,11 @@ import java.util.concurrent.Callable;
 public class SystemInstall implements Callable<String> {
 
   private final AptProperties aptProperties;
+  private final ExecService execService;
 
-  public SystemInstall(AptProperties aptProperties) {
+  public SystemInstall(AptProperties aptProperties, ExecService execService) {
     this.aptProperties = aptProperties;
+    this.execService = execService;
   }
 
 private ProcessBuilder installSystemPackages() throws Exception {
@@ -25,9 +28,7 @@ private ProcessBuilder installSystemPackages() throws Exception {
     throw new Exception("apt package manager is not available");
   }
 
-  return utils.Exec.buildProcess(
-      "bash",
-      "-c",
+  return execService.exec(
       "sudo apt-get -y update && sudo apt-get -y install "
           + String.join(" ", aptProperties.getPackages()))
       .redirectOutput(Redirect.INHERIT).redirectError(Redirect.INHERIT);

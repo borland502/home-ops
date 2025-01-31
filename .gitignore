@@ -13,6 +13,8 @@ venv
 .venv
 
 # IDEs and editors
+.fleet
+**/*.iml
 /.idea
 .project
 .classpath

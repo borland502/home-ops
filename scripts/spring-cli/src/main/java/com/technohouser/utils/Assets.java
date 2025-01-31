@@ -7,6 +7,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
 
+import com.technohouser.utils.DefaultPaths.HomeOpsPaths;
 import org.eclipse.jgit.api.Git;
 
 import com.electronwill.nightconfig.core.concurrent.SynchronizedConfig;
@@ -14,7 +15,6 @@ import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.core.file.FileNotFoundAction;
 
 import lombok.extern.slf4j.Slf4j;
-import utils.DefaultPaths.HomeOpsPaths;
 
 import static java.lang.System.getProperty;
 
@@ -34,12 +34,12 @@ public class Assets {
     private final FileConfig tomlConfig;
 
     Config() {
-      if (utils.DefaultPaths.ensurePaths()) {
+      if (DefaultPaths.ensurePaths()) {
         log.info("Default paths were created or exist");
       }
 
       Path configPath = Paths.get(getProperty("user.home"), ".config", "home-ops", "default.toml");
-      utils.DefaultPaths.ensurePath(configPath.getParent());
+      DefaultPaths.ensurePath(configPath.getParent());
 
       tomlConfig = FileConfig
           .builder(configPath)
@@ -97,13 +97,13 @@ public class Assets {
         System.setProperty(key, value);
       });
 
-      return utils.Exec.buildProcess("bash", new String[] { "-c", "env" })
+      return new ProcessBuilder("bash", "-c", "env")
           .redirectOutput(Redirect.INHERIT)
           .redirectError(Redirect.INHERIT);
     }
 
     private void checkoutHomeOps() {
-      utils.DefaultPaths.ensurePath(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().getParent());
+      DefaultPaths.ensurePath(HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().getParent());
       File homeOpsDataFile = HomeOpsPaths.HOME_OPS_DATA_PATH.getPath().toFile();
       if (homeOpsDataFile.isDirectory()) {
         log.info("HomeOps data path exists");

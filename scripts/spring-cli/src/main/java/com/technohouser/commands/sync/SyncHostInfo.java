@@ -1,15 +1,22 @@
 package com.technohouser.commands.sync;
 
+import com.technohouser.service.ExecService;
+import com.technohouser.utils.DefaultPaths.HomeOpsPaths;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
-import utils.DefaultPaths.HomeOpsPaths;
 import java.util.concurrent.Callable;
 
 @ShellComponent
 public class SyncHostInfo implements Callable<String> {
 
+  private final ExecService execService;
+
+  public SyncHostInfo(ExecService execService) {
+    this.execService = execService;
+  }
+
   private ProcessBuilder syncHostInfo() {
-    return utils.Exec.buildProcess("sudo", "npx", "systeminformation")
+    return execService.exec("sudo", "npx", "systeminformation")
         .directory(HomeOpsPaths.HOME_OPS_CONFIG_PATH.getPath().toFile())
         .redirectOutput(HomeOpsPaths.HOME_OPS_CONFIG_PATH.getPath().resolve("host.json").toFile());
   }

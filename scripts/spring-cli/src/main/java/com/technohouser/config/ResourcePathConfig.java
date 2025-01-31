@@ -3,27 +3,26 @@ package com.technohouser.config;
 import java.nio.file.Path;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 @Slf4j
 @Configuration
 public class ResourcePathConfig implements InitializingBean {
 
-  @Autowired
-  public Environment environment;
+  public final Environment environment;
 
   @Value("${XDG_DATA_HOME}")
   private Path XDG_DATA_HOME;
 
   @Value("${XDG_CONFIG_HOME}")
   private Path XDG_CONFIG_HOME;
+
+  public ResourcePathConfig(Environment environment) {
+    this.environment = environment;
+  }
 
   public Path getDataRoot() {
     return XDG_DATA_HOME.resolve("automation/home-ops");

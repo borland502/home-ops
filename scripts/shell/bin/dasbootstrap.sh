@@ -61,6 +61,7 @@ function create_sudo_user() {
 
   ensurePackageInstalled "sudo"
   ensurePackageInstalled "zsh"
+  ensurePackageInstalled "zip"
 
   if [ -z "$NO_INSTALL_HOMEBREW" ] && [ "$USER" == "root" ] && [ -z "$INIT_CWD" ] && type useradd &>/dev/null; then
     # shellcheck disable=SC2016
@@ -77,8 +78,8 @@ function create_sudo_user() {
 
     mkdir -p /root/.ssh
     chmod 700 /root/.ssh
-    gum input --placeholder "Enter the public key authorized for root access: " | tr -d '\n' > \
-      "/root/authorized_keys"
+    read -rp "Enter the public key authorized for root access: " pubkey && echo "$pubkey" > \
+      "/root/.ssh/authorized_keys"
     chmod 600 /root/.ssh/authorized_keys
     chown "${_username}:${_username}" /root/.ssh/authorized_keys
 
