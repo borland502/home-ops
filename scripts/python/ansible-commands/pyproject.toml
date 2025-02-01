@@ -47,14 +47,6 @@
     sshkey-tools = "^0.11.3"
     xkcdpass = "^1.19.9"
 
-[tool.poetry.dependencies.homeops-utils]
-    develop = true
-    path = "../../pylibs/homeops-utils"
-
-[tool.poetry.dependencies.resources]
-    develop = true
-    path = "../../pylibs/resources"
-
 [tool.ruff]
     exclude = [
         ".svn",

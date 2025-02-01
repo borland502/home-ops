@@ -34,7 +34,7 @@ spring:
     banner-mode: off
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     generate-ddl: true
     show-sql: true
     open-in-view: false
@@ -42,7 +42,7 @@ spring:
     defer-datasource-initialization: true
   datasource:
     driver-class-name: org.sqlite.JDBC
-    url: jdbc:sqlite:${user.home}/.local/share/automation/home-ops/home-ops.sqlite
+    url: jdbc:sqlite:${user.home}/.local/share/home-ops.sqlite
     username: ""
     password: ""
   task:

@@ -1,5 +1,11 @@
 - name: Update Proxmox nodes on the network
-  hosts: proxmox_nodes
+  hosts: |
+    mandorallen.local.technohouser.com
+    mara.local.technohouser.com
+    minfilia.local.technohouser.com
+    noctis.local.technohouser.com
+    salmissra.local.technohouser.com
+    yshtola.local.technohouser.com
   remote_user: root
   tasks:
     - name: Update all packages to their latest version

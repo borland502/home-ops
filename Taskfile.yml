@@ -6,6 +6,9 @@ dotenv:
   - ${HOME}/.zshrc
   - ${HOME}/.zshenv
 
+vars:
+  HOME_OPS_HOOME: "${XDG_DATA_HOME}/automation/home-ops"
+
 includes:
   deploy:
     taskfile: "./scripts/taskfiles/deploy.yaml"
@@ -28,10 +31,10 @@ includes:
     taskfile: "./scripts/taskfiles/unison.yaml"
 
 tasks:
-  build:boot:jar:
-    desc: Build the boot jar
+  build:jar:
+    desc: Build the jar
     summary: |
-      This task builds the boot jar locally
+      To ensure cross-platform compatibility, the jar is built using the Gradle wrapper and as a non AoT jar
     cmds:
       - >-
         ./gradlew clean bootJar
@@ -46,7 +49,7 @@ tasks:
       - task: install:node
       - task: install:python
       - task: install:brew
-      - task: build:boot:jar
+      - task: build:jar
     cmds:
       - cmd: test -d /tmp/mcv && rm -rf /tmp/mcv
       - cmd: mkdir -p /tmp/mcv/dist
@@ -80,82 +83,3 @@ tasks:
       # Run the script
       - cmd: >-
           /tmp/mcv/dist/mcv.run
-
-  angularapp:create:
-    desc: Create a new Angular application
-    summary: |
-      This task creates a new Angular application, skipping test and framework defaults for flexibility
-    cmds:
-      - >-
-        npx nx generate @nx/angular:application --directory apps/{{.PROJ_NAME}} --bundler esbuild
-        --standalone false --e2eTestRunner playwright --unitTestRunner jest --style less
-        --name {{.PROJ_NAME}} --ssr false --verbose
-    vars:
-      PROJ_NAME:
-        sh: "echo $(gum input --placeholder 'Project Name')"
-    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
-
-  nodeapp:create:
-    desc: Create a new NodeJS application
-    summary: |
-      This task creates a new NodeJS application, skipping test and framework defaults for flexibility
-    cmds:
-      - >-
-        npx nx generate @nx/node:application --directory apps/{{.PROJ_NAME}} --bundler esbuild --framework none
-        --name {{.PROJ_NAME}} --docker true --e2eTestRunner none --js false --unitTestRunner none
-        --projectNameAndRootFormat as-provided --verbose
-    #      - test -f ./apps/{{.PROJ_NAME}}/eslint.config.js && rm ./apps/{{.PROJ_NAME}}/eslint.config.js
-    #      - mv ./apps/{{.PROJ_NAME}}/main.ts ./apps/{{.PROJ_NAME}}/main.mts
-    #      - ln -sf ./config/apps/tsconfig.json ./apps/{{.PROJ_NAME}}/tsconfig.json
-    #      - ln -sf ./config/apps/tsconfig.app.json ./apps/{{.PROJ_NAME}}/tsconfig.app.json
-    #      - ln -sf ./config/apps/tsconfig.spec.json ./apps/{{.PROJ_NAME}}/tsconfig.spec.json
-    vars:
-      PROJ_NAME:
-        sh: "echo $(gum input --placeholder 'Project Name')"
-    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
-
-  nodelib:create:
-    desc: Create a new NodeJS library
-    summary: |
-      This task creates a new NodeJS library, skipping test and framework defaults for flexibility
-    cmds:
-      - >-
-        npx nx generate @nx/node:library --directory libs/{{.PROJ_NAME}} --bundler esbuild --framework none
-        --name {{.PROJ_NAME}} --docker true --e2eTestRunner none --js false --unitTestRunner none
-        --projectNameAndRootFormat as-provided --verbose
-    vars:
-      PROJ_NAME:
-        sh: "echo $(gum input --placeholder 'Library Name')"
-    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
-
-  pyapp:create:
-    desc: Create a new Python application
-    summary: |
-      This task creates a new Python application
-    cmds:
-      - >-
-        npx nx generate @nxlv/python:poetry-project {{.PROJ_NAME}} --projectType application --packageName {{.PROJ_NAME}}
-        --directory pyapps/{{.PROJ_NAME}} --moduleName {{.MODULE_NAME}}  --pyprojectPythonDependency '>=3.11,<4.0'
-        --linter ruff --projectNameAndRootFormat as-provided
-    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
-    vars:
-      PROJ_NAME:
-        sh: "echo $(gum input --placeholder 'Project Name')"
-      MODULE_NAME:
-        sh: "echo $(gum input --placeholder 'Module Name: Usually the same as the project name with an underscore')"
-
-  pylib:create:
-    desc: Create a new Python library
-    summary: |
-      This task creates a new Python library
-    cmds:
-      - >-
-        npx nx generate @nxlv/python:poetry-project {{.PROJ_NAME}} --projectType library --packageName {{.PROJ_NAME}}
-        --directory pylibs/{{.PROJ_NAME}} --moduleName {{.MODULE_NAME}}  --pyprojectPythonDependency '>=3.11,<4.0'
-        --linter ruff --projectNameAndRootFormat as-provided
-    dir: "{{.XDG_DATA_HOME}}/automation/home-ops"
-    vars:
-      PROJ_NAME:
-        sh: "echo $(gum input --placeholder 'Library Name')"
-      MODULE_NAME:
-        sh: "echo $(gum input --placeholder 'Module Name: Usually the same as the library name with an underscore')"
