@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
@@ -25,6 +25,7 @@ import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.path;
  * and close the db instance itself.
  */
 @Slf4j
+@Transactional
 @Service
 public class SecretsService implements SmartLifecycle, Callable<Void> {
 

@@ -25,20 +25,4 @@ public class SqliteDataSource {
     return dataSource;
   }
 
-  @Bean
-  public PlatformTransactionManager transactionManager(DataSource dataSource) {
-    return new DataSourceTransactionManager(dataSource);
-  }
-
-  @Bean
-  public JpaTransactionManager jpaTransactionManager(EntityManagerFactory entityManagerFactory) {
-    return new JpaTransactionManager(entityManagerFactory);
-  }
-
-
-  @Bean
-  public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
-    return new PersistenceExceptionTranslationPostProcessor();
-  }
-
 }

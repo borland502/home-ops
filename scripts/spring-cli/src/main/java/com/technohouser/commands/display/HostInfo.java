@@ -2,7 +2,7 @@ package com.technohouser.commands.display;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.technohouser.model.Host;
+import com.technohouser.model.HostDto;
 import jakarta.validation.constraints.AssertFalse.List;
 import java.io.BufferedReader;
 import java.io.File;
@@ -68,9 +68,9 @@ public class HostInfo implements Callable<String> {
     }
   }
 
-  public Host getHost() throws IOException {
+  public HostDto getHost() throws IOException {
     Map<String, Object> jsonMap = readJsonAsMap();
-    return objectMapper.convertValue(jsonMap, Host.class);
+    return objectMapper.convertValue(jsonMap, HostDto.class);
   }
 
   @ShellMethod(value = "Display host information", key = "hostinfo", group = "display")

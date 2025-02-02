@@ -23,8 +23,12 @@ public class ExecService implements Phased, SmartLifecycle {
     this.environment = environment;
   }
 
+  /**
+   * Enum to represent the shell that is currently being used by the system.  none indicates that
+   * the default shell is used without the -c flag.
+   */
   public enum ShellVar {
-    zsh, bash, sh
+    zsh, bash, sh, no_command
   }
 
   /**
@@ -38,7 +42,7 @@ public class ExecService implements Phased, SmartLifecycle {
     return Integer.MIN_VALUE;
   }
 
-  public ProcessBuilder exec(String command, String... args) {
+  public ProcessBuilder exec(ShellVar shell, String command, String... args) {
     // Validate that the command is existing and is executable
     if (Strings.isBlank(command)) {
       throw new IllegalArgumentException("Command cannot be null or empty");
@@ -51,9 +55,17 @@ public class ExecService implements Phased, SmartLifecycle {
     ProcessBuilder pb = new ProcessBuilder(statement);
     pb.environment().putAll(envVars);
 
-    // assume shell is in path
-    pb.command(String.valueOf(statement.addAll(0, List.of(getShell().name(), "-c"))));
+    // don't use <shell name> -c with no_command
+    if (shell == ShellVar.no_command) {
+      return pb;
+    }
+
+    pb.command(String.valueOf(statement.addAll(0, List.of(shell.name(), "-c"))));
     return pb;
+  }
+
+  public ProcessBuilder exec(String command, String... args) {
+    return exec(getShell(), command, args);
   }
 
   /**
@@ -76,6 +88,7 @@ public class ExecService implements Phased, SmartLifecycle {
       case zsh -> ShellVar.zsh;
       case bash -> ShellVar.bash;
       case sh -> ShellVar.sh;
+      default -> ShellVar.no_command;
     };
 
   }

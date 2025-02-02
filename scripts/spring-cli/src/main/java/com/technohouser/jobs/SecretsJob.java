@@ -1,6 +1,7 @@
 package com.technohouser.jobs;
 
 import com.technohouser.service.SecretsService;
+import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
