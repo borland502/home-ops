@@ -7,37 +7,38 @@ dotenv:
   - ${HOME}/.zshenv
 
 vars:
-  HOME_OPS_HOOME: "${XDG_DATA_HOME}/automation/home-ops"
+  HOME_OPS_HOME: "${XDG_DATA_HOME}/automation/home-ops"
 
 includes:
   deploy:
+    internal: true
     taskfile: "./scripts/taskfiles/deploy.yaml"
   ansible:
+    internal: true
     taskfile: "./scripts/taskfiles/ansible.yaml"
   chez:
+    internal: true
     taskfile: "./scripts/taskfiles/chezmoi.yaml"
-  #  kp:
-  #    taskfile: "./scripts/taskfiles/keepassxc.yaml"
   validate:
     internal: true
     taskfile: "./scripts/taskfiles/validate.yaml"
   install:
     internal: true
     taskfile: "./scripts/taskfiles/install/install.yaml"
-  #  git:
-  #    internal: true
-  #    taskfile: "./scripts/taskfiles/git.yaml"
   unison:
+    internal: true
     taskfile: "./scripts/taskfiles/unison.yaml"
 
 tasks:
   build:jar:
     desc: Build the jar
+    silent: true
+    internal: true
     summary: |
       To ensure cross-platform compatibility, the jar is built using the Gradle wrapper and as a non AoT jar
     cmds:
       - >-
-        ./gradlew clean bootJar
+        ./gradlew build jar
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts/spring-cli"
 
   mcv:pack:
@@ -83,3 +84,15 @@ tasks:
       # Run the script
       - cmd: >-
           /tmp/mcv/dist/mcv.run
+
+  shell:
+    desc: Start the Spring Shell Service and console
+    silent: true
+    deps:
+      - task: build:jar
+    summary: |
+      This task runs the shell script
+    cmds:
+      - cmd: >-
+          java -jar {{.XDG_DATA_HOME}}/automation/home-ops/scripts/spring-cli/build/libs/home-ops.jar
+    dir: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts/spring-cli"

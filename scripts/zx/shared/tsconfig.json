@@ -1,12 +1,5 @@
 {
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.lib.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
-    }
-  ],
-  "extends": "../../tsconfig.base.json"
+  "extends": "../../tsconfig.base.json",
+  "include": ["**/*.mts"],
+  "exclude": ["node_modules", "dist"]
 }

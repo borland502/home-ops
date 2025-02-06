@@ -49,7 +49,7 @@ public class BrewInstall implements Callable<String> {
       }
 
       Files.setPosixFilePermissions(tempFile, PosixFilePermissions.fromString("rwxr-xr-x"));
-      return execService.exec("bash", "-c", tempFile.toAbsolutePath().toString())
+      return execService.rawExec("bash", "-c", tempFile.toAbsolutePath().toString())
           .redirectOutput(Redirect.INHERIT).redirectError(Redirect.INHERIT);
     } catch (IOException | InterruptedException e) {
       log.error("Error during Homebrew installation", e);
@@ -87,7 +87,7 @@ public class BrewInstall implements Callable<String> {
           "source " + zshrcPath + " && brew update && brew upgrade && brew install " + String.join(
               " ", brewPackages));
 
-      return execService.exec("bash", arguments.toArray(new String[0]))
+      return execService.rawExec("bash", arguments.toArray(new String[0]))
           .redirectOutput(Redirect.INHERIT).redirectError(Redirect.INHERIT);
     } catch (IOException | ClassCastException e) {
       log.error("Error installing brew packages", e);
@@ -96,11 +96,11 @@ public class BrewInstall implements Callable<String> {
   }
 
   @ShellMethod(value = "Install brew and brew packages", key = {
-      "install brew","brew"}, group = "dasbootstrap", interactionMode = InteractionMode.INTERACTIVE)
+      "install brew", "brew" }, group = "dasbootstrap", interactionMode = InteractionMode.INTERACTIVE)
   @Override
   public String call() throws Exception {
     try {
-      ProcessBuilder checkBrew = execService.exec("brew", "--version");
+      ProcessBuilder checkBrew = execService.rawExec("brew", "--version");
       if (checkBrew.start().waitFor() != 0) {
         if (installBrew().start().waitFor() != 0) {
           throw new Exception("Failed to install Homebrew");

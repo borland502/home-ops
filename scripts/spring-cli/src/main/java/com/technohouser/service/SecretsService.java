@@ -13,6 +13,10 @@ import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
 import org.linguafranca.pwdb.kdbx.jackson.JacksonEntry;
 import org.linguafranca.pwdb.kdbx.jackson.JacksonGroup;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitialization;
+import org.springframework.boot.web.server.GracefulShutdownCallback;
+import org.springframework.boot.web.server.GracefulShutdownResult;
+import org.springframework.context.Phased;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
@@ -27,7 +31,8 @@ import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.path;
 @Slf4j
 @Transactional
 @Service
-public class SecretsService implements SmartLifecycle, Callable<Void> {
+@DependsOnDatabaseInitialization
+public class SecretsService implements SmartLifecycle, Callable<Void>, Phased {
 
   @Value("${XDG_DATA_HOME}")
   private Path XDG_DATA_HOME;
@@ -69,6 +74,12 @@ public class SecretsService implements SmartLifecycle, Callable<Void> {
   @Override
   public boolean isRunning() {
     return this.db != null;
+  }
+
+
+  @Override
+  public int getPhase() {
+    return Integer.MAX_VALUE;
   }
 
   public void saveDatabase() {

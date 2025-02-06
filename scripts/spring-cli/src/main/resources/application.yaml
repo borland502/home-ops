@@ -1,5 +1,6 @@
 assets:
   host.path: ${user.home}/.config/home-ops/host.json
+  hosts.path: ${user.home}/.ansible/inventory/hosts.toml
 spring:
   toml:
     enabled: true
@@ -58,15 +59,16 @@ management:
       exposure:
         include: "*"
       base-path: /actuator
+logging:
+  level:
+    root: WARN
 #db:
 #  property-sources:
 #    - table: "hosts"
 #  property-refresh-interval: 5s
 
-
 database:
   persistence:
     check:
-      interval: 300000  # 5 minutes in milliseconds
-
+      interval: 300000 # 5 minutes in milliseconds
 

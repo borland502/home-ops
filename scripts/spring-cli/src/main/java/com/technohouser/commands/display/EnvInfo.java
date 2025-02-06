@@ -6,6 +6,9 @@ import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
+import org.springframework.shell.boot.CommandRegistrationCustomizer;
+import org.springframework.shell.command.CommandRegistration;
+import org.springframework.shell.command.CommandRegistration.Builder;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 
@@ -18,7 +21,7 @@ public class EnvInfo {
     this.environment = environment;
   }
 
-  @ShellMethod(value = "Print all environment properties", key = "printenv")
+  @ShellMethod(value = "Print all environment properties", key = "printenv", group = "Info")
   public void printEnvironmentProperties() {
     MutablePropertySources propertySources = ((ConfigurableEnvironment) environment).getPropertySources();
     for (PropertySource<?> propertySource : propertySources) {
@@ -32,4 +35,5 @@ public class EnvInfo {
       }
     }
   }
+
 }

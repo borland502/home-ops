@@ -4,58 +4,24 @@
   "license": "MIT",
   "type": "module",
   "private": true,
-  "main": "scripts/zx/main.cjs",
   "engines": {
     "node": "22"
   },
-  "scripts": {
-    "test:all": "npx nx run-many --target=test --parallel --all",
-    "nx:update": "npx nx migrate latest",
-    "nx:graph": "npx nx graph",
-    "dev": "unset NODE_CONFIG_DIR; npx tsx --tsconfig=tsconfig.base.json scripts/zx/main.mts"
-  },
   "devDependencies": {
     "@eslint/js": "^9.8.0",
-    "@nx/esbuild": "20.3.1",
-    "@nx/eslint": "20.3.1",
-    "@nx/eslint-plugin": "20.3.1",
-    "@nx/js": "20.3.1",
-    "@nx/node": "20.3.1",
-    "@nx/playwright": "20.3.1",
-    "@nx/web": "20.3.1",
-    "@nx/workspace": "20.3.1",
-    "@nxlv/python": "20.0.1",
-    "@nxrocks/nx-spring-boot": "^10.2.6",
-    "@playwright/test": "^1.49.1",
-    "@qiwi/deep-proxy": "^3.0.0",
-    "@types/config": "^3.3.5",
-    "@types/cors": "^2.8.17",
-    "@types/eslint": "^9.6.1",
-    "@types/fs-extra": "^11.0.4",
-    "@types/graceful-fs": "^4.1.9",
-    "@types/jsonapi-serializer": "^3.6.8",
-    "@types/minimist": "^1.2.5",
-    "@types/node": "~22.10.2",
-    "@types/sqlite3": "^3.1.11",
-    "@types/uuid": "^10.0.0",
-    "globby": "^14.0.2",
-    "graceful-fs": "^4.2.11",
     "gts": "^6.0.2",
-    "minimist": "^1.2.8",
-    "nx": "20.3.1",
-    "nx-stylelint": "^18.0.0",
     "tsx": "^4.19.2"
   },
   "dependencies": {
     "config": "^3.3.12",
     "radash": "^12.1.0",
     "systeminformation": "^5.25.9",
-    "toml": "^3.0.0",
-    "xdg-basedir": "^5.1.0",
     "zx": "^8.3.0"
   },
   "workspaces": [
-    "libs/shared",
-    "scripts/zx"
-  ]
+    "shared"
+  ],
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
 }

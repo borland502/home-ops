@@ -28,7 +28,7 @@ private ProcessBuilder installSystemPackages() throws Exception {
     throw new Exception("apt package manager is not available");
   }
 
-  return execService.exec(
+  return execService.rawExec(
       "sudo apt-get -y update && sudo apt-get -y install "
           + String.join(" ", aptProperties.getPackages()))
       .redirectOutput(Redirect.INHERIT).redirectError(Redirect.INHERIT);

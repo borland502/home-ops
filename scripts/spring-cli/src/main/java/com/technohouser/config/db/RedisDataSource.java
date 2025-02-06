@@ -1,4 +1,4 @@
-package com.technohouser.config.properties.db;
+package com.technohouser.config.db;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

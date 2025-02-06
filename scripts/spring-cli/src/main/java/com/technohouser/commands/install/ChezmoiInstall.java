@@ -20,31 +20,31 @@ public class ChezmoiInstall implements Callable<String> {
   }
 
   private ProcessBuilder chezmoiCheck() {
-    return execService.exec("chezmoi", "--version").redirectOutput(
+    return execService.rawExec("chezmoi", "--version").redirectOutput(
         ProcessBuilder.Redirect.INHERIT).redirectError(ProcessBuilder.Redirect.INHERIT);
   }
 
   private ProcessBuilder chezmoiInstall() {
-    return execService.exec("bash", "-c", "curl -sfL https://git.io/chezmoi | sh").redirectOutput(
+    return execService.rawExec("bash", "-c", "curl -sfL https://git.io/chezmoi | sh").redirectOutput(
         ProcessBuilder.Redirect.INHERIT).redirectError(ProcessBuilder.Redirect.INHERIT);
   }
 
   private ProcessBuilder chezmoiInit() {
-    return execService.exec("chezmoi", "init").redirectOutput(ProcessBuilder.Redirect.INHERIT)
+    return execService.rawExec("chezmoi", "init").redirectOutput(ProcessBuilder.Redirect.INHERIT)
         .redirectError(ProcessBuilder.Redirect.INHERIT);
   }
 
   private ProcessBuilder chezmoiApply() {
-    return execService.exec("chezmoi", "apply").redirectOutput(ProcessBuilder.Redirect.INHERIT)
+    return execService.rawExec("chezmoi", "apply").redirectOutput(ProcessBuilder.Redirect.INHERIT)
         .redirectError(ProcessBuilder.Redirect.INHERIT);
   }
 
   private ProcessBuilder cloneRepository(Path dotfilesPath) {
     if (Files.exists(dotfilesPath)) {
       log.info("Repository already exists at {}", dotfilesPath);
-      return execService.exec("echo", "Repository already exists at " + dotfilesPath);
+      return execService.rawExec("echo", "Repository already exists at " + dotfilesPath);
     }
-    return execService.exec("bash", "-c",
+    return execService.rawExec("bash", "-c",
         String.format("git clone --recurse-submodules https://github.com/borland502/home-ops %s",
             dotfilesPath)).redirectOutput(ProcessBuilder.Redirect.INHERIT)
         .redirectError(ProcessBuilder.Redirect.INHERIT);

@@ -27,6 +27,8 @@ import com.technohouser.entities.HostDao.TimeDao;
 import com.technohouser.entities.HostDao.UUIDDao;
 import com.technohouser.entities.HostDao.VersionsDao;
 import com.technohouser.entities.HostDao.MemLayoutDao;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,6 +40,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
 public class HostDto {
 
@@ -251,6 +254,7 @@ public class HostDto {
         hostDao.getTime().getTimezoneName());
   }
 
+  @Builder
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record System(
       String manufacturer,
@@ -263,6 +267,7 @@ public class HostDto {
       String type) {
   }
 
+  @Builder
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record Bios(
       String vendor,
@@ -271,6 +276,7 @@ public class HostDto {
       String revision) {
   }
 
+  @Builder
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record Baseboard(
       String manufacturer,
@@ -282,6 +288,7 @@ public class HostDto {
       int memSlots) {
   }
 
+  @Builder
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record Chassis(
       String manufacturer,
@@ -293,6 +300,7 @@ public class HostDto {
       String sku) {
   }
 
+  @Builder
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record OS(
       String platform,
@@ -311,6 +319,7 @@ public class HostDto {
       boolean uefi) {
   }
 
+  @Builder
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record UUID(
       String os,
@@ -318,6 +327,7 @@ public class HostDto {
       List<String> macs) {
   }
 
+  @Builder
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record Versions(
       String kernel,
@@ -341,6 +351,7 @@ public class HostDto {
       String distroCPE) {
   }
 
+  @Builder
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record CPU(
       String vendor,
@@ -363,6 +374,7 @@ public class HostDto {
       String cacheL3) {
   }
 
+  @Builder
   @Data
   @NoArgsConstructor
   public static class Graphics {
@@ -377,9 +389,11 @@ public class HostDto {
     }
   }
 
+  @Builder
   @Getter
   @Setter
   @NoArgsConstructor
+  @JsonIgnoreProperties(ignoreUnknown = true)
   public static class Controller {
     private String model;
     private String vendor;
@@ -407,6 +421,7 @@ public class HostDto {
     }
   }
 
+  @Builder
   @Getter
   @Setter
   @NoArgsConstructor
@@ -461,6 +476,7 @@ public class HostDto {
     }
   }
 
+  @Builder
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record Net(
       String iface,
@@ -486,6 +502,7 @@ public class HostDto {
       int carrierChanges) {
   }
 
+  @Builder
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record MemLayout(
       String bank,
@@ -502,6 +519,7 @@ public class HostDto {
       boolean ecc) {
   }
 
+  @Builder
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record DiskLayout(
       String device,
@@ -524,6 +542,7 @@ public class HostDto {
       String serialNumber) {
   }
 
+  @Builder
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record Time(
       long current,

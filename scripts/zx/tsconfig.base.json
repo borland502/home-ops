@@ -1,43 +1,27 @@
 {
-  "compileOnSave": false,
   "compilerOptions": {
-    "rootDir": ".",
-    "sourceMap": true,
-    "declaration": true,
-    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "module": "esnext",
+    "lib": ["ES2022"],
     "strict": true,
-    "outDir": "dist",
     "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "emitDeclarationOnly": true,
-    "declarationDir": "dist",
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": true,
-    "noFallthroughCasesInSwitch": true,
-    "isolatedModules": true,
-    "strictNullChecks": true,
-    "target": "ESNext",
-    "module": "NodeNext",
-    "lib": [
-      "ESNext",
-      "dom"
-    ],
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@technohouser/shared": [
-        "libs/shared/src/index.mts"
-      ]
-    }
+      "@technohouser": ["."],
+      "@technohouser/shared": ["shared/src"],
+      "@technohouser/shared/*": ["shared/src/*"]
+    },
+    "isolatedModules": true,
+    "composite": true,
+    "declaration": true,
+    "outDir": "build",
+    "rootDir": "."
   },
-  "files": [
-    "config/prod.toml"
-  ],
-  "exclude": [
-    "node_modules",
-    "tmp",
-    "dist"
-  ]
+  "include": ["**/*.mts"],
+  "exclude": ["node_modules", "build"]
 }

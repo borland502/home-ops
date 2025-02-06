@@ -11,9 +11,11 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.shell.command.annotation.CommandScan;
 
 @Slf4j
@@ -50,6 +52,16 @@ public class HomeOpsApplication implements SpringApplicationRunListener {
   public void failed(ConfigurableApplicationContext context, Throwable exception) {
     log.error("HomeOpsApplication failed to start", exception);
     System.exit(2);
+  }
+
+  @Bean
+  public ThreadPoolTaskScheduler taskScheduler() {
+    ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+    taskScheduler.setPoolSize(5);
+    taskScheduler.setThreadNamePrefix("ScheduledTask-");
+    taskScheduler.setAwaitTerminationSeconds(30);
+    taskScheduler.setWaitForTasksToCompleteOnShutdown(true);
+    return taskScheduler;
   }
 
 }

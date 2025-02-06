@@ -7,6 +7,9 @@
     "lint": "gts lint",
     "fix": "gts fix"
   },
+  "exports": {
+    ".": "./src/index.mjs"
+  },
   "author": "",
   "license": "ISC"
 }

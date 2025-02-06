@@ -1,0 +1,25 @@
+[build]
+    # Entry point for your application
+    entry = "src/index.js"
+    # Output directory for build artifacts
+    outDir = "dist"
+    # Generate source maps for debugging
+    sourceMap = true
+    # Disable minification for easier debugging in development
+    minify = false
+
+[watch]
+    # Directories to include for live reloading
+    include = ["src"]
+    # Directories to ignore to avoid unnecessary reloads
+    exclude = ["node_modules", "dist"]
+
+[serve]
+    # Port on which the development server will run
+    port = 3000
+    # Set to true to automatically open the browser on start
+    open = false
+
+[env]
+    # Default environment variable for development
+    NODE_ENV = "default"

@@ -73,7 +73,7 @@ public class HostInfo implements Callable<String> {
     return objectMapper.convertValue(jsonMap, HostDto.class);
   }
 
-  @ShellMethod(value = "Display host information", key = "hostinfo", group = "display")
+  @ShellMethod(value = "Display host information", key = "hostinfo", group = "info")
   @Override
   public String call() throws Exception {
     Map<String, Object> jsonMap = readJsonAsMap();
