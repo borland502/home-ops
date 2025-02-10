@@ -1,0 +1,218 @@
+services:
+
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - /DATA/AppData/gluetun:/gluetun
+    networks:
+      - autoplex
+    ports:
+      - "8388:8388/tcp" # Shadowsocks
+      - "8388:8388/udp" # Shadowsocks
+      - "8888:8888/tcp" # HTTP proxy
+      - "8112:8112/tcp" # Deluge Web UI
+      - "8080:8080/tcp" # SABNzBD
+    environment:
+      - BLOCK_MALICIOUS=on
+      - BLOCK_SURVEILLANCE=off
+      - DOT=on
+      - VPN_SERVICE_PROVIDER={{ vpn_service_provider }}
+      - VPN_TYPE=openvpn
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - OPENVPN_USER={{ openvpn_user }}
+      - OPENVPN_PASSWORD={{ openvpn_password }}
+      - OPENVPN_VERSION=2.6
+      - SERVER_COUNTRIES={{ server_country }}
+      - SERVER_CITIES={{ server_cities }}
+      - OPENVPN_VERBOSITY=3
+      - FIREWALL_OUTBOUND_SUBNETS={{ firewall_outbound_subnets }}
+      - FIREWALL_VPN_INPUT_PORTS=6881
+      - FIREWALL_INPUT_PORTS=8080,8112,8388,8888,8090,8686,7878,8989,9696,7081,8787,8191,8192,9000
+      - HTTPPROXY=on
+      - SHADOWSOCKS=on
+      - SHADOWSOCKS_PASSWORD={{ shadowsocks_password }}
+      - TZ={{ timezone }}
+      - UPDATER_PERIOD=72h
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+
+  deluge:
+    image: lscr.io/linuxserver/deluge:latest
+    container_name: deluge
+    network_mode: service:gluetun
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+    volumes:
+      - /DATA/AppData/deluge:/config
+      - /autoplex/torrents:/autoplex/torrents
+    restart: always
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    network_mode: service:gluetun
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ={{ timezone }}
+    volumes:
+      - /DATA/AppData/sabnzbd/config:/config
+      - /dev/null:/downloads #optional
+      - /dev/null:/incomplete-downloads
+      - /autoplex/usenet:/autoplex/usenet #optional
+    restart: always
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+
+  mylar3:
+    image: lscr.io/linuxserver/mylar3:latest
+    container_name: mylar3
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+    volumes:
+      - /DATA/AppData/mylar3/config:/config
+      - /autoplex:/autoplex
+    restart: always
+    networks:
+        - autoplex
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ={{ timezone }}
+    volumes:
+      - /DATA/AppData/lidarr/config:/config
+      - /autoplex:/autoplex
+    restart: always
+    networks:
+        - autoplex
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ={{ timezone }}
+    volumes:
+      - /DATA/AppData/radarr/config:/config
+      - /autoplex:/autoplex
+    restart: always
+    networks:
+      - autoplex
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+    volumes:
+      - /DATA/AppData/prowlarr/config:/config
+    restart: always
+    networks:
+        - autoplex
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ={{ timezone }}
+    volumes:
+      - /DATA/AppData/sonarr/config:/config
+      - /autoplex:/autoplex
+    restart: always
+    networks:
+        - autoplex
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+    volumes:
+      - /DATA/AppData/bazarr/config:/config
+      - /autoplex:/autoplex
+    restart: always
+    networks:
+        - autoplex
+
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    ports:
+#      - "8080:8080/tcp" # SABNzBD
+#      - "8112:8112/tcp" # Deluge Web UI
+#      - "8090:8090/tcp" # Mylar3
+#      - "8686:8686/tcp" # Lidarr
+#      - "7878:7878/tcp" # Radarr
+#      - "8989:8989/tcp" # Sonarr
+#      - "9696:9696/tcp" # Bazarr
+      - "80:80/tcp"
+      - "81:81/tcp"     # Nginx Proxy Manager
+      - "443:443/tcp"   # Nginx Proxy Manager
+#      - "8787:8787/tcp" # Readarr
+#      - "8191:8191/tcp" # Prowlarr
+#      - "8192:8192/tcp" # FlareSolverr
+#      - "9000:9000/tcp" # Portainer
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+    volumes:
+      - /DATA/AppData/nginxproxymanager/data:/data
+      - /DATA/AppData/nginxproxymanager/etc/letsencrypt:/etc/letsencrypt
+    restart: always
+    networks:
+        - autoplex
+        - default
+
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: readarr
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+    volumes:
+      - /DATA/AppData/readarr/config:/config
+      - /autoplex:/autoplex
+    restart: always
+    networks:
+        - autoplex
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+    volumes:
+      - /DATA/AppData/flaresolverr:/config
+    restart: always
+    networks:
+        - autoplex
+
+networks:
+  autoplex:

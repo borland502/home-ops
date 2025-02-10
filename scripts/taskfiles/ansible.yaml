@@ -2,49 +2,79 @@
 version: "3"
 
 env:
-  ANSIBLE_CONFIG: "{{.ANSIBLE_HOME}}/ansible.cfg"
+  ANSIBLE_CONFIG: "{{.ANSIBLE_SCRIPTS_HOME}}/ansible.cfg"
   ANSIBLE_KEEPASS_PSW: "{{.ANSIBLE_KEEPASS_PSW}}"
   ANSIBLE_KEEPASS_KEY: "{{.ANSIBLE_KEEPASS_FILE}}"
   ANSIBLE_TTL: 600
   ANSIBLE_KEEPASS_SOCKET: "{{.ANSIBLE_HOME}}/keepassxc.sock"
 
 vars:
+  HOME_OPS_HOME: "${XDG_DATA_HOME}/automation/home-ops"
+  ANSIBLE_SCRIPTS_HOME: "{{.HOME_OPS_HOME}}/scripts/ansible"
   ANSIBLE_HOME: "${HOME}/.ansible"
   ANSIBLE_INV_HOME: "{{.ANSIBLE_HOME}}/inventory"
+  venv_path: "{{.ANSIBLE_SCRIPTS_HOME}}/.venv"
+  ANSIBLE_PLAYBOOK_HOME: "{{.ANSIBLE_SCRIPTS_HOME}}/playbooks"
+  ANSIBLE_INVENTORY_HOME: "{{.ANSIBLE_HOME}}/inventory"
 
 tasks:
+
+  venv_init:
+    desc: Activate the virtual environment
+    cmds:
+      - source {{.venv_path}}/bin/activate
+
+  init:
+    desc: Install / Upgrade Ansible galaxy deps
+    deps:
+      - task: venv_init
+    cmds:
+      - ansible-galaxy install -r requirements.yml --roles-path ~/.ansible/roles --force
+      - ansible-galaxy collection install -r requirements.yml --collections-path ~/.ansible/collections --force
+    dir: "{{.HOME_OPS_HOME}}"
+
+  list:
+    desc: List all the hosts
+    deps:
+      - task: venv_init
+    cmds:
+      - ansible all -i {{.ANSIBLE_INV_HOME}} --list-hosts
+    dir: "{{.HOME_OPS_HOME}}"
+
+  show:
+    desc: Show ansible task variables
+    silent: true
+    deps:
+      - task: venv_init
+    cmds:
+      - |
+        echo "ANSIBLE_DIR: {{.ANSIBLE_HOME}}"
+        echo "ANSIBLE_SCRIPTS_HOME: {{.ANSIBLE_SCRIPTS_HOME}}"
+        echo "ANSIBLE_CONFIG: ${ANSIBLE_CONFIG}"
+        echo "ANSIBLE_PLAYBOOK_HOME: {{.ANSIBLE_PLAYBOOK_HOME}}"
+        echo "ANSIBLE_INVENTORY_HOME: {{.ANSIBLE_INV_HOME}}"
+        echo "venv_path: {{.venv_path}}"
+    dir: "{{.HOME_OPS_HOME}}"
 
   ping:
     desc: Ping all the hosts
     cmds:
       - poetry run ansible all -i {{.ANSIBLE_INV_HOME}} -m 'ping'
+    dir: "{{.HOME_OPS_HOME}}"
 
   fingerprint:
-      desc: Get the SSH fingerprint for each host
-      cmds:
-        - poetry run ansible all -i {{.ANSIBLE_INV_HOME}} --one-line -m 'command' -a 'ssh-keygen -lf /etc/ssh/ssh_host_rsa_key.pub'
-
-  sync:
-    desc: Update ansible and synchronize the ansible inventory
-    deps:
-      - task: ping
-      - task: update-roles
-      - task: update-collections
+    desc: Get the SSH fingerprint for each host
     cmds:
+      - poetry run ansible all -i {{.ANSIBLE_INV_HOME}} --one-line -m 'command' -a 'ssh-keygen -lf /etc/ssh/ssh_host_rsa_key.pub'
+    dir: "{{.HOME_OPS_HOME}}"
 
-
-  update-collections:
-      internal: true
-      desc: Update the available ansible collections using ~/.ansible/collections/requirements.yml
-      cmds:
-          - |
-              ansible-commands update-collections 2>/dev/null
-  update-roles:
-      internal: true
-      desc: Update the available ansible roles using ~/.ansible/roles/requirements.yml
-      cmds:
-         - |
-             ansible-commands update-roles 2>/dev/null
+  deploy:autoplex:
+    desc: Deploy the autoplex stack
+    deps:
+      - task: show
+    cmds:
+      - poetry run ansible-playbook -i {{.ANSIBLE_INV_HOME}}/hosts.yaml {{.ANSIBLE_PLAYBOOK_HOME}}/docker/autoplex.yaml
+    dir: "./scripts/ansible"
 
 #  update:containers:
 #      deps:

@@ -1,0 +1,33 @@
+- name: Deploy Autoplex stack
+  hosts: autoplex.local.technohouser.com
+  remote_user: root
+  tasks:
+    - name: Ensure Docker is installed
+      ansible.builtin.package:
+        name: docker
+        state: present
+
+    - name: Ensure pip is installed
+      ansible.builtin.package:
+        name: python3-pip
+        state: present
+
+    - name: Install Docker Compose
+      ansible.builtin.pip:
+        name:
+          - docker-compose
+          - jsondiff
+        state: present
+
+    - name: Copy environment file template
+      ansible.builtin.template:
+        src: "{{ lookup('env', 'XDG_DATA_HOME') | default('~/.local/share', true) }}/automation/home-ops/templates/jinja2/ansible/docker-compose.autoplex.yaml.j2"
+        dest: /DATA/AppData/autoplex.yaml
+
+    - name: Deploy Autoplex stack
+      community.docker.docker_compose_v2:
+        project_src: /DATA/AppData
+        files:
+          - autoplex.yaml
+        state: present
+        pull: always

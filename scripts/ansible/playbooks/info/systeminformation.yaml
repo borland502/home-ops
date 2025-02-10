@@ -1,0 +1,33 @@
+---
+- name: Collect System Information and Store in SQLite
+  hosts: all
+  remote_user: ansible
+  gather_facts: false
+  tasks:
+    - name: Ensure npm is installed
+      package:
+        name: npm
+        state: present
+      become: true
+
+    - name: Install systeminformation globally
+      community.general.npm:
+        global: true
+        name: systeminformation
+        state: present
+
+    - name: Run systeminformation and capture output
+      shell: systeminformation
+      register: sysinfo_output
+      changed_when: false
+
+    - name: Create JSON file from output
+      copy:
+        content: "{{ sysinfo_output.stdout }}"
+        dest: "/tmp/{{ inventory_hostname }}-sysinfo.json"
+
+    - name: Fetch JSON file to local system
+      fetch:
+        src: "/tmp/sysinfo.json"
+        dest: "{{ lookup('ENV', 'XDG_DATA_HOME') }}/automation/home-db/json-intake/{{ inventory_hostname }}-sysinfo.json"
+        flat: true

@@ -14,26 +14,40 @@ While I do hope useful elements can be mined for similar projects, if only by co
 
 > Generic, less-opinionated, frameworks (ZX, NX, Chezmoi, etc.) are referenced at the end
 
-## Apps
+## Script Languages (A stretch for many of these)
 
-* [watchyourlan-api](./apps/watchyourlan-api/README.md)
-* [scripts](./scripts/README.md)
+### Ansible
 
-## Libs
+### Devcontainer-features
 
-### Shared
+### Docker
 
-* [log](./libs/shared/log/README.md)
-* [pkg-install](./libs/shared/pkg-install/README.md)
-* [utils](./libs/shared/utils/README.md)
-* [zx-utils](./libs/shared/zx-utils/README.md)
+### Dotfiles
+
+### Shell
+
+### Spring Shell
+
+### Taskfiles
+
+### ZX
 
 ## Run tasks
 
+```console
+task: Available tasks for this project:
 
+* mcv:pack:                                       Pack all the projects
+* mcv:unpack:                                     Unpack all the projects
+* nodeapp:create:                                 Create a new NodeJS application
+* nodelib:create:                                 Create a new NodeJS library
+* pyapp:create:                                   Create a new Python application
+* pylib:create:                                   Create a new Python library
+```
 
 ## Frameworks Used
 
+* [Spring Shell](https://spring.io/projects/spring-shell)
 * [NX](https://nx.dev/)
 * [ESBuild](https://esbuild.github.io/)
 * [Chezmoi](https://www.chezmoi.io/quick-start/)
@@ -56,11 +70,15 @@ Sources:
 
 ## TODO:
 
-- Add home assistant integration
+- Reorganize project now that primary bootstrap language and framework selected (Java/Spring Shell -- Can't beat what you know best)
+    - Strip out nx
+    - Strip out jbang -- much more compact than spring shell, but not what I am as familar with
+    - Move folders with no scripting function
+    - Create a templates folder for ansible/gomplete/jinja2
+    - Redistribute python apps/libs into a Python script subfolder
+    - Repair Python & ZX apps/libraries in (hopefully) their new and final location
 - Add secrets management via google drive & keepass
 - Complete integrating gomplate into the project
-- Add jest
 - Sort out documentation publishing
-- Add swagger docs
 - Fold functioning parts of dasbootstrap project into the python sections
   https://esbuild.github.io/content-types/#file
