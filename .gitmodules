@@ -10,3 +10,6 @@
 	path = scripts/ansible/collections/ansible_collections/technohouser
 	url = https://github.com/borland502/technohouser
 
+[submodule "scripts/spring-cli"]
+	path = scripts/spring-cli
+	url = https://github.com/borland502/spring-cli
