@@ -26,11 +26,11 @@ fi
 # --- sdkman Installation ---
 if ! command -v sdk > /dev/null; then  # Check if sdkman is already installed
     curl -s "https://get.sdkman.io" | bash # Install sdkman if not present
-    
+
     # Add sdkman initialization to .zshrc (important!)
     echo 'source "$HOME/.sdkman/bin/sdkman-init.sh"' >> ~/.zshrc
     source "$HOME/.sdkman/bin/sdkman-init.sh" # Source for current shell
-    
+
     sdk install java
 fi
 
@@ -44,6 +44,11 @@ brew install go-task
 # --- nvm Installation ---
 brew install nvm
 nvm install --lts
+
+# --- chezmoi Installation ---
+brew install chezmoi
+chezmoi init --source "${HOME}/.local/share/automation/home-ops/scripts/dotfiles"
+chezmoi apply --source "${HOME}/.local/share/automation/home-ops/scripts/dotfiles"
 
 echo "Userspace installation complete."
 
