@@ -96,3 +96,9 @@ tasks:
       - cmd: >-
           java -jar {{.XDG_DATA_HOME}}/automation/home-ops/scripts/spring-cli/build/libs/home-ops.jar
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts/spring-cli"
+
+  sync:
+    desc: Sync the XDG Folders to the Google Drive Share
+    cmds:
+      - rsync -avzPh ~/.config ~/Library/CloudStorage/GoogleDrive-jhettenh@gmail.com/My\ Drive/.config
+      - rsync -avzPh ~/.config ~/Library/CloudStorage/GoogleDrive-jhettenh@gmail.com/My\ Drive/.local
