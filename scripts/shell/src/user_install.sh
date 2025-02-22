@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-source "${HOME}/.local/share/automation/home-ops/scripts/shell/lib/xdg.sh"
-
 # Python has no 'lts' equivalent
 PYTHON_VERSION=3.13
 

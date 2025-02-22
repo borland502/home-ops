@@ -21,6 +21,7 @@ includes:
     taskfile: "./scripts/taskfiles/chezmoi.yaml"
   validate:
     internal: true
+    silent: true
     taskfile: "./scripts/taskfiles/validate.yaml"
   install:
     internal: true
@@ -32,18 +33,29 @@ includes:
 tasks:
   build:jar:
     desc: Build the jar
-    silent: true
+    silent: false
     internal: true
     summary: |
       To ensure cross-platform compatibility, the jar is built using the Gradle wrapper and as a non AoT jar
     cmds:
       - >-
-        ./gradlew build jar
+        ./gradlew bootJar
     dir: "{{.XDG_DATA_HOME}}/automation/home-ops/scripts/spring-cli"
+
+  build:script:
+    desc: Build the shell script to deploy
+    silent: false
+    internal: false
+    cmds:
+      - cmd: >-
+          cat {{.XDG_DATA_HOME }}/automation/home-ops/scripts/shell/src/install_doctor_functions.sh
+          {{.XDG_DATA_HOME}}/automation/home-ops/scripts/shell/src/dasbootstrap.sh
+          {{.XDG_DATA_HOME}}/automation/home-ops/scripts/shell/src/user_install.sh >
+          scripts/shell/install.sh && chmod +x scripts/shell/install.sh
 
   mcv:pack:
     desc: Pack all the projects
-    silent: true
+    silent: false
     summary: |
       This task packs all the projects locally into a script with a jar attachment to install everything on the target system
     deps:
@@ -52,7 +64,7 @@ tasks:
       - task: install:brew
       - task: build:jar
     cmds:
-      - cmd: test -d /tmp/mcv && rm -rf /tmp/mcv
+      - cmd: test -d /tmp/mcv || rm -rf /tmp/mcv
       - cmd: mkdir -p /tmp/mcv/dist
       # Clean build artifacts and temporary directories in the automation data directory
       - cmd: |
@@ -61,16 +73,15 @@ tasks:
           -exec rm -rf {} +
       # Create archive
       - cmd: >-
-          tar -czf /tmp/mcv/dist/payload.tar.gz -C {{.XDG_CONFIG_HOME}} {{.XDG_DATA_HOME}}/trapper_keeper {{.XDG_DATA_HOME}}/unison {{.ANSIBLE_HOME}}
+          tar -czf /tmp/mcv/dist/payload.tar.gz -C {{.XDG_CONFIG_HOME}} {{.XDG_DATA_HOME}}/trapper_keeper {{.ANSIBLE_HOME}}
       # Create executable
       - cmd: >-
-          cat {{.XDG_DATA_HOME}}/automation/home-ops/scripts/shell/bin/dasbootstrap.sh
-          {{.XDG_DATA_HOME}}/automation/home-ops/scripts/shell/bin/user_install.sh
-          {{.XDG_DATA_HOME}}/automation/home-ops/scripts/spring-cli/build/libs/home-ops.jar > /tmp/mcv/dist/mcv.run &&
-          chmod +x /tmp/mcv/dist/mcv.run
+
+          {{.XDG_DATA_HOME}}/automation/home-ops/scripts/spring-cli/build/libs/home-ops.jar > /tmp/mcv/dist/mcv.run
+          && chmod +x /tmp/mcv/dist/mcv.run
       # Create tarball
       - cmd: >-
-          tar -czf /tmp/mcv.tar.gz -C /tmp/mcv/dist/mcv.run /tmp/mcv/dist/payload.tar.gz
+          tar -czf /tmp/mcv.tar.gz -C /tmp/mcv/dist /tmp/mcv/dist/payload.tar.gz
 
   mcv:unpack:
     desc: Unpack all the projects
@@ -100,5 +111,15 @@ tasks:
   sync:
     desc: Sync the XDG Folders to the Google Drive Share
     cmds:
-      - rsync -avzPh ~/.config ~/Library/CloudStorage/GoogleDrive-jhettenh@gmail.com/My\ Drive/.config
-      - rsync -avzPh ~/.config ~/Library/CloudStorage/GoogleDrive-jhettenh@gmail.com/My\ Drive/.local
+      - cmd: rsync -avzPh ~/.config ~/Library/CloudStorage/GoogleDrive-jhettenh@gmail.com/My\ Drive/.config
+        platforms:
+          - darwin
+      - cmd: rsync -avzPh ~/.config ~/Library/CloudStorage/GoogleDrive-jhettenh@gmail.com/My\ Drive/.local
+        platforms:
+          - darwin
+      - cmd: rsync -avzPh ~/.config /srv/gdrive
+        platforms:
+          - linux
+      - cmd: rsync -avzPh ~/.local /srv/gdrive
+        platforms:
+          - linux
