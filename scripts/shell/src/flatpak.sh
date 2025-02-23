@@ -26,45 +26,45 @@ flatpak_origin='flathub'
 
 # List of desktop apps to be installed (specified by app ID)
 flatpak_apps=(
-
-  # Communication
-  'com.discordapp.Discord'    # Team messaging and voice
-  'com.slack.Slack'           # Work and team messaging
-
-  # Media
-  'com.valvesoftware.Steam'   # Gaming
-  'org.libretro.RetroArch'    # Retro game emulation
-  'org.videolan.VLC'          # Media player
-  'com.github.johnfactotum.Foliate' # E-book reader
-  'tech.feliciano.pocket-casts' # Podcast client
-
-  # Creativity
-  'org.flameshot.Flameshot'   # Screenshot tool
-  'org.gimp.GIMP'             # Picture editor
-
-  # Software development
-  'com.visualstudio.code'     # Extendable IDE
-  'cc.arduino.IDE2'           # IOT development
-  'com.axosoft.GitKraken'     # GUI git client
-
-  # Security testing
-  'org.wireshark.Wireshark'   # Packet capture and analyzer
-  'org.zaproxy.ZAP'           # Auto vulnerability scanning
-  'org.nmap.Zenmap'           # GUI for Nmap security scans
-
-  # Settings and system utils
-  'org.kde.kleopatra'         # GPG key and certificate manager
-  'io.github.jacalz.rymdport' # Encrypted file transfers, via Wormhole
-  'org.bleachbit.BleachBit'   # Disk cleaner and log remover
-  'it.mijorus.smile'            # Emoji picker
-
-  # Browsers and internet
-  'md.obsidian.Obsidian'        # Markdown editor
-  'com.vivaldi.Vivaldi'
-
-  # Personal
-  'io.github.hmlendea.geforcenow-electron' # Geforce now client
-  'org.keepassxc.KeePassXC'
+    
+    # Communication
+    'com.discordapp.Discord'    # Team messaging and voice
+    'com.slack.Slack'           # Work and team messaging
+    
+    # Media
+    'com.valvesoftware.Steam'   # Gaming
+    'org.libretro.RetroArch'    # Retro game emulation
+    'org.videolan.VLC'          # Media player
+    'com.github.johnfactotum.Foliate' # E-book reader
+    'tech.feliciano.pocket-casts' # Podcast client
+    
+    # Creativity
+    'org.flameshot.Flameshot'   # Screenshot tool
+    'org.gimp.GIMP'             # Picture editor
+    
+    # Software development
+    'com.visualstudio.code'     # Extendable IDE
+    'cc.arduino.IDE2'           # IOT development
+    'com.axosoft.GitKraken'     # GUI git client
+    
+    # Security testing
+    'org.wireshark.Wireshark'   # Packet capture and analyzer
+    'org.zaproxy.ZAP'           # Auto vulnerability scanning
+    'org.nmap.Zenmap'           # GUI for Nmap security scans
+    
+    # Settings and system utils
+    'org.kde.kleopatra'         # GPG key and certificate manager
+    'io.github.jacalz.rymdport' # Encrypted file transfers, via Wormhole
+    'org.bleachbit.BleachBit'   # Disk cleaner and log remover
+    'it.mijorus.smile'            # Emoji picker
+    
+    # Browsers and internet
+    'md.obsidian.Obsidian'        # Markdown editor
+    'com.vivaldi.Vivaldi'
+    
+    # Personal
+    'io.github.hmlendea.geforcenow-electron' # Geforce now client
+    'org.keepassxc.KeePassXC'
 )
 
 # Color Variables
@@ -81,77 +81,77 @@ PROMPT_TIMEOUT=15 # When user is prompted for input, skip after x seconds
 PARAMS=$* # User-specified parameters
 
 if [[ $PARAMS == *"--auto-yes"* ]]; then
-  PROMPT_TIMEOUT=1
-  AUTO_YES=true
+    PROMPT_TIMEOUT=1
+    AUTO_YES=true
 fi
 
 # Helper function to install Flatpak (if not present) for users current distro
 function install_flatpak () {
-  # Arch, Manjaro
-  if hash "pacman" 2> /dev/null; then
-    echo -e "${PURPLE}Installing Flatpak via Pacman${RESET}"
-    sudo pacman -S flatpak
-  # Debian, Ubuntu, PopOS, Raspian
-  elif hash "apt" 2> /dev/null; then
-    echo -e "${PURPLE}Installing Flatpak via apt get${RESET}"
-    sudo apt install flatpak
-  # Alpine
-  elif hash "apk" 2> /dev/null; then
-    echo -e "${PURPLE}Installing Flatpak via apk add${RESET}"
-    sudo apk add flatpak
-  # Red Hat, CentOS
-  elif hash "yum" 2> /dev/null; then
-    echo -e "${PURPLE}Installing Flatpak via Yum${RESET}"
-    sudo yum install flatpak
-  fi
+    # Arch, Manjaro
+    if hash "pacman" 2> /dev/null; then
+        echo -e "${PURPLE}Installing Flatpak via Pacman${RESET}"
+        sudo pacman -S flatpak
+        # Debian, Ubuntu, PopOS, Raspian
+        elif hash "apt" 2> /dev/null; then
+        echo -e "${PURPLE}Installing Flatpak via apt get${RESET}"
+        sudo apt install flatpak
+        # Alpine
+        elif hash "apk" 2> /dev/null; then
+        echo -e "${PURPLE}Installing Flatpak via apk add${RESET}"
+        sudo apk add flatpak
+        # Red Hat, CentOS
+        elif hash "yum" 2> /dev/null; then
+        echo -e "${PURPLE}Installing Flatpak via Yum${RESET}"
+        sudo yum install flatpak
+    fi
 }
 
 # Checks if a given app ($1) is already installed, otherwise installs it
 function install_app () {
-  app=$1
-
-  # If --prompt-before-each is set, then ask user if they'd like to proceed
-  if [[ $PARAMS == *"--prompt-before-each"* ]]; then
-    echo -e -n "\n${CYAN_B}Would you like to install ${app}? (y/N) ${RESET}"
-    read -t 15 -n 1 -r
-    if [[ ! $REPLY =~ ^[Yy]$ ]] && [[ $AUTO_YES != true ]] ; then
-      echo -e "\n${YELLOW}[Skipping] ${LIGHT}${app}, rejected by user${RESET}"
-      return
+    app=$1
+    
+    # If --prompt-before-each is set, then ask user if they'd like to proceed
+    if [[ $PARAMS == *"--prompt-before-each"* ]]; then
+        echo -e -n "\n${CYAN_B}Would you like to install ${app}? (y/N) ${RESET}"
+        read -r -t 15 -n 1 || true
+        if [[ ! $REPLY =~ ^[Yy]$ ]] && [[ $AUTO_YES != true ]] ; then
+            echo -e "\n${YELLOW}[Skipping] ${LIGHT}${app}, rejected by user${RESET}"
+            return
+        fi
+        echo
     fi
-    echo
-  fi
-
-  # Process app ID, and grep for it in system
-  app_name=$(echo "$app" | rev | cut -d "." -f1 | rev)
-  is_in_flatpak=$(echo $(flatpak list --columns=ref | grep $app))
-  is_in_pacman=$(echo $(pacman -Qk $(echo $app_name | tr 'A-Z' 'a-z') 2> /dev/null ))
-  is_in_apt=$(echo $(dpkg -s $(echo $app_name | tr 'A-Z' 'a-z') 2> /dev/null ))
-
-  # Check app not already installed via Flatpak
-  if [ -n "$is_in_flatpak" ]; then
-    echo -e "${YELLOW}[Skipping] ${LIGHT}${app_name} is already installed.${RESET}"
-  # Check app not installed via Pacman (Arch Linux)
-  elif [[ "${is_in_pacman}" == *"total files"* ]]; then
-    echo -e "${YELLOW}[Skipping] ${LIGHT}${app_name} is already installed via Pacman.${RESET}"
-  # Check app not installed via apt get (Debian)
-  elif [[ "${is_in_apt}" == *"install ok installed"* ]]; then
-    echo -e "${YELLOW}[Skipping] ${LIGHT}${app_name} is already installed via apt-get.${RESET}"
-  else
-    # Install app using Flatpak
-    echo -e "${GREEN}[Installing] ${LIGHT}Downloading ${app_name} (from ${flatpak_origin}).${RESET}"
-    if [[ $PARAMS == *"--dry-run"* ]]; then return; fi # Skip if --dry-run enabled
-    flatpak install -y --noninteractive $flatpak_origin $app
-  fi
+    
+    # Process app ID, and grep for it in system
+    app_name=$(echo "$app" | rev | cut -d "." -f1 | rev)
+    is_in_flatpak=$(echo $(flatpak list --columns=ref | grep $app))
+    is_in_pacman=$(echo $(pacman -Qk $(echo $app_name | tr 'A-Z' 'a-z') 2> /dev/null ))
+    is_in_apt=$(echo $(dpkg -s $(echo $app_name | tr 'A-Z' 'a-z') 2> /dev/null ))
+    
+    # Check app not already installed via Flatpak
+    if [ -n "$is_in_flatpak" ]; then
+        echo -e "${YELLOW}[Skipping] ${LIGHT}${app_name} is already installed.${RESET}"
+        # Check app not installed via Pacman (Arch Linux)
+        elif [[ "${is_in_pacman}" == *"total files"* ]]; then
+        echo -e "${YELLOW}[Skipping] ${LIGHT}${app_name} is already installed via Pacman.${RESET}"
+        # Check app not installed via apt get (Debian)
+        elif [[ "${is_in_apt}" == *"install ok installed"* ]]; then
+        echo -e "${YELLOW}[Skipping] ${LIGHT}${app_name} is already installed via apt-get.${RESET}"
+    else
+        # Install app using Flatpak
+        echo -e "${GREEN}[Installing] ${LIGHT}Downloading ${app_name} (from ${flatpak_origin}).${RESET}"
+        if [[ $PARAMS == *"--dry-run"* ]]; then return; fi # Skip if --dry-run enabled
+        flatpak install -y --noninteractive $flatpak_origin $app
+    fi
 }
 
 function print_usage () {
-  echo -e "${CYAN_B}Flatpak Linux Desktop App Installation and Update script${RESET}"
-  echo -e "${PURPLE}The following tasks will be completed:\n"\
-  "- Check Flatpak is installed correctly / prompt to install if not\n"\
-  "- Add the flathub repo, if not already present\n"\
-  "- Upgrade Flatpak, and update all exiting installed apps\n"\
-  "- Installs each app in the list (if not already present)\n"\
-  "${RESET}"
+    echo -e "${CYAN_B}Flatpak Linux Desktop App Installation and Update script${RESET}"
+    echo -e "${PURPLE}The following tasks will be completed:\n"\
+    "- Check Flatpak is installed correctly / prompt to install if not\n"\
+    "- Add the flathub repo, if not already present\n"\
+    "- Upgrade Flatpak, and update all exiting installed apps\n"\
+    "- Installs each app in the list (if not already present)\n"\
+    "${RESET}"
 }
 
 # Show help menu
@@ -160,27 +160,26 @@ if [[ $PARAMS == *"--help"* ]]; then exit; fi
 
 # Ask user if they'd like to proceed, and exit if not
 echo -e "${CYAN_B}Would you like to install Flatpak desktop apps? (y/N)${RESET}\n"
-read -t $PROMPT_TIMEOUT -n 1 -r
+read -t $PROMPT_TIMEOUT -n 1
 echo
 if [[ ! $REPLY =~ ^[Yy]$ ]] && [[ $AUTO_YES != true ]] ; then
-  echo -e "${YELLOW}Skipping Flatpak installations..."
-  exit 0
+    echo -e "${YELLOW}Skipping Flatpak installations..."
 fi
 
 echo -e "${CYAN_B}Starting Flatpak App Installation Script${RESET}"
 
 # Check that Flatpak is present, prompt to install or exit if not
 if ! hash flatpak 2> /dev/null; then
-  echo -e "${PURPLE}Flatpak isn't yet installed on your system${RESET}"
-  echo -e "${CYAN_B}Would you like to install Flatpak now?${RESET}\n"
-  read -t $PROMPT_TIMEOUT -n 1 -r
-  echo
-  if [[ $REPLY =~ ^[Yy]$ ]] || [[ $AUTO_YES = true ]] ; then
-    install_flatpak
-  else
-    echo -e "${YELLOW}Skipping Flatpak installations, as Flatpack not installed"
-    exit 0
-  fi
+    echo -e "${PURPLE}Flatpak isn't yet installed on your system${RESET}"
+    echo -e "${CYAN_B}Would you like to install Flatpak now?${RESET}\n"
+    read -t $PROMPT_TIMEOUT -n 1
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]] || [[ $AUTO_YES = true ]] ; then
+        install_flatpak
+    else
+        echo -e "${YELLOW}Skipping Flatpak installations, as Flatpack not installed"
+        exit 0
+    fi
 fi
 
 # Add FlatHub as upstream repo, if not already present
@@ -194,7 +193,7 @@ flatpak update --assumeyes --noninteractive
 # Install each app listed above (if not already installed)
 echo -e "${PURPLE}Installing apps defined in manifest${RESET}"
 for app in "${flatpak_apps[@]}"; do
-  install_app "$app"
+    install_app "$app"
 done
 
 echo -e "${PURPLE}Finished processing Flatpak apps${RESET}"

@@ -1,3 +1,46 @@
+#!/usr/bin/env bash
+
+echo "Starting Home-Ops Installation Script${RESET} with $(whoami) in $(pwd)"
+# shellcheck disable=SC2148
+# Python has no 'lts' equivalent
+export PYTHON_VERSION=3.13
+export XDG_DATA_HOME="${HOME}/.local/share"
+export XDG_CONFIG_HOME="${HOME}/.config"
+export XDG_CACHE_HOME="${HOME}/.cache"
+export XDG_STATE_HOME="${HOME}/.local/state"
+export XDG_RUNTIME_DIR="${HOME}/.local/run"
+export XDG_CONFIG_DIRS="/etc/xdg:${XDG_CONFIG_HOME}"
+export XDG_DATA_DIRS="/usr/local/share:/usr/share:${XDG_DATA_HOME}:/var/lib/flatpak/exports/share:${XDG_DATA_HOME}/flatpak/exports/share"
+export NVM_DIR="${HOME}/.local/share/nvm"
+export SDKMAN_DIR="${HOME}/.local/share/sdkman"
+export PYENV_ROOT="${HOME}/.local/share/pyenv"
+export DEFAULT_PATH="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/home/linuxbrew/.linuxbrew/bin:/opt/homebrew/bin"
+export DEFAULT_PATH="${DEFAULT_PATH}:${HOME}/.local/share/sdkman/bin:${HOME}/.local/share/pyenv:${HOME}/.local/share/nvm"
+export DEFAULT_PATH="${DEFAULT_PATH}:${HOME}/.local/bin"
+
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+RED=$(tput setaf 1)
+CYAN=$(tput setaf 6)
+PURPLE=$(tput setaf 5)
+LIGHT=$(tput bold)
+RESET=$(tput sgr0)
+
+# widen the path to include homebrew binaries -- export so that user is left with homebrew for the
+# current session
+declare -x PATH="${DEFAULT_PATH}"
+
+# Catch the re-run of the script in non-root mode
+source "${SDKMAN_DIR}/bin/sdkman-init.sh" 2>/dev/null
+source "${NVM_DIR}/nvm.sh" 2>/dev/null
+source "${PYENV_ROOT}/bin/pyenv" 2>/dev/null
+source "${HOME}/.local/share/pyenv/versions/${PYTHON_VERSION}/bin/activate" 2>/dev/null
+
+if [[ -d "/home/linuxbrew/.linuxbrew" ]]; then
+    sudo chown "${USER}:${USER}" -R "/home/linuxbrew/.linuxbrew" 2>/dev/null
+fi
+
+echo "${GREEN}Default path set to ${DEFAULT_PATH}${RESET}"
 # shellcheck disable=SC2148
 
 echo "Running install_doctor_functions.sh"
@@ -453,3 +496,337 @@ function bootstrap_ansible_node() {
     fi
     
 }
+# shellcheck disable=SC2148
+
+declare -rx GH_RAW="https://raw.githubusercontent.com/borland502"
+declare -rx GH_PROJ="https://github.com/borland502/home-ops"
+
+
+if [[ "${USER}" == "root" ]]; then
+    echo "Running as root, creating a non-root user to run home-ops"
+    NEWUSER=${1:-"ansible"}
+    
+    ensureRootPackageInstalled git
+    ensureRootPackageInstalled zip
+    ensureRootPackageInstalled curl
+    ensureRootPackageInstalled zsh
+    ensureRootPackageInstalled sudo
+    
+    create_sudo_user "${NEWUSER}"
+    installTask
+    if ! command -v task &> /dev/null; then
+        echo "Task could not be found, please install it."
+        exit 1
+    fi
+    # Bootstrap this host for ansible
+    bootstrap_ansible_node "${NEWUSER}"
+    
+fi
+
+ensurePackageInstalled git
+ensurePackageInstalled curl
+ensurePackageInstalled rsync
+ensurePackageInstalled npm
+ensurePackageInstalled gcc
+ensurePackageInstalled zip
+ensurePackageInstalled keepassxc
+ensurePackageInstalled rclone
+
+mkdir -p "${HOME}/.local/share/automation"
+if [ ! -d "${HOME}/.local/share/automation/home-ops" ]; then
+    git clone --recurse-submodules https://github.com/borland502/home-ops.git "${HOME}/.local/share/automation/home-ops"
+fi
+cd "${HOME}/.local/share/automation/home-ops" || exit 2
+# shellcheck disable=SC2148
+
+echo "Starting home-ops_install.sh with $(whoami) in $(pwd)"
+
+# install packages for home-ops
+PREV_DIR=$(pwd)
+
+if ! [[ -f ~/.config/home-ops/default.toml ]]; then
+    mkdir -p "${HOME}/.config/home-ops"
+    cp ./config/default.toml ~/.config/home-ops/default.toml
+fi
+
+# spring shell
+cd ./scripts/spring-cli || exit 2
+sdk env install
+./gradlew clean bootJar
+cd "${PREV_DIR}" || exit 2
+
+
+cd ./scripts/zx || exit 2
+brew install oven-sh/bun/bun
+nvm use
+brew install bun
+bun install
+cd "${PREV_DIR}" || exit 2
+#!/usr/bin/env bash
+# https://github.com/Lissy93/dotfiles/blob/master/scripts/installs/flatpak.sh
+######################################################################
+# Linux Desktop Application Installations via Flatpak                #
+######################################################################
+# This script will:                                                  #
+# - Check that Flatpak is installed / prompt to install               #
+# - Update currently installed Flatpak apps from FlatHub             #
+# - Check app not already installed via system package manager       #
+# - Then install any not-yet-installed that are apps listed          #
+#                                                                    #
+# The following flag parameters are accepted:                        #
+#   --prompt-before-each - Ask for user confirmation for each app    #
+#   --dry-run - Run script, but without making changes to disk       #
+#   --auto-yes - Don't prompt for any user input, use with care      #
+#   --help - Print usage instructions / help menu, then exit         #
+#                                                                    #
+# IMPORTANT: Be sure to remove / comment any apps you do not want!   #
+# For docs and more info, see: https://github.com/lissy93/dotfiles   #
+######################################################################
+# Licensed under MIT (C) Alicia Sykes 2022 <https://aliciasykes.com> #
+######################################################################
+
+# Remote origin to use for installations
+flatpak_origin='flathub'
+
+# List of desktop apps to be installed (specified by app ID)
+flatpak_apps=(
+    
+    # Communication
+    'com.discordapp.Discord'    # Team messaging and voice
+    'com.slack.Slack'           # Work and team messaging
+    
+    # Media
+    'com.valvesoftware.Steam'   # Gaming
+    'org.libretro.RetroArch'    # Retro game emulation
+    'org.videolan.VLC'          # Media player
+    'com.github.johnfactotum.Foliate' # E-book reader
+    'tech.feliciano.pocket-casts' # Podcast client
+    
+    # Creativity
+    'org.flameshot.Flameshot'   # Screenshot tool
+    'org.gimp.GIMP'             # Picture editor
+    
+    # Software development
+    'com.visualstudio.code'     # Extendable IDE
+    'cc.arduino.IDE2'           # IOT development
+    'com.axosoft.GitKraken'     # GUI git client
+    
+    # Security testing
+    'org.wireshark.Wireshark'   # Packet capture and analyzer
+    'org.zaproxy.ZAP'           # Auto vulnerability scanning
+    'org.nmap.Zenmap'           # GUI for Nmap security scans
+    
+    # Settings and system utils
+    'org.kde.kleopatra'         # GPG key and certificate manager
+    'io.github.jacalz.rymdport' # Encrypted file transfers, via Wormhole
+    'org.bleachbit.BleachBit'   # Disk cleaner and log remover
+    'it.mijorus.smile'            # Emoji picker
+    
+    # Browsers and internet
+    'md.obsidian.Obsidian'        # Markdown editor
+    'com.vivaldi.Vivaldi'
+    
+    # Personal
+    'io.github.hmlendea.geforcenow-electron' # Geforce now client
+    'org.keepassxc.KeePassXC'
+)
+
+# Color Variables
+CYAN_B='\033[1;96m'
+YELLOW='\033[0;93m'
+RED_B='\033[1;31m'
+RESET='\033[0m'
+GREEN='\033[0;32m'
+PURPLE='\033[0;35m'
+LIGHT='\x1b[2m'
+
+# Options
+PROMPT_TIMEOUT=15 # When user is prompted for input, skip after x seconds
+PARAMS=$* # User-specified parameters
+
+if [[ $PARAMS == *"--auto-yes"* ]]; then
+    PROMPT_TIMEOUT=1
+    AUTO_YES=true
+fi
+
+# Helper function to install Flatpak (if not present) for users current distro
+function install_flatpak () {
+    # Arch, Manjaro
+    if hash "pacman" 2> /dev/null; then
+        echo -e "${PURPLE}Installing Flatpak via Pacman${RESET}"
+        sudo pacman -S flatpak
+        # Debian, Ubuntu, PopOS, Raspian
+        elif hash "apt" 2> /dev/null; then
+        echo -e "${PURPLE}Installing Flatpak via apt get${RESET}"
+        sudo apt install flatpak
+        # Alpine
+        elif hash "apk" 2> /dev/null; then
+        echo -e "${PURPLE}Installing Flatpak via apk add${RESET}"
+        sudo apk add flatpak
+        # Red Hat, CentOS
+        elif hash "yum" 2> /dev/null; then
+        echo -e "${PURPLE}Installing Flatpak via Yum${RESET}"
+        sudo yum install flatpak
+    fi
+}
+
+# Checks if a given app ($1) is already installed, otherwise installs it
+function install_app () {
+    app=$1
+    
+    # If --prompt-before-each is set, then ask user if they'd like to proceed
+    if [[ $PARAMS == *"--prompt-before-each"* ]]; then
+        echo -e -n "\n${CYAN_B}Would you like to install ${app}? (y/N) ${RESET}"
+        read -t 15 -n 1 || true
+        if [[ ! $REPLY =~ ^[Yy]$ ]] && [[ $AUTO_YES != true ]] ; then
+            echo -e "\n${YELLOW}[Skipping] ${LIGHT}${app}, rejected by user${RESET}"
+            return
+        fi
+        echo
+    fi
+    
+    # Process app ID, and grep for it in system
+    app_name=$(echo "$app" | rev | cut -d "." -f1 | rev)
+    is_in_flatpak=$(echo $(flatpak list --columns=ref | grep $app))
+    is_in_pacman=$(echo $(pacman -Qk $(echo $app_name | tr 'A-Z' 'a-z') 2> /dev/null ))
+    is_in_apt=$(echo $(dpkg -s $(echo $app_name | tr 'A-Z' 'a-z') 2> /dev/null ))
+    
+    # Check app not already installed via Flatpak
+    if [ -n "$is_in_flatpak" ]; then
+        echo -e "${YELLOW}[Skipping] ${LIGHT}${app_name} is already installed.${RESET}"
+        # Check app not installed via Pacman (Arch Linux)
+        elif [[ "${is_in_pacman}" == *"total files"* ]]; then
+        echo -e "${YELLOW}[Skipping] ${LIGHT}${app_name} is already installed via Pacman.${RESET}"
+        # Check app not installed via apt get (Debian)
+        elif [[ "${is_in_apt}" == *"install ok installed"* ]]; then
+        echo -e "${YELLOW}[Skipping] ${LIGHT}${app_name} is already installed via apt-get.${RESET}"
+    else
+        # Install app using Flatpak
+        echo -e "${GREEN}[Installing] ${LIGHT}Downloading ${app_name} (from ${flatpak_origin}).${RESET}"
+        if [[ $PARAMS == *"--dry-run"* ]]; then return; fi # Skip if --dry-run enabled
+        flatpak install -y --noninteractive $flatpak_origin $app
+    fi
+}
+
+function print_usage () {
+    echo -e "${CYAN_B}Flatpak Linux Desktop App Installation and Update script${RESET}"
+    echo -e "${PURPLE}The following tasks will be completed:\n"\
+    "- Check Flatpak is installed correctly / prompt to install if not\n"\
+    "- Add the flathub repo, if not already present\n"\
+    "- Upgrade Flatpak, and update all exiting installed apps\n"\
+    "- Installs each app in the list (if not already present)\n"\
+    "${RESET}"
+}
+
+# Show help menu
+print_usage
+if [[ $PARAMS == *"--help"* ]]; then exit; fi
+
+# Ask user if they'd like to proceed, and exit if not
+echo -e "${CYAN_B}Would you like to install Flatpak desktop apps? (y/N)${RESET}\n"
+read -t $PROMPT_TIMEOUT -n 1
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]] && [[ $AUTO_YES != true ]] ; then
+    echo -e "${YELLOW}Skipping Flatpak installations..."
+fi
+
+echo -e "${CYAN_B}Starting Flatpak App Installation Script${RESET}"
+
+# Check that Flatpak is present, prompt to install or exit if not
+if ! hash flatpak 2> /dev/null; then
+    echo -e "${PURPLE}Flatpak isn't yet installed on your system${RESET}"
+    echo -e "${CYAN_B}Would you like to install Flatpak now?${RESET}\n"
+    read -t $PROMPT_TIMEOUT -n 1
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]] || [[ $AUTO_YES = true ]] ; then
+        install_flatpak
+    else
+        echo -e "${YELLOW}Skipping Flatpak installations, as Flatpack not installed"
+        exit 0
+    fi
+fi
+
+# Add FlatHub as upstream repo, if not already present
+echo -e "${PURPLE}Adding Flathub repo${RESET}"
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+# Update currently installed apps
+echo -e "${PURPLE}Updating installed apps${RESET}"
+flatpak update --assumeyes --noninteractive
+
+# Install each app listed above (if not already installed)
+echo -e "${PURPLE}Installing apps defined in manifest${RESET}"
+for app in "${flatpak_apps[@]}"; do
+    install_app "$app"
+done
+
+echo -e "${PURPLE}Finished processing Flatpak apps${RESET}"
+#!/usr/bin/env bash
+
+#########
+# This script carries the installation forward into the userspace with an assumption
+# of homebrew availability (Homebrew/Linuxbrew) before chezmoi is configured
+
+# Check if running as root and switch to user if needed
+if [[ $USER == root ]]; then
+    mkdir -p "/home/${_username}/.local/bin"
+    cp "$0" "/home/${_username}/.local/bin"
+    chown "${_username}:${_username}" "/home/${_username}/.local/bin/$(basename "$0")"
+    exec su - "${_username}" "/home/${_username}/.local/bin/$(basename "$0")" -- "$@"
+fi
+
+if ! [[ $(command -v age) ]]; then
+    brew install age
+fi
+
+# Check if zsh is already the default shell
+if ! [[ $(command -v zsh) ]]; then
+    # Change the default shell to zsh
+    brew install zsh
+    sudo echo '/home/linuxbrew/.linuxbrew/bin/zsh' | sudo tee -a /etc/shells
+    chsh -s '/home/linuxbrew/.linuxbrew/bin/zsh'
+    echo "Default shell changed to zsh."
+    
+    # export the path again for the new shell
+    declare -x PATH="${DEFAULT_PATH}"
+fi
+
+# --- sdkman Installation ---
+if ! command -v sdk > /dev/null; then  # Check if sdkman is already installed
+    brew install zip
+    export SDKMAN_DIR="${HOME}/.local/share/sdkman" && curl -s "https://get.sdkman.io" | bash
+    
+    if [[ -d "${HOME}/.sdkman" ]] && ! [[ -d "${SDKMAN_DIR}" ]]; then
+        mv "${HOME}/.sdkman/" "${HOME}/.local/share/sdkman/"
+    fi
+    
+    # Add sdkman initialization to .zshrc (important!)
+    # shellcheck disable=SC2016
+    echo 'source "${SDKMAN_DIR}/bin/sdkman-init.sh"' >> ~/.zshrc
+    source "${SDKMAN_DIR}/bin/sdkman-init.sh" # Source for current shell
+    
+    sdk install java
+fi
+
+# --- pyenv Installation ---
+brew install pyenv
+pyenv install "${PYTHON_VERSION}"
+
+# --- Taskfile.dev Installation ---
+brew install go-task
+
+# --- nvm Installation ---
+source "${HOME}/.local/share/nvm/nvm.sh" 2>/dev/null
+brew install nvm
+nvm install --lts
+
+# activate envs for home-ops
+pyenv global "$PYTHON_VERSION"
+
+# --- chezmoi Installation ---
+brew install chezmoi
+chezmoi init --source "${HOME}/.local/share/automation/home-ops/scripts/dotfiles"
+chezmoi apply --source "${HOME}/.local/share/automation/home-ops/scripts/dotfiles"
+
+echo "Userspace installation complete."
+
