@@ -1632,12 +1632,34 @@ description = "Pexpect allows easy control of interactive console applications."
 optional = false
 python-versions = "*"
 files = [
-    {file = "pexpect-4.9.0-py2.py3-none-any.whl", hash = "sha256:7236d1e080e4936be2dc3e326cec0af72acf9212a7e1d060210e70a47e253523"},
-    {file = "pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f"},
+    {file = "parsing-2.0.4-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:ee0919535578a6177a88047d0630381b874d1c8bda96fabb734eb0c675580115"},
+    {file = "parsing-2.0.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6eefc1b9007e32824ae3503947f6e252e48bb67b2eb2e6d3ffbcee07235ca4ac"},
+    {file = "parsing-2.0.4-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:5d20562a85fc6e86ad87d71c53ad36b2af33c0e79a2055224f71a36ebcc6f307"},
+    {file = "parsing-2.0.4-cp310-cp310-win_amd64.whl", hash = "sha256:a847a9e51b3b11ea10aad723d1c534b7eb953d710b5faf3892a9c1f49d087a97"},
+    {file = "parsing-2.0.4-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:4d78a2618e57f5f0a93c8180240435e91176a17bc43b69ddc980c90f1f0a43c7"},
+    {file = "parsing-2.0.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c968acb7520518992cb43bd17f5b6b2df03fa4b28dd8feb3fd3495da7fbaa797"},
+    {file = "parsing-2.0.4-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:6a3f98f8f98cb2d3cfb278bdafea1078936e2f310a0bd6a33b1973242fc18ab8"},
+    {file = "parsing-2.0.4-cp311-cp311-win_amd64.whl", hash = "sha256:a4e71de67adba771ca759af7238851184e90ec102c5a88c07c9ac065fd48ef8b"},
+    {file = "parsing-2.0.4-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:44a9a62abb56efe6d475dfcfd5a7465fb1b7c061af3928ab30f4e6c548e033af"},
+    {file = "parsing-2.0.4-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a4bb065646c3d5dc2317aadb7d651d15acd6756977fd9e4a38da7ff3127b46da"},
+    {file = "parsing-2.0.4-cp37-cp37m-musllinux_1_1_x86_64.whl", hash = "sha256:0b3ca746d622b9e90da2ab4d63880d68936062dce43fa71ebd726e9c4aeb9f45"},
+    {file = "parsing-2.0.4-cp37-cp37m-win_amd64.whl", hash = "sha256:e34490bfa6106c7862650f38f314d16fbae26fbc1370dfb310caf05db776e7b4"},
+    {file = "parsing-2.0.4-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:1a00c05e502e9885b3d7763f285db2fa6d3f07a7e473bfcb91989d26116c216f"},
+    {file = "parsing-2.0.4-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a5109324c3d164ef75b7fabfa930be483374b37b8cd2d09d41430728d6c72590"},
+    {file = "parsing-2.0.4-cp38-cp38-musllinux_1_1_x86_64.whl", hash = "sha256:b8f91bd6c8dcfa3922a0ee91bba14e39e9d2f362fa0f6e377f2a8b2522132214"},
+    {file = "parsing-2.0.4-cp38-cp38-win_amd64.whl", hash = "sha256:d3322a3d7cefb622c5770a7683ae82e50640a5730268c2d18b862acf8378c632"},
+    {file = "parsing-2.0.4-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:5a038b21552102f9dff6430f6f68bd8d581822888f0539671660d7222d4b909d"},
+    {file = "parsing-2.0.4-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:057549b5c6c10fc889d6f4bb7bae08f03daf14e60d2db8fb7ea67acddc2911f2"},
+    {file = "parsing-2.0.4-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:bfab47b677843287be0f0eda0a86a113058bee1ff3e20fee4f3daa6e048016df"},
+    {file = "parsing-2.0.4-cp39-cp39-win_amd64.whl", hash = "sha256:b80cceb891af53be1ad9dcfb5e60e083048aa8cfa616133c46f15350a3e7e379"},
+    {file = "parsing-2.0.4.tar.gz", hash = "sha256:08ff194215366defea26e8b2b364363cdcd0d3e464b42b1d49bb86c7642ca504"},
 ]
 
 [package.dependencies]
-ptyprocess = ">=0.5"
+mypy-extensions = ">=1.0.0"
+
+[package.extras]
+test = ["flake8", "mypy (>=1.4.1)"]
 
 [[package]]
 name = "platformdirs"
@@ -3203,6 +3225,9 @@ files = [
 
 [package.dependencies]
 bracex = ">=2.1.1"
+
+[package.extras]
+watchmedo = ["PyYAML (>=3.10)"]
 
 [[package]]
 name = "wcwidth"
