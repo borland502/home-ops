@@ -193,32 +193,62 @@ tasks:
 #          fi
 
   internal:deploy:zx:
-    silent: true
-    internal: true
-    desc: Deploy the ZX scripts to the ~/.local/bin directory
+    desc: Deploy the ZX scripts to the ~/.local/bin directory as SEA scripts
+    summary: |
+      # SEA scripts
+
+      > Deploy the ZX scripts to the ~/.local/bin directory
+
+      ## Links
+      - [SEA](https://nodejs.org/api/single-executable-applications.html)
+      - [ZX](https://google.github.io/zx/getting-started)
     cmds:
-      - |-
-        # Define the source directories and the target directory
-        source_dirs=("{{.HOMEOPS_DIR}}/scripts/zx")
-        target_dir="{{.TARGET_DIR}}"
-
-        # Create the target directory if it doesn't exist
-        mkdir -p "$target_dir"
-
-        # create a shim to the script directory
-        for dir in "${source_dirs[@]}"; do
-          files=$(find "$dir" -type f)
-          for file in $files; do
-            base_name=$(basename "$file" | sed 's/\.[^.]*$//')
-
-            # missing something about heredocs in yaml
-            echo "#!/usr/bin/env zsh" > ${XDG_BIN_HOME}/${base_name}
-            echo "nvm use --lts" >> ${XDG_BIN_HOME}/${base_name}
-            echo "NODE_ENV=prod npx tsx --tsconfig "${XDG_DATA_HOME}/automation/home-ops/tsconfig.base.json" $file" >> ${XDG_BIN_HOME}/${base_name}
-
-            chmod +x ${XDG_BIN_HOME}/${base_name}
+      - cmd: |
+          # Compile all TypeScript files in the HOMEOPS_DIR/scripts/zx directory to CJS files
+          for file in $(find "{{.HOMEOPS_DIR}}/scripts/zx" -name "*.mts"); do
+            npx tsc --outDir "{{.HOMEOPS_DIR}}/scripts/dist" --module commonjs --target es2020 "$file"
           done
-        done
+      - cmd: >-
+          npx tsx --experimental-sea-config "{{.HOMEOPS_DIR}}/scripts/zx/sea-config.json"
+          > "{{.HOMEOPS_DIR}}/dist/sea-prep.blob"
+      - cmd: cp $(command -v node) "{{.HOMEOPS_DIR}}/scripts/dist/home-ops"
+      - cmd: |
+          if [[ $(uname) == "Darwin" ]]; then
+            codesign --remove-signature "{{.HOMEOPS_DIR}}/scripts/dist/home-ops"
+            npx postject "{{.HOMEOPS_DIR}}/scripts/dist/home-ops" NODE_SEA_BLOB \
+            "{{.HOMEOPS_DIR}}/scripts/dist/sea-prep.blob" --macho-segment-name NODE_SEA \
+            --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
+          else
+            npx postject "{{.HOMEOPS_DIR}}/scripts/dist/home-ops" NODE_SEA_BLOB "{{.HOMEOPS_DIR}}/scripts/dist/sea-prep.blob" --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8
+          fi
+
+  #  internal:deploy:zx:
+  #    silent: true
+  #    internal: true
+  #    desc: Deploy the ZX scripts to the ~/.local/bin directory
+  #    cmds:
+  #      - |-
+  #        # Define the source directories and the target directory
+  #        source_dirs=("{{.HOMEOPS_DIR}}/scripts/zx")
+  #        target_dir="{{.TARGET_DIR}}"
+  #
+  #        # Create the target directory if it doesn't exist
+  #        mkdir -p "$target_dir"
+  #
+  #        # create a shim to the script directory
+  #        for dir in "${source_dirs[@]}"; do
+  #          files=$(find "$dir" -type f)
+  #          for file in $files; do
+  #            base_name=$(basename "$file" | sed 's/\.[^.]*$//')
+  #
+  #            # missing something about heredocs in yaml
+  #            echo "#!/usr/bin/env zsh" > ${XDG_BIN_HOME}/${base_name}
+  #            echo "nvm use --lts" >> ${XDG_BIN_HOME}/${base_name}
+  #            echo "NODE_ENV=prod npx tsx --tsconfig "${XDG_DATA_HOME}/automation/home-ops/tsconfig.base.json" $file" >> ${XDG_BIN_HOME}/${base_name}
+  #
+  #            chmod +x ${XDG_BIN_HOME}/${base_name}
+  #          done
+  #        done
 
   sync:
     silent: true
