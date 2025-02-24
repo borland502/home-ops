@@ -46,11 +46,8 @@ tasks:
     silent: false
     internal: false
     cmds:
-      - cmd: >-
-          cat {{.XDG_DATA_HOME }}/automation/home-ops/scripts/shell/src/install_doctor_functions.sh
-          {{.XDG_DATA_HOME}}/automation/home-ops/scripts/shell/src/dasbootstrap.sh
-          {{.XDG_DATA_HOME}}/automation/home-ops/scripts/shell/src/user_install.sh >
-          scripts/shell/install.sh && chmod +x scripts/shell/install.sh
+      - cmd: ./build.sh
+    dir: "scripts/shell"
 
   mcv:pack:
     desc: Pack all the projects
@@ -116,9 +113,9 @@ tasks:
       - cmd: rsync -avzPh ~/.config ~/Library/CloudStorage/GoogleDrive-jhettenh@gmail.com/My\ Drive/.local
         platforms:
           - darwin
-      - cmd: rsync -avzPh ~/.config /srv/gdrive
+      - cmd: rsync -avzPh ~/.config $HOME/.local/state/gdrive
         platforms:
           - linux
-      - cmd: rsync -avzPh ~/.local /srv/gdrive
+      - cmd: rsync -avzPh ~/.local $HOME/.local/state/gdrive
         platforms:
           - linux

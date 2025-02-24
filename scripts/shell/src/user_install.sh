@@ -12,6 +12,10 @@ if [[ $USER == root ]]; then
     exec su - "${_username}" "/home/${_username}/.local/bin/$(basename "$0")" -- "$@"
 fi
 
+if ! [[ -f ~/.zshrc ]]; then
+    cp ../../../config/default.zshrc ~/.zshrc
+fi
+
 if ! [[ $(command -v age) ]]; then
     brew install age
 fi

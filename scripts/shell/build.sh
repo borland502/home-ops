@@ -21,7 +21,6 @@ cat "src/default_path.sh" \
 "src/install_doctor_functions.sh" \
 "src/dasbootstrap.sh" \
 "src/home-ops_install.sh" \
-"src/flatpak.sh" \
 "src/user_install.sh" \
 >> "${OUTPUT_FILE}"
 
