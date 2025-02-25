@@ -10,16 +10,4 @@ if ! [[ -f ~/.config/home-ops/default.toml ]]; then
     cp ./config/default.toml ~/.config/home-ops/default.toml
 fi
 
-# spring shell
-cd ./scripts/spring-cli || exit 2
-sdk env install
-./gradlew clean bootJar
-cd "${PREV_DIR}" || exit 2
-
-
-cd ./scripts/zx || exit 2
-brew install oven-sh/bun/bun
-nvm use
-brew install bun
-bun install
-cd "${PREV_DIR}" || exit 2
+task homeops:init

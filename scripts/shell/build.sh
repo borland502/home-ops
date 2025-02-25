@@ -20,8 +20,8 @@ echo 'echo "Starting Home-Ops Installation Script${RESET} with $(whoami) in $(pw
 cat "src/default_path.sh" \
 "src/install_doctor_functions.sh" \
 "src/dasbootstrap.sh" \
-"src/home-ops_install.sh" \
 "src/user_install.sh" \
+"src/home-ops_install.sh" \
 >> "${OUTPUT_FILE}"
 
 # Make the output file executable

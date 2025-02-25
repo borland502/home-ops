@@ -28,10 +28,10 @@ RESET=$(tput sgr0)
 declare -x PATH="${DEFAULT_PATH}"
 
 # Catch the re-run of the script in non-root mode
-source "${SDKMAN_DIR}/bin/sdkman-init.sh" 2>/dev/null
-source "${NVM_DIR}/nvm.sh" 2>/dev/null
-source "${PYENV_ROOT}/bin/pyenv" 2>/dev/null
-source "${HOME}/.local/share/pyenv/versions/${PYTHON_VERSION}/bin/activate" 2>/dev/null
+# Catch the re-run of the script in non-root mode
+source "${SDKMAN_DIR}/bin/sdkman-init.sh"
+source "${NVM_DIR}/nvm.sh"
+eval "$(pyenv init -)"
 
 if [[ -d "/home/linuxbrew/.linuxbrew" ]]; then
     sudo chown "${USER}:${USER}" -R "/home/linuxbrew/.linuxbrew" 2>/dev/null

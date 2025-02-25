@@ -1,0 +1,79 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+#https://github.com/itzalak/anvil/blob/main/taskfiles/taskfile.sdkman.yml
+
+env:
+  SDKMAN_DIR: "${XDG_DATA_HOME}/sdkman"
+  NVM_DIR: "${XDG_DATA_HOME}/nvm"
+
+vars:
+  SDKMAN: "$SDKMAN_DIR/bin/sdkman-init.sh"
+  NVM: "$NVM_DIR/nvm.sh"
+  SDK_SOURCE_CMD: "bash -c 'source {{.SDKMAN}}"
+  NVM_SOURCE_CMD: "bash -c 'source {{.NVM}}"
+
+tasks:
+  system:information:
+    desc: Print system information
+    silent: false
+    internal: true
+    status:
+      - test command -v systeminformation || npm install --global systeminformation
+    cmds:
+      - |
+        mkdir -p "${XDG_CONFIG_HOME}/home-ops"
+        systeminformation > "${XDG_CONFIG_HOME}/home-ops/host.json"
+  require:
+    desc: Ensure home-ops languages are installed
+    silent: true
+    internal: true
+    preconditions:
+      - "command -v node"
+      - "command -v npm"
+      - "command -v npx"
+      - "command -v python"
+      - "command -v java"
+    cmds:
+      - echo "All required languages are installed"
+
+  nodejs:
+    desc: Install nodejs
+    deps:
+      - require
+    cmds:
+      - brew install oven-sh/bun/bun
+      - brew install bun
+      - "{{.NVM_SOURCE_CMD}} && nvm use'"
+      - bun install
+    dir: scripts/nodejs
+
+  python:
+    desc: Install python
+    deps:
+      - require
+    cmds:
+      - brew install poetry
+      - pyenv install "$(cat .python-version)"
+      - pyenv local "$(cat .python-version)"
+      - poetry install
+    dir: scripts/python
+
+  java:
+    desc: Install java
+    deps:
+      - require
+    cmds:
+      - "{{.SDK_SOURCE_CMD}} && sdk env install'"
+      - ./gradlew bootJar
+    dir: scripts/spring-cli
+
+  init:
+    desc: Initialize the home-ops environment
+    silent: false
+    deps:
+      - task: nodejs
+      - task: python
+      - task: java
+    cmds:
+      - echo "Initialized home-ops environment"

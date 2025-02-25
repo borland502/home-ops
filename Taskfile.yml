@@ -3,17 +3,14 @@ version: "3"
 
 dotenv:
   - ${HOME}/.env
-  - ${HOME}/.zshrc
+  - ${XDG_CONFIG_HOME}/zsh/.zshrc
   - ${HOME}/.zshenv
 
 vars:
   HOME_OPS_HOME: "${XDG_DATA_HOME}/automation/home-ops"
 
 includes:
-  deploy:
-    taskfile: "./scripts/taskfiles/deploy.yaml"
   ansible:
-    internal: true
     taskfile: "./scripts/taskfiles/ansible.yaml"
   chez:
     internal: true
@@ -25,6 +22,8 @@ includes:
   install:
     internal: true
     taskfile: "./scripts/taskfiles/install/install.yaml"
+  homeops:
+    taskfile: "./scripts/taskfiles/install/homeops.yaml"
   unison:
     internal: true
     taskfile: "./scripts/taskfiles/unison.yaml"
