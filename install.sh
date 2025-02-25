@@ -31,10 +31,10 @@ RESET=$(tput sgr0)
 declare -x PATH="${DEFAULT_PATH}"
 
 # Catch the re-run of the script in non-root mode
-source "${SDKMAN_DIR}/bin/sdkman-init.sh" 2>/dev/null
-source "${NVM_DIR}/nvm.sh" 2>/dev/null
-source "${PYENV_ROOT}/bin/pyenv" 2>/dev/null
-source "${HOME}/.local/share/pyenv/versions/${PYTHON_VERSION}/bin/activate" 2>/dev/null
+# Catch the re-run of the script in non-root mode
+source "${SDKMAN_DIR}/bin/sdkman-init.sh"
+source "${NVM_DIR}/nvm.sh"
+eval "$(pyenv init -)"
 
 if [[ -d "/home/linuxbrew/.linuxbrew" ]]; then
     sudo chown "${USER}:${USER}" -R "/home/linuxbrew/.linuxbrew" 2>/dev/null
@@ -537,31 +537,6 @@ if [ ! -d "${HOME}/.local/share/automation/home-ops" ]; then
     git clone --recurse-submodules https://github.com/borland502/home-ops.git "${HOME}/.local/share/automation/home-ops"
 fi
 cd "${HOME}/.local/share/automation/home-ops" || exit 2
-# shellcheck disable=SC2148
-
-echo "Starting home-ops_install.sh with $(whoami) in $(pwd)"
-
-# install packages for home-ops
-PREV_DIR=$(pwd)
-
-if ! [[ -f ~/.config/home-ops/default.toml ]]; then
-    mkdir -p "${HOME}/.config/home-ops"
-    cp ./config/default.toml ~/.config/home-ops/default.toml
-fi
-
-# spring shell
-cd ./scripts/spring-cli || exit 2
-sdk env install
-./gradlew clean bootJar
-cd "${PREV_DIR}" || exit 2
-
-
-cd ./scripts/zx || exit 2
-brew install oven-sh/bun/bun
-nvm use
-brew install bun
-bun install
-cd "${PREV_DIR}" || exit 2
 #!/usr/bin/env bash
 
 #########
@@ -635,3 +610,16 @@ chezmoi apply --source "${HOME}/.local/share/automation/home-ops/scripts/dotfile
 
 echo "Userspace installation complete."
 
+# shellcheck disable=SC2148
+
+echo "Starting home-ops_install.sh with $(whoami) in $(pwd)"
+
+# install packages for home-ops
+PREV_DIR=$(pwd)
+
+if ! [[ -f ~/.config/home-ops/default.toml ]]; then
+    mkdir -p "${HOME}/.config/home-ops"
+    cp ./config/default.toml ~/.config/home-ops/default.toml
+fi
+
+task homeops:init
