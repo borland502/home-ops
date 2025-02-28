@@ -4,6 +4,7 @@ import * as zx from "zx";
 import config from "config";
 import * as process from "node:process";
 import { exit } from "node:process";
+import { $ } from "bun";
 
 const whichOptions = {
     path: "/bin:/usr/bin:/usr/local/bin",

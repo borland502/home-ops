@@ -6,16 +6,12 @@
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
-    "paths": {
-      "@technohouser": ["."],
-      "@technohouser/shared": ["shared/src"],
-      "@technohouser/shared/*": ["shared/src/*"]
-    },
     "isolatedModules": true,
     "composite": true,
     "declaration": true,

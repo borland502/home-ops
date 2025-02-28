@@ -1,15 +1,19 @@
 [submodule "dotfiles"]
-	path = scripts/dotfiles
-	url = https://github.com/borland502/dotfiles
+path = scripts/dotfiles
+url = https://github.com/borland502/dotfiles
+
+[submodule "dotfiles-lite"]
+path = scripts/dotfiles-lite
+url = https://github.com/borland502/dotfiles-lite
 
 [submodule "devcontainer-features"]
-	path = scripts/devcontainer-features
-	url = https://github.com/borland502/devcontainer-features
+path = scripts/devcontainer-features
+url = https://github.com/borland502/devcontainer-features
 
 [submodule "technohouser"]
-	path = scripts/ansible/collections/ansible_collections/technohouser
-	url = https://github.com/borland502/technohouser
+path = scripts/ansible/collections/ansible_collections/technohouser
+url = https://github.com/borland502/technohouser
 
 [submodule "spring-cli"]
-	path = scripts/spring-cli
-	url = https://github.com/borland502/spring-cli
+path = scripts/spring-cli
+url = https://github.com/borland502/spring-cli
